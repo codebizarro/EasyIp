@@ -1,0 +1,8 @@
+syntax: glob
+Package/Bin/**
+Package/Dcu/**
+Tests/Bin/**
+Tests/Dcu/**
+*.~dpk
+*.~bpg
+*.~pas
