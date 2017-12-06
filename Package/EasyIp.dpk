@@ -34,6 +34,7 @@ contains
   EasyIpExceptions in 'Source\EasyIpExceptions.pas',
   EasyIpPacket in 'Source\EasyIpPacket.pas',
   EasyIpHelpers in 'Source\EasyIpHelpers.pas',
-  EasyIpChannel in 'Source\EasyIpChannel.pas';
+  EasyIpChannel in 'Source\EasyIpChannel.pas',
+  EasyIpCommonTypes in 'Source\EasyIpCommonTypes.pas';
 
 end.
