@@ -30,7 +30,6 @@ requires
 contains
   EasyIpCient in 'Source\EasyIpCient.pas',
   EasyIpConstants in 'Source\EasyIpConstants.pas',
-  EasyIpEnums in 'Source\EasyIpEnums.pas',
   EasyIpExceptions in 'Source\EasyIpExceptions.pas',
   EasyIpPacket in 'Source\EasyIpPacket.pas',
   EasyIpHelpers in 'Source\EasyIpHelpers.pas',
