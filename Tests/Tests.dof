@@ -43,7 +43,7 @@ OutputDir=.\Bin
 UnitOutputDir=.\Dcu
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=.\Sources
+SearchPath=.\Source;..\Package\Source
 Packages=Vcl50;Vclx50;VclSmp50;Vcldb50;vclado50;Vclbde50;vcldbx50;Qrpt50;Vclmid50;vclie50;Inetdb50;Inet50;NMFast50;webmid50;dclocx50;CryptPack;DclYuPack;LogPack;IcsDel50;FlexCel50;FlexCelXLS50;Indy50;tdbf_d5r;TeeUI85;Tee85;TeeDB85;TeeGL85;TeeQR85;TeePro85;TeeLanguage85;A258_R50;RxCtl5;JvStringGrig1;TwoDesk_D5R;K102_R50;GridPackd5
 Conditionals=
 DebugSourceDirs=
@@ -83,10 +83,12 @@ Item0=DEBUG
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=3
-Item0=.\Sources
-Item1=\Sources
-Item2=.\include
+Count=5
+Item0=.\Source
+Item1=.\Source;..\Package\Source
+Item2=.\Sources
+Item3=\Sources
+Item4=.\include
 [HistoryLists\hlUnitOutputDirectory]
 Count=2
 Item0=.\Dcu
@@ -95,3 +97,9 @@ Item1=\Dcu
 Count=2
 Item0=.\Bin
 Item1=\Bin
+[HistoryLists\hlBPLOutput]
+Count=1
+Item0=.\Bin
+[HistoryLists\hlDCPOutput]
+Count=1
+Item0=.\Bin

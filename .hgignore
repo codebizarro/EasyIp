@@ -6,3 +6,4 @@ Tests/Dcu/**
 *.~dpk
 *.~bpg
 *.~pas
+*.~dpr

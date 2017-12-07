@@ -1,11 +1,16 @@
 program Tests;
-{$APPTYPE CONSOLE}
+
 uses
   SysUtils,
+  Forms,
+  TestFrameWork,
+  GUITestRunner,
   ChannelTests in 'Source\ChannelTests.pas',
   ClientTests in 'Source\ClientTests.pas',
   UnitTests in 'Source\UnitTests.pas';
 
 begin
-  // Insert user code here
+  Application.Initialize;
+  GUITestRunner.RunRegisteredTests;
 end.
+
