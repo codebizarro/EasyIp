@@ -10,20 +10,27 @@ type
     function Execute(buffer: TByteArray): TByteArray;
   end;
 
-  TMockChannel = class(TInterfacedObject, IChannel)
+  TCustomChannel = class(TInterfacedObject, IChannel)
   private
+  protected
     FHost: string;
     FPort: int;
-  protected
   public
     constructor Create(host: string; port: int); overload;
+    function Execute(buffer: TByteArray): TByteArray; virtual; abstract;
+  end;
+
+  TMockChannel = class(TCustomChannel)
+  private
+  protected
+  public
     destructor Destroy; override;
-    function Execute(buffer: TByteArray): TByteArray;
+    function Execute(buffer: TByteArray): TByteArray; override;
   end;
 
 implementation
 
-constructor TMockChannel.Create(host: string; port: int);
+constructor TCustomChannel.Create(host: string; port: int);
 begin
   inherited Create;
   FHost := host;

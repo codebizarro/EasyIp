@@ -29,7 +29,7 @@ class function TPacketFactory.GetReadPacket(offset: short; dataType, length: byt
 var
   tempArray: TByteArray;
 begin
-  //ZeroMemory(Pointer(@Result.Data), Length(Result.Data));
+  //TODO: fill Data with zeroes
 
   with Result do
   begin
@@ -50,7 +50,8 @@ end;
 
 class function TPacketFactory.GetWritePacket(offset: short; dataType, length: byte): TEasyIpPacket;
 begin
-
+  //TODO: fill Data with zeroes
+  
   with Result do
   begin
     Flags := 0;

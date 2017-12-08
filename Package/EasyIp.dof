@@ -37,7 +37,7 @@ RemoteSymbols=0
 MinStackSize=16384
 MaxStackSize=1048576
 ImageBase=4194304
-ExeDescription=
+ExeDescription=EasyIp protocol implementation
 [Directories]
 OutputDir=
 UnitOutputDir=.\Dcu
