@@ -7,3 +7,7 @@ Tests/Dcu/**
 *.~bpg
 *.~pas
 *.~dpr
+*.dcu
+*.exe
+*.dll
+*.bpl
