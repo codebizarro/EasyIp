@@ -3,9 +3,9 @@ unit EasyIpCommonTypes;
 interface
 
 type
-  PByteArray =  ^TByteArray;
+  PEiByteArray =  ^TEiByteArray;
 
-  TByteArray = array of Byte;
+  TEiByteArray = array of Byte;
 
   bool = Boolean;
 
@@ -24,4 +24,10 @@ type
 implementation
 
 end.
+
+
+
+
+
+
 

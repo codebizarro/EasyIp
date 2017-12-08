@@ -4,6 +4,7 @@ interface
 
 uses
   Windows,
+  SysUtils,
   EasyIpCommonTypes,
   EasyIpConstants,
   EasyIpPacket;
@@ -17,8 +18,8 @@ type
 
   TPacketAdapter = class
   public
-    class function ToByteArray(packet: TEasyIpPacket): TByteArray;
-    class function ToEasyIpPacket(buffer: TByteArray): TEasyIpPacket;
+    class function ToByteArray(packet: TEasyIpPacket): TEiByteArray;
+    class function ToEasyIpPacket(buffer: TEiByteArray): TEasyIpPacket;
   end;
 
 implementation
@@ -27,7 +28,7 @@ implementation
 
 class function TPacketFactory.GetReadPacket(offset: short; dataType, length: byte): TEasyIpPacket;
 var
-  tempArray: TByteArray;
+  tempArray: TEiByteArray;
 begin
   //TODO: fill Data with zeroes
 
@@ -69,16 +70,16 @@ begin
   end;
 end;
 
-class function TPacketAdapter.ToByteArray(packet: TEasyIpPacket): TByteArray;
+class function TPacketAdapter.ToByteArray(packet: TEasyIpPacket): TEiByteArray;
 var
-  tBuffer: TByteArray;
+  tBuffer: TEiByteArray;
 begin
   SetLength(tBuffer, SizeOf(packet));
   CopyMemory(tBuffer, @packet, SizeOf(packet));
   Result := tBuffer;
 end;
 
-class function TPacketAdapter.ToEasyIpPacket(buffer: TByteArray): TEasyIpPacket;
+class function TPacketAdapter.ToEasyIpPacket(buffer: TEiByteArray): TEasyIpPacket;
 var
   tPacket: TEasyIpPacket;
 begin

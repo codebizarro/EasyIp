@@ -18,7 +18,7 @@ type
   private
     FChannel: IChannel;
     FSendPacket: TEasyIpPacket;
-    FSendBuffer: TByteArray;
+    FSendBuffer: TEiByteArray;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -46,7 +46,7 @@ end;
 
 procedure TChannelTest.TestExecute;
 var
-  receiveBuffer: TByteArray;
+  receiveBuffer: TEiByteArray;
   receivePacket: TEasyIpPacket;
 begin
   receiveBuffer := FChannel.Execute(FSendBuffer);
