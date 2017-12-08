@@ -3,6 +3,8 @@ unit EasyIpCommonTypes;
 interface
 
 type
+  PByteArray =  ^TByteArray;
+
   TByteArray = array of Byte;
 
   bool = Boolean;
