@@ -28,11 +28,12 @@ implementation
 
 class function TPacketFactory.GetReadPacket(offset: short; dataType, length: byte): TEasyIpPacket;
 var
-  tempArray: TEiByteArray;
+  packet: TEasyIpPacket;
 begin
   //TODO: fill Data with zeroes
-
-  with Result do
+  ZeroMemory(@packet, SizeOf(packet));
+  //SetLength(Result.Data, length);
+  with packet do
   begin
     Flags := 0;
     Error := 0;
@@ -47,12 +48,13 @@ begin
     RequestDataOffsetServer := offset;
     RequestDataOffsetClient := 0;
   end;
+  Result := packet;
 end;
 
 class function TPacketFactory.GetWritePacket(offset: short; dataType, length: byte): TEasyIpPacket;
 begin
   //TODO: fill Data with zeroes
-  
+  //SetLength(Result.Data, length);
   with Result do
   begin
     Flags := 0;

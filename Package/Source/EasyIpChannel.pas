@@ -89,21 +89,25 @@ var
   error: Cardinal;
   receiveBuffer: TEiByteArray;
 begin
-  WSAStartup($101, Init);
+  WSAStartup($101, init);
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
   target.sin_port := htons(FPort);
   target.sin_addr.S_addr := inet_addr(PChar(FHost));
   target.sa_family := AF_INET;
+  FillChar(target.sin_zero,SizeOf(target.sin_zero),0);
   error := connect(sock, target, SizeOf(target));
   if (error = SOCKET_ERROR) then
     raise Exception.Create('Socket error');
 
-  error := send(sock, buffer, EASYIP_HEADERSIZE, 0);
-  error := recv(sock, receiveBuffer, sizeof(receiveBuffer), 0);
+  SetLength(receiveBuffer, Length(buffer));
+  SetLength(Result, Length(buffer));
 
-  closesocket(sock);
+  error := send(sock, buffer, Length(buffer), 0);
+
+  error := recv(sock, Result, Length(buffer), 0);
+
+  //closesocket(sock);
   WSACleanup;
-  Result := receiveBuffer;
 end;
 
 end.
