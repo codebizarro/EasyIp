@@ -9,6 +9,7 @@ uses
   EasyIpHelpers,
   Classes,
   SysUtils,
+  Windows,
   WinSock;
 
 type
@@ -82,39 +83,27 @@ end;
 
 function TUdpChannel.Execute(buffer: TEiByteArray): TEiByteArray;
 var
-  Init: TWSAData;
-//  SockOpt: BOOL;
+  init: TWSAData;
   sock: TSocket;
   target: TSockAddrIn;
-  err: Cardinal;
-  sendPacket: TEasyIpPacket;
-  recvPacket: TEasyIpPacket;
+  error: Cardinal;
+  receiveBuffer: TEiByteArray;
 begin
-  {
   WSAStartup($101, Init);
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-//  SockOpt:=TRUE;
-//  SetSockOpt(sock,SOL_SOCKET,SO_BROADCAST, PChar(@SockOpt),SizeOf(SockOpt)) ;
-  target.sin_port := htons(EASYIP_PORT);
+  target.sin_port := htons(FPort);
   target.sin_addr.S_addr := inet_addr(PChar(FHost));
   target.sa_family := AF_INET;
-  err := connect(sock, target, SizeOf(target));
-  if (err = SOCKET_ERROR) then
+  error := connect(sock, target, SizeOf(target));
+  if (error = SOCKET_ERROR) then
     raise Exception.Create('Socket error');
 
-  ZeroMemory(@sendPacket, SizeOf(sendPacket));
-  ZeroMemory(@recvPacket, SizeOf(recvPacket));
-
-  sendPacket.RequestDataType := EASYIP_TYPE_FLAGWORD;
-  sendPacket.RequestDataSize := 3;
-  sendPacket.RequestDataOffsetServer := 0;
-
-  err := send(sock, sendPacket, EASYIP_HEADERSIZE, 0);
-  err := recv(sock, recvPacket, sizeof(recvPacket), 0);
+  error := send(sock, buffer, EASYIP_HEADERSIZE, 0);
+  error := recv(sock, receiveBuffer, sizeof(receiveBuffer), 0);
 
   closesocket(sock);
   WSACleanup;
-  }
+  Result := receiveBuffer;
 end;
 
 end.
