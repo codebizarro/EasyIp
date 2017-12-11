@@ -97,7 +97,8 @@ var
   sock: TSocket;
   target: TSockAddrIn;
   returnCode: Cardinal;
-  receiveBuffer: TEiByteArray;
+  sendBuffer: TEiByteArray;
+  recvBuffer: TEiByteArray;
   lenFrom: int;
 begin
   WSAStartup($101, init);
@@ -112,18 +113,20 @@ begin
   if (returnCode = SOCKET_ERROR) then
     raise Exception.Create('Socket error');
 
-  SetLength(receiveBuffer, Length(buffer));
+  SetLength(sendBuffer, Length(buffer));
+  SetLength(recvBuffer, Length(buffer));
+  sendBuffer := buffer;
 
   //returnCode := send(sock, Pointer(buffer)^, Length(buffer), 0);
   //returnCode := recv(sock, Pointer(receiveBuffer)^, Length(receiveBuffer), 0);
 
-  returnCode := sendto(sock, Pointer(buffer)^, Length(buffer), 0, target, Length(buffer));
-  lenFrom := Length(receiveBuffer);
-  returnCode := recvfrom(sock, Pointer(receiveBuffer)^, Length(receiveBuffer), 0, target, lenFrom);
+  returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, target, Length(sendBuffer));
+  lenFrom := Length(recvBuffer);
+  returnCode := recvfrom(sock, Pointer(recvBuffer)^, Length(recvBuffer), 0, target, lenFrom);
 
   closesocket(sock);
   WSACleanup;
-  Result := receiveBuffer;
+  Result := recvBuffer;
 end;
 
 function TEasyIpChannel.Execute(packet: TEasyIpPacket): TEasyIpPacket;
