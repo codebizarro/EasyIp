@@ -75,9 +75,13 @@ end;
 class function TPacketAdapter.ToByteArray(packet: TEasyIpPacket): TEiByteArray;
 var
   tBuffer: TEiByteArray;
+  bufferLength: int;
 begin
-  SetLength(tBuffer, SizeOf(packet));
-  CopyMemory(tBuffer, @packet, SizeOf(packet));
+  bufferLength := EASYIP_HEADERSIZE;
+  if packet.SendDataSize > 0 then
+    bufferLength := bufferLength + packet.SendDataSize * SHORT_SIZE;
+  SetLength(tBuffer, bufferLength);
+  CopyMemory(tBuffer, @packet, bufferLength);
   Result := tBuffer;
 end;
 
