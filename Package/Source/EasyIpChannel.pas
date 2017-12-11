@@ -14,15 +14,19 @@ uses
 
 type
   IChannel = interface
-    function Execute(buffer: TEiByteArray): TEiByteArray; overload;
-    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload;
+    function Execute(buffer: TEiByteArray): TEiByteArray;
   end;
 
-  TCustomChannel = class(TInterfacedObject, IChannel)
+  IEasyIpChannel = interface
+    function Execute(packet: TEasyIpPacket): TEasyIpPacket;
+  end;
+
+  TCustomChannel = class(TInterfacedObject, IChannel, IEasyIpChannel)
   private
   protected
     FHost: string;
     FPort: int;
+    FTarget: TSockAddrIn;
   public
     constructor Create(host: string; port: int); overload;
     function Execute(buffer: TEiByteArray): TEiByteArray; overload; virtual; abstract;
@@ -55,6 +59,10 @@ begin
   inherited Create;
   FHost := host;
   FPort := port;
+  ZeroMemory(@FTarget, SizeOf(FTarget));
+  FTarget.sin_port := htons(FPort);
+  FTarget.sin_addr.S_addr := inet_addr(PChar(FHost));
+  FTarget.sa_family := AF_INET;
 end;
 
 destructor TMockChannel.Destroy;
@@ -95,7 +103,6 @@ function TEasyIpChannel.Execute(buffer: TEiByteArray): TEiByteArray;
 var
   init: TWSAData;
   sock: TSocket;
-  target: TSockAddrIn;
   returnCode: Cardinal;
   sendBuffer: TEiByteArray;
   recvBuffer: TEiByteArray;
@@ -104,12 +111,7 @@ begin
   WSAStartup($101, init);
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-  ZeroMemory(@target, SizeOf(target));
-  target.sin_port := htons(FPort);
-  target.sin_addr.S_addr := inet_addr(PChar(FHost));
-  target.sa_family := AF_INET;
-
-  returnCode := connect(sock, target, SizeOf(target));
+  returnCode := connect(sock, FTarget, SizeOf(FTarget));
   if (returnCode = SOCKET_ERROR) then
     raise Exception.Create('Socket error');
 
@@ -120,9 +122,9 @@ begin
   //returnCode := send(sock, Pointer(buffer)^, Length(buffer), 0);
   //returnCode := recv(sock, Pointer(receiveBuffer)^, Length(receiveBuffer), 0);
 
-  returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, target, Length(sendBuffer));
+  returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, FTarget, Length(sendBuffer));
   lenFrom := Length(recvBuffer);
-  returnCode := recvfrom(sock, Pointer(recvBuffer)^, Length(recvBuffer), 0, target, lenFrom);
+  returnCode := recvfrom(sock, Pointer(recvBuffer)^, Length(recvBuffer), 0, FTarget, lenFrom);
 
   closesocket(sock);
   WSACleanup;
@@ -133,7 +135,6 @@ function TEasyIpChannel.Execute(packet: TEasyIpPacket): TEasyIpPacket;
 var
   init: TWSAData;
   sock: TSocket;
-  target: TSockAddrIn;
   returnCode: Cardinal;
   sendPacket: TEasyIpPacket;
   recvPacket: TEasyIpPacket;
@@ -143,12 +144,7 @@ begin
 
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-  ZeroMemory(@target, SizeOf(target));
-  target.sin_port := htons(FPort);
-  target.sin_addr.S_addr := inet_addr(PChar(FHost));
-  target.sa_family := AF_INET;
-
-  returnCode := connect(sock, target, SizeOf(target));
+  returnCode := connect(sock, FTarget, SizeOf(FTarget));
   if (returnCode = SOCKET_ERROR) then
     raise Exception.Create('Socket error');
 
@@ -160,9 +156,9 @@ begin
   //err := send(sock, sendPacket, EASYIP_HEADERSIZE, 0);
   //err := recv(sock, recvPacket, sizeof(recvPacket), 0);
 
-  returnCode := sendto(sock, sendPacket, SizeOf(sendPacket), 0, target, SizeOf(sendPacket));
+  returnCode := sendto(sock, sendPacket, SizeOf(sendPacket), 0, FTarget, SizeOf(sendPacket));
   lenFrom := SizeOf(recvPacket);
-  returnCode := recvfrom(sock, recvPacket, sizeof(recvPacket), 0, target, lenFrom);
+  returnCode := recvfrom(sock, recvPacket, sizeof(recvPacket), 0, FTarget, lenFrom);
 
   closesocket(sock);
   WSACleanup;

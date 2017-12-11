@@ -11,12 +11,14 @@ uses
   EasyIpPacket,
   EasyIpHelpers,
   EasyIpChannel,
-  TestFramework , WinSock;
+  TestFramework,
+  WinSock;
 
 type
   TChannelTest = class(TTestCase)
   private
-    FChannel: IChannel;
+    FBufferChannel: IChannel;
+    FPacketChannel: IEasyIpChannel;
     FSendPacket: TEasyIpPacket;
     FSendBuffer: TEiByteArray;
   protected
@@ -35,7 +37,8 @@ procedure TChannelTest.SetUp;
 begin
   inherited;
 //  FChannel := TMockChannel.Create('127.0.0.1', EASYIP_PORT);
-  FChannel := TEasyIpChannel.Create('10.20.0.104', EASYIP_PORT);
+  FBufferChannel := TEasyIpChannel.Create('10.20.0.104', EASYIP_PORT);
+  FPacketChannel := TEasyIpChannel.Create('10.20.0.104', EASYIP_PORT);
   FSendPacket := TPacketFactory.GetReadPacket(0, EASYIP_TYPE_FLAGWORD, 20);
   FSendBuffer := TPacketAdapter.ToByteArray(FSendPacket);
 end;
@@ -51,7 +54,7 @@ var
   receiveBuffer: TEiByteArray;
   receivePacket: TEasyIpPacket;
 begin
-  receiveBuffer := FChannel.Execute(FSendBuffer);
+  receiveBuffer := FBufferChannel.Execute(FSendBuffer);
 
   Check(receiveBuffer <> nil);
   Check(Length(FSendBuffer) = Length(receiveBuffer));
@@ -64,7 +67,7 @@ procedure TChannelTest.TestExecuteRecord;
 var
   receivePacket: TEasyIpPacket;
 begin
-  receivePacket := FChannel.Execute(FSendPacket);
+  receivePacket := FPacketChannel.Execute(FSendPacket);
 
   Check(SizeOf(receivePacket) > 0);
   Check(SizeOf(receivePacket) = SizeOf(FSendPacket));
