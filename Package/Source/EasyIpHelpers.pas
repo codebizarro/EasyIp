@@ -77,9 +77,9 @@ var
   tBuffer: TEiByteArray;
   bufferLength: int;
 begin
-  bufferLength := EASYIP_HEADERSIZE;
-  if packet.SendDataSize > 0 then
-    bufferLength := bufferLength + packet.SendDataSize * SHORT_SIZE;
+  bufferLength := EASYIP_HEADERSIZE + packet.RequestDataSize * SHORT_SIZE + packet.SendDataSize * SHORT_SIZE;
+//  if packet.SendDataSize > 0 then
+//    bufferLength := bufferLength + packet.SendDataSize * SHORT_SIZE;
   SetLength(tBuffer, bufferLength);
   CopyMemory(tBuffer, @packet, bufferLength);
   Result := tBuffer;

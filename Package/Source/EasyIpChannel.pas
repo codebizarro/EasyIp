@@ -15,7 +15,7 @@ uses
 type
   IChannel = interface
     function Execute(buffer: TEiByteArray): TEiByteArray; overload;
-    function Execute(buffer: TEasyIpPacket): TEasyIpPacket; overload;
+    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload;
   end;
 
   TCustomChannel = class(TInterfacedObject, IChannel)
@@ -26,7 +26,7 @@ type
   public
     constructor Create(host: string; port: int); overload;
     function Execute(buffer: TEiByteArray): TEiByteArray; overload; virtual; abstract;
-    function Execute(buffer: TEasyIpPacket): TEasyIpPacket; overload; virtual; abstract;
+    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; virtual; abstract;
   end;
 
   TMockChannel = class(TCustomChannel)
@@ -35,7 +35,7 @@ type
   public
     destructor Destroy; override;
     function Execute(buffer: TEiByteArray): TEiByteArray; overload; override;
-    function Execute(buffer: TEasyIpPacket): TEasyIpPacket; overload; override;
+    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; override;
   end;
 
   TEasyIpChannel = class(TCustomChannel)
@@ -45,7 +45,7 @@ type
     constructor Create(host: string; port: int); overload;
     destructor Destroy; override;
     function Execute(buffer: TEiByteArray): TEiByteArray; override;
-    function Execute(buffer: TEasyIpPacket): TEasyIpPacket; overload; override;
+    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; override;
   end;
 
 implementation
@@ -73,10 +73,10 @@ begin
   Result := temp;
 end;
 
-function TMockChannel.Execute(buffer: TEasyIpPacket): TEasyIpPacket;
+function TMockChannel.Execute(packet: TEasyIpPacket): TEasyIpPacket;
 begin
-  buffer.Flags := $80;
-  Result := buffer;
+  packet.Flags := $80;
+  Result := packet;
 end;
 
 constructor TEasyIpChannel.Create(host: string; port: int);
@@ -96,38 +96,37 @@ var
   init: TWSAData;
   sock: TSocket;
   target: TSockAddrIn;
-  error: Cardinal;
-  //localBuffer: TEiByteArray;
-  localBuffer: array[0..1024 - 1] of Byte;
+  returnCode: Cardinal;
+  receiveBuffer: TEiByteArray;
   lenFrom: int;
 begin
   WSAStartup($101, init);
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+  ZeroMemory(@target, SizeOf(target));
   target.sin_port := htons(FPort);
   target.sin_addr.S_addr := inet_addr(PChar(FHost));
   target.sa_family := AF_INET;
-  //FillChar(target.sin_zero,SizeOf(target.sin_zero),0);
-  error := connect(sock, target, SizeOf(target));
-  if (error = SOCKET_ERROR) then
+
+  returnCode := connect(sock, target, SizeOf(target));
+  if (returnCode = SOCKET_ERROR) then
     raise Exception.Create('Socket error');
 
-//  SetLength(localBuffer, Length(buffer));
-  ZeroMemory(@localBuffer, Length(localBuffer));
-  //localBuffer := buffer;
-  lenFrom := SizeOf(buffer);
-  lenFrom := Length(buffer);
-  error := send(sock, buffer, Length(buffer), 0);
-  //lenFrom := SizeOf(localBuffer);
-  lenFrom := Length(localBuffer);
-  //error := recvfrom(sock, localBuffer, Length(localBuffer), 0, target, lenFrom);
-  error := recv(sock, localBuffer[0], 1024 {Length(buffer)}, 0);
+  SetLength(receiveBuffer, Length(buffer));
+
+  //returnCode := send(sock, Pointer(buffer)^, Length(buffer), 0);
+  //returnCode := recv(sock, Pointer(receiveBuffer)^, Length(receiveBuffer), 0);
+
+  returnCode := sendto(sock, Pointer(buffer)^, Length(buffer), 0, target, Length(buffer));
+  lenFrom := Length(receiveBuffer);
+  returnCode := recvfrom(sock, Pointer(receiveBuffer)^, Length(receiveBuffer), 0, target, lenFrom);
 
   closesocket(sock);
   WSACleanup;
-  //Result := localBuffer;
+  Result := receiveBuffer;
 end;
 
-function TEasyIpChannel.Execute(buffer: TEasyIpPacket): TEasyIpPacket;
+function TEasyIpChannel.Execute(packet: TEasyIpPacket): TEasyIpPacket;
 var
   init: TWSAData;
   sock: TSocket;
@@ -141,7 +140,6 @@ begin
 
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-  //FillChar(target, SizeOf(target), 0); //target.sin_zero
   ZeroMemory(@target, SizeOf(target));
   target.sin_port := htons(FPort);
   target.sin_addr.S_addr := inet_addr(PChar(FHost));
@@ -154,7 +152,7 @@ begin
   ZeroMemory(@sendPacket, SizeOf(sendPacket));
   ZeroMemory(@recvPacket, SizeOf(recvPacket));
 
-  sendPacket := buffer;
+  sendPacket := packet;
 
   //err := send(sock, sendPacket, EASYIP_HEADERSIZE, 0);
   //err := recv(sock, recvPacket, sizeof(recvPacket), 0);
