@@ -38,7 +38,7 @@ type
     function Execute(buffer: TEasyIpPacket): TEasyIpPacket; overload; override;
   end;
 
-  TUdpChannel = class(TCustomChannel)
+  TEasyIpChannel = class(TCustomChannel)
   private
   protected
   public
@@ -79,19 +79,19 @@ begin
   Result := buffer;
 end;
 
-constructor TUdpChannel.Create(host: string; port: int);
+constructor TEasyIpChannel.Create(host: string; port: int);
 begin
   inherited Create(host, port);
 
 end;
 
-destructor TUdpChannel.Destroy;
+destructor TEasyIpChannel.Destroy;
 begin
   inherited;
 
 end;
 
-function TUdpChannel.Execute(buffer: TEiByteArray): TEiByteArray;
+function TEasyIpChannel.Execute(buffer: TEiByteArray): TEiByteArray;
 var
   init: TWSAData;
   sock: TSocket;
@@ -127,7 +127,7 @@ begin
   //Result := localBuffer;
 end;
 
-function TUdpChannel.Execute(buffer: TEasyIpPacket): TEasyIpPacket;
+function TEasyIpChannel.Execute(buffer: TEasyIpPacket): TEasyIpPacket;
 var
   init: TWSAData;
   sock: TSocket;
@@ -141,7 +141,8 @@ begin
 
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-  FillChar(target.sin_zero,SizeOf(target.sin_zero),0);
+  //FillChar(target, SizeOf(target), 0); //target.sin_zero
+  ZeroMemory(@target, SizeOf(target));
   target.sin_port := htons(FPort);
   target.sin_addr.S_addr := inet_addr(PChar(FHost));
   target.sa_family := AF_INET;
@@ -158,7 +159,7 @@ begin
   //err := send(sock, sendPacket, EASYIP_HEADERSIZE, 0);
   //err := recv(sock, recvPacket, sizeof(recvPacket), 0);
 
-  returnCode := sendto(sock, sendPacket, EASYIP_HEADERSIZE, 0, target, SizeOf(sendPacket));
+  returnCode := sendto(sock, sendPacket, SizeOf(sendPacket), 0, target, SizeOf(sendPacket));
   lenFrom := SizeOf(recvPacket);
   returnCode := recvfrom(sock, recvPacket, sizeof(recvPacket), 0, target, lenFrom);
 
