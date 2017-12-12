@@ -8,10 +8,12 @@ uses
   Classes,
   EasyIpCommonTypes,
   EasyIpConstants,
+  EasyIpExceptions,
   EasyIpPacket,
   EasyIpHelpers,
   EasyIpChannel,
   TestFramework,
+  TestExtensions,
   WinSock;
 
 type
@@ -61,6 +63,7 @@ begin
 
   receivePacket := TPacketAdapter.ToEasyIpPacket(receiveBuffer);
   Check(receivePacket.Error = 0);
+  Check(receivePacket.Flags = EASYIP_FLAG_RESPONSE);
 end;
 
 procedure TChannelTest.TestExecuteRecord;
@@ -72,10 +75,12 @@ begin
   Check(SizeOf(receivePacket) > 0);
   Check(SizeOf(receivePacket) = SizeOf(FSendPacket));
   Check(receivePacket.Error = 0);
+  Check(receivePacket.Flags = EASYIP_FLAG_RESPONSE);
 end;
 
 initialization
-  TestFramework.RegisterTest(TChannelTest.Suite);
+  //TestFramework.RegisterTest(TChannelTest.Suite);
+  TestFramework.RegisterTest(TRepeatedTest.Create(TChannelTest.Suite, 10));
 
 end.
 
