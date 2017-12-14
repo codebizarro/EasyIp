@@ -22,7 +22,7 @@ type
     FBufferChannel: IChannel;
     FPacketChannel: IEasyIpChannel;
     FSendPacket: TEasyIpPacket;
-    FSendBuffer: TEiByteArray;
+    FSendBuffer: TDynamicByteArray;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -53,7 +53,7 @@ end;
 
 procedure TChannelTest.TestExecuteBuffer;
 var
-  receiveBuffer: TEiByteArray;
+  receiveBuffer: TDynamicByteArray;
   receivePacket: TEasyIpPacket;
 begin
   receiveBuffer := FBufferChannel.Execute(FSendBuffer);
@@ -80,7 +80,7 @@ end;
 
 initialization
   //TestFramework.RegisterTest(TChannelTest.Suite);
-  TestFramework.RegisterTest(TRepeatedTest.Create(TChannelTest.Suite, 10));
+  TestFramework.RegisterTest(TRepeatedTest.Create(TChannelTest.Suite, 1));
 
 end.
 

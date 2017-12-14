@@ -18,8 +18,8 @@ type
 
   TPacketAdapter = class
   public
-    class function ToByteArray(packet: TEasyIpPacket): TEiByteArray;
-    class function ToEasyIpPacket(buffer: TEiByteArray): TEasyIpPacket;
+    class function ToByteArray(packet: TEasyIpPacket): TDynamicByteArray;
+    class function ToEasyIpPacket(buffer: TDynamicByteArray): TEasyIpPacket;
   end;
 
 implementation
@@ -70,9 +70,9 @@ begin
   Result := packet;
 end;
 
-class function TPacketAdapter.ToByteArray(packet: TEasyIpPacket): TEiByteArray;
+class function TPacketAdapter.ToByteArray(packet: TEasyIpPacket): TDynamicByteArray;
 var
-  tBuffer: TEiByteArray;
+  tBuffer: TDynamicByteArray;
   bufferLength: int;
 begin
   bufferLength := EASYIP_HEADERSIZE + packet.RequestDataSize * SHORT_SIZE + packet.SendDataSize * SHORT_SIZE;
@@ -83,7 +83,7 @@ begin
   Result := tBuffer;
 end;
 
-class function TPacketAdapter.ToEasyIpPacket(buffer: TEiByteArray): TEasyIpPacket;
+class function TPacketAdapter.ToEasyIpPacket(buffer: TDynamicByteArray): TEasyIpPacket;
 var
   tPacket: TEasyIpPacket;
 begin

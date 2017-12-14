@@ -3,9 +3,9 @@ unit EasyIpCommonTypes;
 interface
 
 type
-  PEiByteArray =  ^TEiByteArray;
+  PDynamicByteArray =  ^TDynamicByteArray;
 
-  TEiByteArray = array of Byte;
+  TDynamicByteArray = array of Byte;
 
   bool = Boolean;
 

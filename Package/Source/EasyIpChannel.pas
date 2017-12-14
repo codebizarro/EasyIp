@@ -5,6 +5,7 @@ interface
 uses
   EasyIpCommonTypes,
   EasyIpConstants,
+  EasyIpExceptions,
   EasyIpPacket,
   EasyIpHelpers,
   Classes,
@@ -14,7 +15,7 @@ uses
 
 type
   IChannel = interface
-    function Execute(buffer: TEiByteArray): TEiByteArray;
+    function Execute(buffer: TDynamicByteArray): TDynamicByteArray;
   end;
 
   IEasyIpChannel = interface
@@ -27,9 +28,11 @@ type
     FHost: string;
     FPort: int;
     FTarget: TSockAddrIn;
+    //FTimeout: int; //using it occurs AV 0_o
+    function GetLastErrorString(): string;
   public
     constructor Create(host: string; port: int); overload;
-    function Execute(buffer: TEiByteArray): TEiByteArray; overload; virtual; abstract;
+    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; overload; virtual; abstract;
     function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; virtual; abstract;
   end;
 
@@ -38,7 +41,7 @@ type
   protected
   public
     destructor Destroy; override;
-    function Execute(buffer: TEiByteArray): TEiByteArray; overload; override;
+    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; overload; override;
     function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; override;
   end;
 
@@ -48,17 +51,21 @@ type
   public
     constructor Create(host: string; port: int); overload;
     destructor Destroy; override;
-    function Execute(buffer: TEiByteArray): TEiByteArray; override;
+    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; override;
     function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; override;
   end;
 
 implementation
+
+var
+  FTimeout: int; //TODO: temporary
 
 constructor TCustomChannel.Create(host: string; port: int);
 begin
   inherited Create;
   FHost := host;
   FPort := port;
+  FTimeout := 2000;
   ZeroMemory(@FTarget, SizeOf(FTarget));
   FTarget.sin_port := htons(FPort);
   FTarget.sin_addr.S_addr := inet_addr(PChar(FHost));
@@ -71,9 +78,17 @@ begin
 
 end;
 
-function TMockChannel.Execute(buffer: TEiByteArray): TEiByteArray;
+function TCustomChannel.GetLastErrorString: string;
 var
-  temp: TEiByteArray;
+  Buffer: array[0..2047] of Char;
+begin
+  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nil, WSAGetLastError, $400, @Buffer, SizeOf(Buffer), nil);
+  Result := Buffer;
+end;
+
+function TMockChannel.Execute(buffer: TDynamicByteArray): TDynamicByteArray;
+var
+  temp: TDynamicByteArray;
 begin
   SetLength(temp, Length(buffer));
   temp := Copy(buffer, 0, Length(buffer));
@@ -99,32 +114,37 @@ begin
 
 end;
 
-function TEasyIpChannel.Execute(buffer: TEiByteArray): TEiByteArray;
+function TEasyIpChannel.Execute(buffer: TDynamicByteArray): TDynamicByteArray;
 var
   init: TWSAData;
   sock: TSocket;
   returnCode: Cardinal;
-  sendBuffer: TEiByteArray;
-  recvBuffer: TEiByteArray;
+  sendBuffer: TDynamicByteArray;
+  recvBuffer: TDynamicByteArray;
   lenFrom: int;
 begin
-  WSAStartup($101, init);
+  WSAStartup($0202, init);
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
   returnCode := connect(sock, FTarget, SizeOf(FTarget));
   if (returnCode = SOCKET_ERROR) then
-    raise Exception.Create('Socket error');
+    raise ESocketException.Create(GetLastErrorString());
+  setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, @FTimeout, SizeOf(FTimeout));
+  setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, @FTimeout, SizeOf(FTimeout));
 
   SetLength(sendBuffer, Length(buffer));
-  SetLength(recvBuffer, Length(buffer));
+  SetLength(recvBuffer, High(short));
   sendBuffer := buffer;
 
-  //returnCode := send(sock, Pointer(buffer)^, Length(buffer), 0);
-  //returnCode := recv(sock, Pointer(receiveBuffer)^, Length(receiveBuffer), 0);
+  returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, FTarget, SizeOf(FTarget));
+  if returnCode < 0 then
+    raise ESocketException.Create(GetLastErrorString());
 
-  returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, FTarget, Length(sendBuffer));
-  lenFrom := Length(recvBuffer);
+  lenFrom := SizeOf(FTarget);
   returnCode := recvfrom(sock, Pointer(recvBuffer)^, Length(recvBuffer), 0, FTarget, lenFrom);
+  if returnCode < 0 then
+    raise ESocketException.Create(GetLastErrorString());
+
+  SetLength(recvBuffer, returnCode);
 
   closesocket(sock);
   WSACleanup;
@@ -140,25 +160,27 @@ var
   recvPacket: TEasyIpPacket;
   lenFrom: int;
 begin
-  WSAStartup($101, init);
+  WSAStartup($0202, init);
 
   sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
   returnCode := connect(sock, FTarget, SizeOf(FTarget));
   if (returnCode = SOCKET_ERROR) then
-    raise Exception.Create('Socket error');
+    raise ESocketException.Create(GetLastErrorString());
+  setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, @FTimeout, SizeOf(FTimeout));
+  setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, @FTimeout, SizeOf(FTimeout));
 
   ZeroMemory(@sendPacket, SizeOf(sendPacket));
   ZeroMemory(@recvPacket, SizeOf(recvPacket));
-
   sendPacket := packet;
 
-  //err := send(sock, sendPacket, EASYIP_HEADERSIZE, 0);
-  //err := recv(sock, recvPacket, sizeof(recvPacket), 0);
+  returnCode := sendto(sock, sendPacket, SizeOf(sendPacket), 0, FTarget, SizeOf(FTarget));
+  if returnCode < 0 then
+    raise ESocketException.Create(GetLastErrorString());
 
-  returnCode := sendto(sock, sendPacket, SizeOf(sendPacket), 0, FTarget, SizeOf(sendPacket));
-  lenFrom := SizeOf(recvPacket);
+  lenFrom := SizeOf(FTarget);
   returnCode := recvfrom(sock, recvPacket, sizeof(recvPacket), 0, FTarget, lenFrom);
+  if returnCode < 0 then
+    raise ESocketException.Create(GetLastErrorString());
 
   closesocket(sock);
   WSACleanup;

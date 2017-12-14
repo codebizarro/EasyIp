@@ -9,27 +9,29 @@ uses
 type
   TEasyIpError = Byte;
 
+  ESocketException = class(Exception);
+
   EEasyIpException = class(Exception);
 
-  EDataSizeOverflow = class(EEasyIpException);
-
-  ERequestedDataSize = class(EEasyIpException);
-
-  EOperand = class(EEasyIpException);
-
-  EOffset = class(EEasyIpException);
-
-  ENoSupport = class(EEasyIpException);
-
-  EDataSize = class(EEasyIpException);
-
-  EGeneral = class(EEasyIpException)
+  EGeneralException = class(EEasyIpException)
   private
     FInnerException: EEasyIpException;
   public
     constructor Create(message: string; innerException: EEasyIpException);
     property InnerException: EEasyIpException read FInnerException write FInnerException;
   end;
+
+  EDataSizeOverflow = class(EEasyIpException);
+
+  ERequestedDataSize = class(EEasyIpException);
+
+  EOperandException = class(EEasyIpException);
+
+  EOffsetException = class(EEasyIpException);
+
+  ENoSupportException = class(EEasyIpException);
+
+  EDataSizeException = class(EEasyIpException);
 
   TEasyIpErrors = class
     class function CreateMessage(error: TEasyIpError): string;
@@ -42,13 +44,13 @@ class function TEasyIpErrors.CreateException(error: TEasyIpError): EEasyIpExcept
 begin
   case error of
     EASYIP_ERROR_OPERAND:
-      Result := EOperand.Create(self.CreateMessage(error));
+      Result := EOperandException.Create(self.CreateMessage(error));
     EASYIP_ERROR_OFFSET:
-      Result := EOffset.Create(self.CreateMessage(error));
+      Result := EOffsetException.Create(self.CreateMessage(error));
     EASYIP_ERROR_DATASIZE:
-      Result := EDataSize.Create(self.CreateMessage(error));
+      Result := EDataSizeException.Create(self.CreateMessage(error));
     EASYIP_ERROR_NOSUPPORT:
-      Result := ENoSupport.Create(self.CreateMessage(error));
+      Result := ENoSupportException.Create(self.CreateMessage(error));
   else
     Result := EEasyIpException.Create(self.CreateMessage(error));
   end;
@@ -70,7 +72,7 @@ begin
   end;
 end;
 
-constructor EGeneral.Create(message: string; innerException: EEasyIpException);
+constructor EGeneralException.Create(message: string; innerException: EEasyIpException);
 begin
   inherited Create(message);
   FInnerException := innerException;
