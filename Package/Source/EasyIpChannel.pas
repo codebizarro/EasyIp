@@ -22,43 +22,39 @@ type
     function Execute(packet: TEasyIpPacket): TEasyIpPacket;
   end;
 
-  TCustomChannel = class(TInterfacedObject, IChannel, IEasyIpChannel)
+  TCustomChannel = class(TInterfacedObject)
   private
   protected
     FHost: string;
     FPort: int;
     FTarget: TSockAddrIn;
-    //FTimeout: int; //using it occurs AV 0_o
+    FTimeout: int;
     function GetLastErrorString(): string;
   public
     constructor Create(host: string; port: int); overload;
-    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; overload; virtual; abstract;
-    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; virtual; abstract;
+    property Timeout: int read FTimeout write FTimeout;
   end;
 
-  TMockChannel = class(TCustomChannel)
+  TMockChannel = class(TCustomChannel, IChannel, IEasyIpChannel)
   private
   protected
   public
     destructor Destroy; override;
-    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; overload; override;
-    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; override;
+    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; overload;
+    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload;
   end;
 
-  TEasyIpChannel = class(TCustomChannel)
+  TEasyIpChannel = class(TCustomChannel, IChannel, IEasyIpChannel)
   private
   protected
   public
     constructor Create(host: string; port: int); overload;
     destructor Destroy; override;
-    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; override;
-    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload; override;
+    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; overload;
+    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload;
   end;
 
 implementation
-
-var
-  FTimeout: int; //TODO: temporary
 
 constructor TCustomChannel.Create(host: string; port: int);
 begin
