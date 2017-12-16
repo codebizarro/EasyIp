@@ -114,74 +114,96 @@ function TEasyIpChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
 var
   init: TWSAData;
   sock: TSocket;
-  returnCode: Cardinal;
+  returnCode: int;
   sendBuffer: DynamicByteArray;
   recvBuffer: DynamicByteArray;
   lenFrom: int;
 begin
-  WSAStartup($0202, init);
-  sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-  returnCode := connect(sock, FTarget, SizeOf(FTarget));
-  if (returnCode = SOCKET_ERROR) then
-    raise ESocketException.Create(GetLastErrorString());
-  setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, @FTimeout, SizeOf(FTimeout));
-  setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, @FTimeout, SizeOf(FTimeout));
+  try
+    returnCode := WSAStartup($0202, init);
+    if returnCode <> 0 then
+      raise ESocketException.Create(GetLastErrorString());
+    try
+      sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+      returnCode := connect(sock, FTarget, SizeOf(FTarget));
+      if (returnCode = SOCKET_ERROR) then
+        raise ESocketException.Create(GetLastErrorString());
+      setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, @FTimeout, SizeOf(FTimeout));
+      setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, @FTimeout, SizeOf(FTimeout));
 
-  SetLength(sendBuffer, Length(buffer));
-  SetLength(recvBuffer, High(short));
-  sendBuffer := buffer;
+      SetLength(sendBuffer, Length(buffer));
+      SetLength(recvBuffer, High(short));
+      sendBuffer := buffer;
 
-  returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, FTarget, SizeOf(FTarget));
-  if returnCode < 0 then
-    raise ESocketException.Create(GetLastErrorString());
+      returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, FTarget, SizeOf(FTarget));
+      if (returnCode = SOCKET_ERROR) then
+        raise ESocketException.Create(GetLastErrorString());
 
-  lenFrom := SizeOf(FTarget);
-  returnCode := recvfrom(sock, Pointer(recvBuffer)^, Length(recvBuffer), 0, FTarget, lenFrom);
-  if returnCode < 0 then
-    raise ESocketException.Create(GetLastErrorString());
+      lenFrom := SizeOf(FTarget);
+      returnCode := recvfrom(sock, Pointer(recvBuffer)^, Length(recvBuffer), 0, FTarget, lenFrom);
+      if (returnCode = SOCKET_ERROR) then
+        raise ESocketException.Create(GetLastErrorString());
 
-  SetLength(recvBuffer, returnCode);
+      SetLength(recvBuffer, returnCode);
 
-  closesocket(sock);
-  WSACleanup;
-  Result := recvBuffer;
+      closesocket(sock);
+      Result := recvBuffer;
+    except
+      on E: ESocketException do
+        raise;
+      on E: Exception do
+        raise EEasyIpException.Create(E.Message);
+    end;
+  finally
+    WSACleanup;
+  end;
 end;
 
 function TEasyIpChannel.Execute(packet: EasyIpPacket): EasyIpPacket;
 var
   init: TWSAData;
   sock: TSocket;
-  returnCode: Cardinal;
+  returnCode: int;
   sendPacket: EasyIpPacket;
   recvPacket: EasyIpPacket;
   lenFrom: int;
 begin
-  WSAStartup($0202, init);
+  try
+    returnCode := WSAStartup($0202, init);
+    if returnCode <> 0 then
+      raise ESocketException.Create(GetLastErrorString());
+    try
+      sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+      returnCode := connect(sock, FTarget, SizeOf(FTarget));
+      if (returnCode = SOCKET_ERROR) then
+        raise ESocketException.Create(GetLastErrorString());
+      setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, @FTimeout, SizeOf(FTimeout));
+      setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, @FTimeout, SizeOf(FTimeout));
 
-  sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-  returnCode := connect(sock, FTarget, SizeOf(FTarget));
-  if (returnCode = SOCKET_ERROR) then
-    raise ESocketException.Create(GetLastErrorString());
-  setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, @FTimeout, SizeOf(FTimeout));
-  setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, @FTimeout, SizeOf(FTimeout));
+      ZeroMemory(@sendPacket, SizeOf(sendPacket));
+      ZeroMemory(@recvPacket, SizeOf(recvPacket));
+      sendPacket := packet;
 
-  ZeroMemory(@sendPacket, SizeOf(sendPacket));
-  ZeroMemory(@recvPacket, SizeOf(recvPacket));
-  sendPacket := packet;
+      returnCode := sendto(sock, sendPacket, SizeOf(sendPacket), 0, FTarget, SizeOf(FTarget));
+      if (returnCode = SOCKET_ERROR) then
+        raise ESocketException.Create(GetLastErrorString());
 
-  returnCode := sendto(sock, sendPacket, SizeOf(sendPacket), 0, FTarget, SizeOf(FTarget));
-  if returnCode < 0 then
-    raise ESocketException.Create(GetLastErrorString());
+      lenFrom := SizeOf(FTarget);
+      returnCode := recvfrom(sock, recvPacket, sizeof(recvPacket), 0, FTarget, lenFrom);
+      if (returnCode = SOCKET_ERROR) then
+        raise ESocketException.Create(GetLastErrorString());
 
-  lenFrom := SizeOf(FTarget);
-  returnCode := recvfrom(sock, recvPacket, sizeof(recvPacket), 0, FTarget, lenFrom);
-  if returnCode < 0 then
-    raise ESocketException.Create(GetLastErrorString());
-
-  closesocket(sock);
-  WSACleanup;
-
-  Result := recvPacket;
+      closesocket(sock);
+      Result := recvPacket;
+    except
+      on E: ESocketException do
+        raise;
+      on E: Exception do
+        raise EEasyIpException.Create(E.Message);
+    end;
+  finally
+    WSACleanup;
+  end;
 end;
 
 end.
