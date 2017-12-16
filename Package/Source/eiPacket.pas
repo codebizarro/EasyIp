@@ -98,7 +98,7 @@ type
     Data: array[1..256] of Word;
   end;
 
-  DataTypeEnum = (dtFlag, dtInput, dtOutput, dtRegister, dtTimer, dtString);
+  DataTypeEnum = (dtUndefined, dtFlag, dtInput, dtOutput, dtRegister, dtTimer, dtString);
 
   PacketModeEnum = (pmRead, pmWrite);
 
@@ -165,7 +165,7 @@ function TEasyIpPacket.GetDataLength: DataLength;
 begin
   if (FMode = pmRead) then
     Result := FPacket.RequestDataSize
-  else if (FMode = pmWrite) then
+  else
     Result := FPacket.SendDataSize;
 end;
 
@@ -173,7 +173,7 @@ function TEasyIpPacket.GetDataOffset: ushort;
 begin
   if (FMode = pmRead) then
     Result := FPacket.RequestDataOffsetServer
-  else if (FMode = pmWrite) then
+  else
     Result := FPacket.SendDataOffset;
 end;
 
@@ -181,9 +181,10 @@ function TEasyIpPacket.GetDataType: DataTypeEnum;
 var
   dataType: byte;
 begin
+  Result := dtUndefined;
   if (FMode = pmRead) then
     dataType := FPacket.RequestDataType
-  else if (FMode = pmWrite) then
+  else
     dataType := FPacket.SendDataType;
   case dataType of
     EASYIP_TYPE_FLAGWORD:
@@ -219,6 +220,7 @@ procedure TEasyIpPacket.SetDataType(const value: DataTypeEnum);
 var
   dataType: byte;
 begin
+  dataType := 0;
   case value of
     dtFlag:
       dataType := EASYIP_TYPE_FLAGWORD;
@@ -235,7 +237,7 @@ begin
   end;
   if (FMode = pmRead) then
     FPacket.RequestDataType := dataType
-  else if (FMode = pmWrite) then
+  else
     FPacket.SendDataType := dataType;
 end;
 
