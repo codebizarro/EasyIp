@@ -1,13 +1,13 @@
-unit EasyIpChannel;
+unit eiChannel;
 
 interface
 
 uses
-  EasyIpCommonTypes,
-  EasyIpConstants,
-  EasyIpExceptions,
-  EasyIpPacket,
-  EasyIpHelpers,
+  eiCommonTypes,
+  eiConstants,
+  eiExceptions,
+  eiPacket,
+  eiHelpers,
   Classes,
   SysUtils,
   Windows,

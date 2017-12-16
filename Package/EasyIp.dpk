@@ -29,12 +29,12 @@ requires
   vcl50;
 
 contains
-  EasyIpCient in 'Source\EasyIpCient.pas',
-  EasyIpConstants in 'Source\EasyIpConstants.pas',
-  EasyIpExceptions in 'Source\EasyIpExceptions.pas',
-  EasyIpPacket in 'Source\EasyIpPacket.pas',
-  EasyIpHelpers in 'Source\EasyIpHelpers.pas',
-  EasyIpChannel in 'Source\EasyIpChannel.pas',
-  EasyIpCommonTypes in 'Source\EasyIpCommonTypes.pas';
+  eiCient in 'Source\eiCient.pas',
+  eiConstants in 'Source\eiConstants.pas',
+  eiExceptions in 'Source\eiExceptions.pas',
+  eiPacket in 'Source\eiPacket.pas',
+  eiHelpers in 'Source\eiHelpers.pas',
+  eiChannel in 'Source\eiChannel.pas',
+  eiCommonTypes in 'Source\eiCommonTypes.pas';
 
 end.

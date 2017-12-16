@@ -1,4 +1,4 @@
-unit EasyIpPacket;
+unit eiPacket;
 
 interface
 

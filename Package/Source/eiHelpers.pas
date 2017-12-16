@@ -1,13 +1,13 @@
-unit EasyIpHelpers;
+unit eiHelpers;
 
 interface
 
 uses
   Windows,
   SysUtils,
-  EasyIpCommonTypes,
-  EasyIpConstants,
-  EasyIpPacket;
+  eiCommonTypes,
+  eiConstants,
+  eiPacket;
 
 type
   TPacketFactory = class

@@ -1,10 +1,10 @@
-unit EasyIpExceptions;
+unit eiExceptions;
 
 interface
 
 uses
   SysUtils,
-  EasyIpConstants;
+  eiConstants;
 
 type
   TEasyIpError = Byte;

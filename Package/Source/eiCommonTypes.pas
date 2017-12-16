@@ -1,4 +1,4 @@
-unit EasyIpCommonTypes;
+unit eiCommonTypes;
 
 interface
 

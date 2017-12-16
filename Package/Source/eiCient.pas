@@ -1,4 +1,4 @@
-unit EasyIpCient;
+unit eiCient;
 
 interface
 

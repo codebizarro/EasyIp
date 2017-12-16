@@ -1,9 +1,9 @@
-unit EasyIpConstants;
+unit eiConstants;
 
 interface
 
 uses
-  EasyIpCommonTypes;
+  eiCommonTypes;
 
 const
   SHORT_SIZE = sizeof(short);

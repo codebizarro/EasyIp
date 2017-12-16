@@ -5,10 +5,10 @@ interface
 uses
   SysUtils,
   Classes,
-  EasyIpCommonTypes,
-  EasyIpConstants,
-  EasyIpPacket,
-  EasyIpHelpers,
+  eiCommonTypes,
+  eiConstants,
+  eiPacket,
+  eiHelpers,
   TestFramework;
 
 type
