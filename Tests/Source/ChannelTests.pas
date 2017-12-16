@@ -72,7 +72,6 @@ var
 begin
   receivePacket := FPacketChannel.Execute(FSendPacket);
 
-  Check(SizeOf(receivePacket) > 0);
   Check(SizeOf(receivePacket) = SizeOf(FSendPacket));
   Check(receivePacket.Error = 0);
   Check(receivePacket.Flags = EASYIP_FLAG_RESPONSE);
