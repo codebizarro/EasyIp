@@ -24,7 +24,7 @@ type
 
 implementation
 
-class function TPacketFactory.GetReadPacket(offset: short; dataType, length: byte):EasyIpPacket;
+class function TPacketFactory.GetReadPacket(offset: short; dataType, length: byte): EasyIpPacket;
 var
   packet: EasyIpPacket;
 begin
