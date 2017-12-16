@@ -78,7 +78,7 @@ end;
 procedure TPacketFactoryTest.SetUp;
 begin
   inherited;
-  FPacketSize := SizeOf(TEasyIpPacket);
+  FPacketSize := SizeOf(EasyIpPacket);
 end;
 
 procedure TPacketFactoryTest.TearDown;
@@ -89,14 +89,14 @@ end;
 
 procedure TPacketFactoryTest.TestGetReadPacket;
 var
-  readPacket: TEasyIpPacket;
+  readPacket: EasyIpPacket;
 begin
   readPacket := TPacketFactory.GetReadPacket(0, EASYIP_TYPE_FLAGWORD, EASYIP_DATASIZE-1);//TODO: overflow
 end;
 
 procedure TPacketFactoryTest.TestGetWritePacket;
 var
-  writePacket: TEasyIpPacket;
+  writePacket: EasyIpPacket;
 begin
   writePacket := TPacketFactory.GetWritePacket(0, EASYIP_TYPE_FLAGWORD, EASYIP_DATASIZE-1);//TODO: overflow
 end;

@@ -12,21 +12,21 @@ uses
 type
   TPacketFactory = class
   public
-    class function GetReadPacket(offset: short; dataType, length: byte): TEasyIpPacket;
-    class function GetWritePacket(offset: short; dataType, length: byte): TEasyIpPacket;
+    class function GetReadPacket(offset: short; dataType, length: byte): EasyIpPacket;
+    class function GetWritePacket(offset: short; dataType, length: byte): EasyIpPacket;
   end;
 
   TPacketAdapter = class
   public
-    class function ToByteArray(packet: TEasyIpPacket): TDynamicByteArray;
-    class function ToEasyIpPacket(buffer: TDynamicByteArray): TEasyIpPacket;
+    class function ToByteArray(packet: EasyIpPacket): DynamicByteArray;
+    class function ToEasyIpPacket(buffer: DynamicByteArray): EasyIpPacket;
   end;
 
 implementation
 
-class function TPacketFactory.GetReadPacket(offset: short; dataType, length: byte): TEasyIpPacket;
+class function TPacketFactory.GetReadPacket(offset: short; dataType, length: byte):EasyIpPacket;
 var
-  packet: TEasyIpPacket;
+  packet: EasyIpPacket;
 begin
   ZeroMemory(@packet, SizeOf(packet));
   with packet do
@@ -47,9 +47,9 @@ begin
   Result := packet;
 end;
 
-class function TPacketFactory.GetWritePacket(offset: short; dataType, length: byte): TEasyIpPacket;
+class function TPacketFactory.GetWritePacket(offset: short; dataType, length: byte): EasyIpPacket;
 var
-  packet: TEasyIpPacket;
+  packet: EasyIpPacket;
 begin
   ZeroMemory(@packet, SizeOf(packet));
   with packet do
@@ -70,9 +70,9 @@ begin
   Result := packet;
 end;
 
-class function TPacketAdapter.ToByteArray(packet: TEasyIpPacket): TDynamicByteArray;
+class function TPacketAdapter.ToByteArray(packet: EasyIpPacket): DynamicByteArray;
 var
-  tBuffer: TDynamicByteArray;
+  tBuffer: DynamicByteArray;
   bufferLength: int;
 begin
   bufferLength := EASYIP_HEADERSIZE + packet.RequestDataSize * SHORT_SIZE + packet.SendDataSize * SHORT_SIZE;
@@ -83,9 +83,9 @@ begin
   Result := tBuffer;
 end;
 
-class function TPacketAdapter.ToEasyIpPacket(buffer: TDynamicByteArray): TEasyIpPacket;
+class function TPacketAdapter.ToEasyIpPacket(buffer: DynamicByteArray): EasyIpPacket;
 var
-  tPacket: TEasyIpPacket;
+  tPacket: EasyIpPacket;
 begin
   ZeroMemory(@tPacket, SizeOf(tPacket));
   CopyMemory(@tPacket, buffer, length(buffer));

@@ -21,8 +21,8 @@ type
   private
     FBufferChannel: IChannel;
     FPacketChannel: IEasyIpChannel;
-    FSendPacket: TEasyIpPacket;
-    FSendBuffer: TDynamicByteArray;
+    FSendPacket: EasyIpPacket;
+    FSendBuffer: DynamicByteArray;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -53,8 +53,8 @@ end;
 
 procedure TChannelTest.TestExecuteBuffer;
 var
-  receiveBuffer: TDynamicByteArray;
-  receivePacket: TEasyIpPacket;
+  receiveBuffer: DynamicByteArray;
+  receivePacket: EasyIpPacket;
 begin
   receiveBuffer := FBufferChannel.Execute(FSendBuffer);
 
@@ -68,7 +68,7 @@ end;
 
 procedure TChannelTest.TestExecuteRecord;
 var
-  receivePacket: TEasyIpPacket;
+  receivePacket: EasyIpPacket;
 begin
   receivePacket := FPacketChannel.Execute(FSendPacket);
 

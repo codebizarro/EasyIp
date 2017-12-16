@@ -3,12 +3,12 @@ unit eiPacket;
 interface
 
 type
-  PEasyIpPacket = ^TEasyIpPacket;
+  PEasyIpPacket = ^EasyIpPacket;
 
 /// <summary>
 /// Encapsulate EasyIP packet
 /// </summary>
-  TEasyIpPacket = packed record
+  EasyIpPacket = packed record
 /// <summary>
 /// 1 byte
 /// Bit 0 information packet (request or response)

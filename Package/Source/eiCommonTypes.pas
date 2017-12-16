@@ -3,9 +3,9 @@ unit eiCommonTypes;
 interface
 
 type
-  PDynamicByteArray =  ^TDynamicByteArray;
+  PDynamicByteArray =  ^DynamicByteArray;
 
-  TDynamicByteArray = array of Byte;
+  DynamicByteArray = array of Byte;
 
   bool = Boolean;
 

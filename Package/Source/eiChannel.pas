@@ -15,11 +15,11 @@ uses
 
 type
   IChannel = interface
-    function Execute(buffer: TDynamicByteArray): TDynamicByteArray;
+    function Execute(buffer: DynamicByteArray): DynamicByteArray;
   end;
 
   IEasyIpChannel = interface
-    function Execute(packet: TEasyIpPacket): TEasyIpPacket;
+    function Execute(packet: EasyIpPacket): EasyIpPacket;
   end;
 
   TCustomChannel = class(TInterfacedObject)
@@ -40,8 +40,8 @@ type
   protected
   public
     destructor Destroy; override;
-    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; overload;
-    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload;
+    function Execute(buffer: DynamicByteArray): DynamicByteArray; overload;
+    function Execute(packet: EasyIpPacket): EasyIpPacket; overload;
   end;
 
   TEasyIpChannel = class(TCustomChannel, IChannel, IEasyIpChannel)
@@ -50,8 +50,8 @@ type
   public
     constructor Create(host: string; port: int); overload;
     destructor Destroy; override;
-    function Execute(buffer: TDynamicByteArray): TDynamicByteArray; overload;
-    function Execute(packet: TEasyIpPacket): TEasyIpPacket; overload;
+    function Execute(buffer: DynamicByteArray): DynamicByteArray; overload;
+    function Execute(packet: EasyIpPacket): EasyIpPacket; overload;
   end;
 
 implementation
@@ -82,9 +82,9 @@ begin
   Result := Buffer;
 end;
 
-function TMockChannel.Execute(buffer: TDynamicByteArray): TDynamicByteArray;
+function TMockChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
 var
-  temp: TDynamicByteArray;
+  temp: DynamicByteArray;
 begin
   SetLength(temp, Length(buffer));
   temp := Copy(buffer, 0, Length(buffer));
@@ -92,7 +92,7 @@ begin
   Result := temp;
 end;
 
-function TMockChannel.Execute(packet: TEasyIpPacket): TEasyIpPacket;
+function TMockChannel.Execute(packet: EasyIpPacket): EasyIpPacket;
 begin
   packet.Flags := $80;
   Result := packet;
@@ -110,13 +110,13 @@ begin
 
 end;
 
-function TEasyIpChannel.Execute(buffer: TDynamicByteArray): TDynamicByteArray;
+function TEasyIpChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
 var
   init: TWSAData;
   sock: TSocket;
   returnCode: Cardinal;
-  sendBuffer: TDynamicByteArray;
-  recvBuffer: TDynamicByteArray;
+  sendBuffer: DynamicByteArray;
+  recvBuffer: DynamicByteArray;
   lenFrom: int;
 begin
   WSAStartup($0202, init);
@@ -147,13 +147,13 @@ begin
   Result := recvBuffer;
 end;
 
-function TEasyIpChannel.Execute(packet: TEasyIpPacket): TEasyIpPacket;
+function TEasyIpChannel.Execute(packet: EasyIpPacket): EasyIpPacket;
 var
   init: TWSAData;
   sock: TSocket;
   returnCode: Cardinal;
-  sendPacket: TEasyIpPacket;
-  recvPacket: TEasyIpPacket;
+  sendPacket: EasyIpPacket;
+  recvPacket: EasyIpPacket;
   lenFrom: int;
 begin
   WSAStartup($0202, init);
