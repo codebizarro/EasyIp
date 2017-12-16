@@ -147,7 +147,7 @@ end;
 constructor TEasyIpPacket.Create(mode: PacketModeEnum);
 begin
   inherited Create;
-
+  FMode := mode;
 end;
 
 function TEasyIpPacket.GetBuffer: DynamicByteArray;
@@ -163,29 +163,29 @@ end;
 
 function TEasyIpPacket.GetDataLength: DataLength;
 begin
-  if (FPacket.SendDataSize > 0) then
-    Result := FPacket.SendDataSize
-  else if (FPacket.RequestDataSize > 0) then
-    Result := FPacket.RequestDataSize;
+  if (FMode = pmRead) then
+    Result := FPacket.RequestDataSize
+  else if (FMode = pmWrite) then
+    Result := FPacket.SendDataSize;
 end;
 
 function TEasyIpPacket.GetDataOffset: ushort;
 begin
-  if (FPacket.SendDataSize > 0) then
-    Result := FPacket.SendDataOffset
-  else if (FPacket.RequestDataSize > 0) then
-    Result := FPacket.RequestDataOffsetServer;
+  if (FMode = pmRead) then
+    Result := FPacket.RequestDataOffsetServer
+  else if (FMode = pmWrite) then
+    Result := FPacket.SendDataOffset;
 end;
 
 function TEasyIpPacket.GetDataType: DataTypeEnum;
 var
   dataType: byte;
 begin
-  if (FPacket.SendDataSize > 0) then
-    dataType := FPacket.SendDataType
-  else if (FPacket.RequestDataSize > 0) then
-    dataType := FPacket.RequestDataType;
-  case FPacket.SendDataType of
+  if (FMode = pmRead) then
+    dataType := FPacket.RequestDataType
+  else if (FMode = pmWrite) then
+    dataType := FPacket.SendDataType;
+  case dataType of
     EASYIP_TYPE_FLAGWORD:
       Result := dtFlag;
     EASYIP_TYPE_INPUTWORD:
@@ -203,9 +203,9 @@ end;
 
 procedure TEasyIpPacket.SetDataLength(const value: DataLength);
 begin
-  if FMode = pmRead then
+  if (FMode = pmRead) then
     FPacket.RequestDataSize := value
-  else if FMode = pmWrite then
+  else if (FMode = pmWrite) then
     FPacket.SendDataSize := value;
 end;
 
@@ -233,10 +233,10 @@ begin
     dtString:
       dataType := EASYIP_TYPE_STRING;
   end;
-  if (FPacket.SendDataSize > 0) then
-    FPacket.SendDataType := dataType
-  else if (FPacket.RequestDataSize > 0) then
-    FPacket.RequestDataType := dataType;
+  if (FMode = pmRead) then
+    FPacket.RequestDataType := dataType
+  else if (FMode = pmWrite) then
+    FPacket.SendDataType := dataType;
 end;
 
 end.
