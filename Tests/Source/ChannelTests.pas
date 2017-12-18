@@ -9,7 +9,7 @@ uses
   eiTypes,
   eiConstants,
   eiExceptions,
-  eiPacket,
+  eiProtocol,
   eiHelpers,
   eiChannel,
   TestFramework,

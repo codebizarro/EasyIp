@@ -6,7 +6,7 @@ uses
   eiTypes,
   eiConstants,
   eiExceptions,
-  eiPacket,
+  eiProtocol,
   eiHelpers,
   Classes,
   SysUtils,

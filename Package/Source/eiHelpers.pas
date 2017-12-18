@@ -7,7 +7,7 @@ uses
   SysUtils,
   eiTypes,
   eiConstants,
-  eiPacket;
+  eiProtocol;
 
 type
   TPacketFactory = class

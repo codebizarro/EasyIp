@@ -7,8 +7,8 @@ uses
   eiConstants in '..\Package\Source\eiConstants.pas',
   eiExceptions in '..\Package\Source\eiExceptions.pas',
   eiHelpers in '..\Package\Source\eiHelpers.pas',
-  eiPacket in '..\Package\Source\eiPacket.pas',
-  eiTypes in '..\Package\Source\eiTypes.pas';
+  eiTypes in '..\Package\Source\eiTypes.pas',
+  eiProtocol in '..\Package\Source\eiProtocol.pas';
 
 begin
   // Insert user code here

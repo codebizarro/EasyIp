@@ -1,4 +1,4 @@
-unit eiPacket;
+unit eiProtocol;
 
 interface
 

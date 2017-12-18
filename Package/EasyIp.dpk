@@ -32,9 +32,9 @@ contains
   eiCient in 'Source\eiCient.pas',
   eiConstants in 'Source\eiConstants.pas',
   eiExceptions in 'Source\eiExceptions.pas',
-  eiPacket in 'Source\eiPacket.pas',
   eiHelpers in 'Source\eiHelpers.pas',
   eiChannel in 'Source\eiChannel.pas',
-  eiTypes in 'Source\eiTypes.pas';
+  eiTypes in 'Source\eiTypes.pas',
+  eiProtocol in 'Source\eiProtocol.pas';
 
 end.

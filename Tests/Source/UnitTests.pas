@@ -7,7 +7,7 @@ uses
   Classes,
   eiTypes,
   eiConstants,
-  eiPacket,
+  eiProtocol,
   eiHelpers,
   TestFramework;
 
