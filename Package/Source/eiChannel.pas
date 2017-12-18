@@ -14,14 +14,6 @@ uses
   WinSock;
 
 type
-  IChannel = interface
-    function Execute(buffer: DynamicByteArray): DynamicByteArray;
-  end;
-
-  IEasyIpChannel = interface
-    function Execute(packet: EasyIpPacket): EasyIpPacket;
-  end;
-
   TCustomChannel = class(TInterfacedObject)
   private
   protected
