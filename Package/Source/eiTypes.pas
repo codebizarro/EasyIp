@@ -116,7 +116,10 @@ type
   end;
 
   IChannel = interface
+    function GetTimeout: int;
+    procedure SetTimeout(const value: int);
     function Execute(buffer: DynamicByteArray): DynamicByteArray;
+    property Timeout: int read GetTimeout write SetTimeout;
   end;
 
   IEasyIpChannel = interface
