@@ -18,7 +18,7 @@ type
     FDataType: DataTypeEnum;
     FLength: DataLength;
     FPacket: EasyIpPacket;
-    FWrapperPacket: TEasyIpPacket;
+    FWrapperPacket: IEasyIpProtocol;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -50,7 +50,7 @@ var
   i: int;
 begin
   FPacket := TPacketFactory.GetReadPacket(FOffset, EASYIP_TYPE_FLAGWORD, FLength);
-  FWrapperPacket := TEasyIpPacket.Create(pmRead);
+  FWrapperPacket := TEasyIpProtocol.Create(pmRead);
   with FWrapperPacket do
   begin
     DataLength := FLength;
@@ -66,14 +66,15 @@ begin
     Check(FPacket.Data[i] = 0);
     Check(FWrapperPacket.Packet.Data[i] = 0);
   end;
+  FWrapperPacket := nil;
 end;
 
 procedure TPacketWrapperTest.TestWritePacket;
 var
   i: int;
 begin
-    FPacket := TPacketFactory.GetWritePacket(FOffset, EASYIP_TYPE_FLAGWORD, FLength);
-  FWrapperPacket := TEasyIpPacket.Create(pmWrite);
+  FPacket := TPacketFactory.GetWritePacket(FOffset, EASYIP_TYPE_FLAGWORD, FLength);
+  FWrapperPacket := TEasyIpProtocol.Create(pmWrite);
   with FWrapperPacket do
   begin
     DataLength := FLength;
@@ -88,6 +89,7 @@ begin
   begin
     Check(FWrapperPacket.Packet.Data[i] = FPacket.Data[i]);
   end;
+  FWrapperPacket := nil;
 end;
 
 initialization

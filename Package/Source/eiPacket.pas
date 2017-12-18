@@ -10,12 +10,13 @@ uses
   eiConstants;
 
 type
-  TEasyIpPacket = class
+  TEasyIpProtocol = class(TInterfacedObject, IEasyIpProtocol)
   private
     FPacket: EasyIpPacket;
     FMode: PacketModeEnum;
     constructor Create(buffer: DynamicByteArray); overload;
     constructor Create(packet: EasyIpPacket); overload;
+    function GetPacket: EasyIpPacket;
     function GetBuffer: DynamicByteArray;
     function GetDataLength: DataLength;
     function GetDataOffset: ushort;
@@ -25,16 +26,17 @@ type
     procedure SetDataType(const value: DataTypeEnum);
   public
     constructor Create(mode: PacketModeEnum); overload;
+    destructor Destroy; override;
     property Buffer: DynamicByteArray read GetBuffer;
     property DataLength: DataLength read GetDataLength write SetDataLength;
     property DataOffset: ushort read GetDataOffset write SetDataOffset;
     property DataType: DataTypeEnum read GetDataType write SetDataType;
-    property Packet: EasyIpPacket read FPacket;
+    property Packet: EasyIpPacket read GetPacket;
   end;
 
 implementation
 
-constructor TEasyIpPacket.Create(buffer: DynamicByteArray);
+constructor TEasyIpProtocol.Create(buffer: DynamicByteArray);
 var
   tPacket: EasyIpPacket;
 begin
@@ -44,30 +46,36 @@ begin
   FPacket := tPacket;
 end;
 
-constructor TEasyIpPacket.Create(packet: EasyIpPacket);
+constructor TEasyIpProtocol.Create(packet: EasyIpPacket);
 begin
   inherited Create;
   FPacket := packet;
 end;
 
-constructor TEasyIpPacket.Create(mode: PacketModeEnum);
+constructor TEasyIpProtocol.Create(mode: PacketModeEnum);
 begin
   inherited Create;
   FMode := mode;
 end;
 
-function TEasyIpPacket.GetBuffer: DynamicByteArray;
+destructor TEasyIpProtocol.Destroy;
+begin
+  inherited;
+
+end;
+
+function TEasyIpProtocol.GetBuffer: DynamicByteArray;
 var
   tBuffer: DynamicByteArray;
   length: int;
 begin
   length := SizeOf(FPacket);
   SetLength(tBuffer, length);
-  CopyMemory(tBuffer, @packet, length);
+  CopyMemory(tBuffer, @FPacket, length);
   Result := tBuffer;
 end;
 
-function TEasyIpPacket.GetDataLength: DataLength;
+function TEasyIpProtocol.GetDataLength: DataLength;
 begin
   if (FMode = pmRead) then
     Result := FPacket.RequestDataSize
@@ -75,7 +83,7 @@ begin
     Result := FPacket.SendDataSize;
 end;
 
-function TEasyIpPacket.GetDataOffset: ushort;
+function TEasyIpProtocol.GetDataOffset: ushort;
 begin
   if (FMode = pmRead) then
     Result := FPacket.RequestDataOffsetServer
@@ -83,7 +91,7 @@ begin
     Result := FPacket.SendDataOffset;
 end;
 
-function TEasyIpPacket.GetDataType: DataTypeEnum;
+function TEasyIpProtocol.GetDataType: DataTypeEnum;
 var
   dataType: byte;
 begin
@@ -108,7 +116,12 @@ begin
   end;
 end;
 
-procedure TEasyIpPacket.SetDataLength(const value: DataLength);
+function TEasyIpProtocol.GetPacket: EasyIpPacket;
+begin
+  Result := FPacket;
+end;
+
+procedure TEasyIpProtocol.SetDataLength(const value: DataLength);
 begin
   if (FMode = pmRead) then
     FPacket.RequestDataSize := value
@@ -116,13 +129,13 @@ begin
     FPacket.SendDataSize := value;
 end;
 
-procedure TEasyIpPacket.SetDataOffset(const value: ushort);
+procedure TEasyIpProtocol.SetDataOffset(const value: ushort);
 begin
   FPacket.SendDataOffset := value;
   FPacket.RequestDataOffsetServer := value;
 end;
 
-procedure TEasyIpPacket.SetDataType(const value: DataTypeEnum);
+procedure TEasyIpProtocol.SetDataType(const value: DataTypeEnum);
 var
   dataType: byte;
 begin
