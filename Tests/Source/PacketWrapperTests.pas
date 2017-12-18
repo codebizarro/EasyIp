@@ -5,7 +5,7 @@ interface
 uses
   SysUtils,
   Classes,
-  eiCommonTypes,
+  eiTypes,
   eiConstants,
   eiPacket,
   eiHelpers,

@@ -6,7 +6,7 @@ uses
   Windows,
   SysUtils,
   Classes,
-  eiCommonTypes,
+  eiTypes,
   eiConstants,
   eiExceptions,
   eiPacket,

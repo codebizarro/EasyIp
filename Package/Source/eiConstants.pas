@@ -3,7 +3,7 @@ unit eiConstants;
 interface
 
 uses
-  eiCommonTypes;
+  eiTypes;
 
 const
   SHORT_SIZE = sizeof(short);

@@ -35,6 +35,6 @@ contains
   eiPacket in 'Source\eiPacket.pas',
   eiHelpers in 'Source\eiHelpers.pas',
   eiChannel in 'Source\eiChannel.pas',
-  eiCommonTypes in 'Source\eiCommonTypes.pas';
+  eiTypes in 'Source\eiTypes.pas';
 
 end.

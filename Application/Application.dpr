@@ -4,11 +4,11 @@ uses
   SysUtils,
   eiChannel in '..\Package\Source\eiChannel.pas',
   eiCient in '..\Package\Source\eiCient.pas',
-  eiCommonTypes in '..\Package\Source\eiCommonTypes.pas',
   eiConstants in '..\Package\Source\eiConstants.pas',
   eiExceptions in '..\Package\Source\eiExceptions.pas',
   eiHelpers in '..\Package\Source\eiHelpers.pas',
-  eiPacket in '..\Package\Source\eiPacket.pas';
+  eiPacket in '..\Package\Source\eiPacket.pas',
+  eiTypes in '..\Package\Source\eiTypes.pas';
 
 begin
   // Insert user code here

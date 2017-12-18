@@ -5,7 +5,7 @@ interface
 uses
   Windows,
   SysUtils,
-  eiCommonTypes,
+  eiTypes,
   eiConstants,
   eiPacket;
 

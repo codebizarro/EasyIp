@@ -3,7 +3,7 @@ unit eiChannel;
 interface
 
 uses
-  eiCommonTypes,
+  eiTypes,
   eiConstants,
   eiExceptions,
   eiPacket,
