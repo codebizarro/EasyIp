@@ -14,7 +14,15 @@ uses
   WinSock;
 
 type
-  TUdpChannel = class(TInterfacedObject)
+  TCustomChannel = class(TInterfacedObject)
+  end;
+
+  TNetworkChannel = class(TCustomChannel)
+  protected
+    function GetLastErrorString: string;
+  end;
+
+  TUdpChannel = class(TNetworkChannel, IChannel)
   private
     function GetTimeout: int;
     procedure SetTimeout(const value: int);
@@ -23,14 +31,13 @@ type
     FPort: int;
     FTimeout: int;
     FTarget: TSockAddrIn;
-    function GetLastErrorString(): string;
   public
     constructor Create(host: string; port: int); overload;
     function Execute(buffer: DynamicByteArray): DynamicByteArray; overload;
     property Timeout: int read GetTimeout write SetTimeout default 2000;
   end;
 
-  TMockChannel = class(TUdpChannel, IChannel, IEasyIpChannel)
+  TMockChannel = class(TUdpChannel, IEasyIpChannel)
   private
   protected
   public
@@ -39,7 +46,7 @@ type
     function Execute(packet: EasyIpPacket): EasyIpPacket; overload;
   end;
 
-  TEasyIpChannel = class(TUdpChannel, IChannel, IEasyIpChannel)
+  TEasyIpChannel = class(TUdpChannel, IEasyIpChannel)
   private
   protected
   public
@@ -119,14 +126,6 @@ begin
   finally
     WSACleanup;
   end;
-end;
-
-function TUdpChannel.GetLastErrorString: string;
-var
-  Buffer: array[0..2047] of Char;
-begin
-  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nil, WSAGetLastError, LANG_ID, @Buffer, SizeOf(Buffer), nil);
-  Result := Buffer;
 end;
 
 function TUdpChannel.GetTimeout: int;
@@ -212,6 +211,14 @@ begin
   finally
     WSACleanup;
   end;
+end;
+
+function TNetworkChannel.GetLastErrorString: string;
+var
+  Buffer: array[0..2047] of Char;
+begin
+  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nil, WSAGetLastError, LANG_ID, @Buffer, SizeOf(Buffer), nil);
+  Result := Buffer;
 end;
 
 end.

@@ -122,7 +122,7 @@ type
     property Timeout: int read GetTimeout write SetTimeout;
   end;
 
-  IEasyIpChannel = interface
+  IEasyIpChannel = interface(IChannel)
     function Execute(packet: EasyIpPacket): EasyIpPacket;
   end;
 
