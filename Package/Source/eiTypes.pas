@@ -124,8 +124,22 @@ type
   end;
 
   IProtocol = interface
-    function GetBuffer: DynamicByteArray; stdcall;
+    function GetBuffer: DynamicByteArray;
     property Buffer: DynamicByteArray read GetBuffer;
+  end;
+
+  IEasyIpProtocol = interface(IProtocol)
+    function GetPacket: EasyIpPacket;
+    function GetDataLength: DataLength;
+    function GetDataOffset: ushort;
+    function GetDataType: DataTypeEnum;
+    procedure SetDataLength(const value: DataLength);
+    procedure SetDataOffset(const value: ushort);
+    procedure SetDataType(const value: DataTypeEnum);
+    property DataLength: DataLength read GetDataLength write SetDataLength;
+    property DataOffset: ushort read GetDataOffset write SetDataOffset;
+    property DataType: DataTypeEnum read GetDataType write SetDataType;
+    property Packet: EasyIpPacket read GetPacket;
   end;
 
 implementation
