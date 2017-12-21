@@ -122,7 +122,16 @@ type
     property Timeout: int read GetTimeout write SetTimeout;
   end;
 
-  IEasyIpChannel = interface(IChannel)
+  IUdpChannel = interface(IChannel)
+    function GetHost: string;
+    procedure SetHost(const value: string);
+    property Host: string read GetHost write SetHost;
+    function GetPort: int;
+    procedure SetPort(const value: int);
+    property Port: int read GetPort write SetPort;
+  end;
+
+  IEasyIpChannel = interface(IUdpChannel)
     function Execute(packet: EasyIpPacket): EasyIpPacket;
   end;
 
@@ -143,6 +152,9 @@ type
     property DataOffset: ushort read GetDataOffset write SetDataOffset;
     property DataType: DataTypeEnum read GetDataType write SetDataType;
     property Packet: EasyIpPacket read GetPacket;
+  end;
+
+  IClient = interface
   end;
 
 implementation

@@ -19,7 +19,7 @@ uses
 type
   TChannelTest = class(TTestCase)
   private
-    FBufferChannel: IChannel;
+    FBufferChannel: IUdpChannel;
     FPacketChannel: IEasyIpChannel;
     FSendPacket: EasyIpPacket;
     FSendBuffer: DynamicByteArray;

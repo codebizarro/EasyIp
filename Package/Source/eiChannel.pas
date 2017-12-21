@@ -15,26 +15,36 @@ uses
 
 type
   TCustomChannel = class(TInterfacedObject)
-  end;
-
-  TNetworkChannel = class(TCustomChannel)
-  protected
-    function GetLastErrorString: string;
-  end;
-
-  TUdpChannel = class(TNetworkChannel, IChannel)
   private
     function GetTimeout: int;
     procedure SetTimeout(const value: int);
   protected
-    FHost: string;
-    FPort: int;
     FTimeout: int;
+  public
+    property Timeout: int read GetTimeout write SetTimeout default 2000;
+  end;
+
+  TNetworkChannel = class(TCustomChannel)
+  protected
+    FHost: string;
+    function GetLastErrorString: string;
+  public
+    function GetHost: string;
+    procedure SetHost(const value: string);
+    property Host: string read GetHost write SetHost;
+  end;
+
+  TUdpChannel = class(TNetworkChannel, IUdpChannel)
+  private
+  protected
+    FPort: int;
     FTarget: TSockAddrIn;
   public
     constructor Create(host: string; port: int); overload;
     function Execute(buffer: DynamicByteArray): DynamicByteArray; overload;
-    property Timeout: int read GetTimeout write SetTimeout default 2000;
+    function GetPort: int;
+    procedure SetPort(const value: int);
+    property Port: int read GetPort write SetPort;
   end;
 
   TMockChannel = class(TUdpChannel, IEasyIpChannel)
@@ -64,13 +74,13 @@ const
 constructor TUdpChannel.Create(host: string; port: int);
 begin
   inherited Create;
-  FHost := host;
-  FPort := port;
-  FTimeout := 2000;
+  Self.Host := host;
+  Self.Port := port;
+  Self.Timeout := 2000;
   ZeroMemory(@FTarget, SizeOf(FTarget));
-  FTarget.sin_port := htons(FPort);
-  FTarget.sin_addr.S_addr := inet_addr(PChar(FHost));
-  FTarget.sa_family := AF_INET;
+  Self.FTarget.sin_port := htons(FPort);
+  Self.FTarget.sin_addr.S_addr := inet_addr(PChar(FHost));
+  Self.FTarget.sa_family := AF_INET;
 end;
 
 destructor TMockChannel.Destroy;
@@ -128,14 +138,14 @@ begin
   end;
 end;
 
-function TUdpChannel.GetTimeout: int;
+function TUdpChannel.GetPort: int;
 begin
-  Result := FTimeout;
+  Result := FPort;
 end;
 
-procedure TUdpChannel.SetTimeout(const value: int);
+procedure TUdpChannel.SetPort(const value: int);
 begin
-  FTimeout := value;
+  FPort := value;
 end;
 
 function TMockChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
@@ -168,49 +178,17 @@ end;
 
 function TEasyIpChannel.Execute(packet: EasyIpPacket): EasyIpPacket;
 var
-  init: TWSAData;
-  sock: TSocket;
-  returnCode: int;
-  sendPacket: EasyIpPacket;
-  recvPacket: EasyIpPacket;
-  lenFrom: int;
+  sendPacket: DynamicByteArray;
+  recvPacket: DynamicByteArray;
 begin
-  try
-    returnCode := WSAStartup(WINSOCK_VERSION, init);
-    if returnCode <> 0 then
-      raise ESocketException.Create(GetLastErrorString());
-    try
-      sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-      returnCode := connect(sock, FTarget, SizeOf(FTarget));
-      if (returnCode = SOCKET_ERROR) then
-        raise ESocketException.Create(GetLastErrorString());
-      setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, @FTimeout, SizeOf(FTimeout));
-      setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, @FTimeout, SizeOf(FTimeout));
+  sendPacket := TPacketAdapter.ToByteArray(packet);
+  recvPacket := inherited Execute(sendPacket);
+  Result := TPacketAdapter.ToEasyIpPacket(recvPacket);
+end;
 
-      ZeroMemory(@sendPacket, SizeOf(sendPacket));
-      ZeroMemory(@recvPacket, SizeOf(recvPacket));
-      sendPacket := packet;
-
-      returnCode := sendto(sock, sendPacket, SizeOf(sendPacket), 0, FTarget, SizeOf(FTarget));
-      if (returnCode = SOCKET_ERROR) then
-        raise ESocketException.Create(GetLastErrorString());
-
-      lenFrom := SizeOf(FTarget);
-      returnCode := recvfrom(sock, recvPacket, sizeof(recvPacket), 0, FTarget, lenFrom);
-      if (returnCode = SOCKET_ERROR) then
-        raise ESocketException.Create(GetLastErrorString());
-
-      closesocket(sock);
-      Result := recvPacket;
-    except
-      on E: ESocketException do
-        raise;
-      on E: Exception do
-        raise EEasyIpException.Create(E.Message);
-    end;
-  finally
-    WSACleanup;
-  end;
+function TNetworkChannel.GetHost: string;
+begin
+  Result := FHost;
 end;
 
 function TNetworkChannel.GetLastErrorString: string;
@@ -219,6 +197,21 @@ var
 begin
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nil, WSAGetLastError, LANG_ID, @Buffer, SizeOf(Buffer), nil);
   Result := Buffer;
+end;
+
+procedure TNetworkChannel.SetHost(const value: string);
+begin
+  FHost := value;
+end;
+
+function TCustomChannel.GetTimeout: int;
+begin
+  Result := FTimeout;
+end;
+
+procedure TCustomChannel.SetTimeout(const value: int);
+begin
+  FTimeout := value;
 end;
 
 end.
