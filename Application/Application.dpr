@@ -3,7 +3,7 @@ program Application;
 uses
   SysUtils,
   eiChannel in '..\Package\Source\eiChannel.pas',
-  eiCient in '..\Package\Source\eiCient.pas',
+  eiClient in '..\Package\Source\eiClient.pas',
   eiConstants in '..\Package\Source\eiConstants.pas',
   eiExceptions in '..\Package\Source\eiExceptions.pas',
   eiHelpers in '..\Package\Source\eiHelpers.pas',

@@ -29,7 +29,7 @@ requires
   vcl50;
 
 contains
-  eiCient in 'Source\eiCient.pas',
+  eiClient in 'Source\eiClient.pas',
   eiConstants in 'Source\eiConstants.pas',
   eiExceptions in 'Source\eiExceptions.pas',
   eiHelpers in 'Source\eiHelpers.pas',
