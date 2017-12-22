@@ -26,25 +26,26 @@ type
   end;
 
   TNetworkChannel = class(TCustomChannel, INetworkChannel)
+  private
+    function GetHost: string;
+    procedure SetHost(const value: string);
   protected
     FHost: string;
     function GetLastErrorString: string;
   public
-    function GetHost: string;
-    procedure SetHost(const value: string);
     property Host: string read GetHost write SetHost;
   end;
 
   TUdpChannel = class(TNetworkChannel, IUdpChannel)
   private
+    function GetPort: int;
+    procedure SetPort(const value: int);
   protected
     FPort: int;
     FTarget: TSockAddrIn;
   public
     constructor Create(host: string; port: int); overload;
-    function Execute(buffer: DynamicByteArray): DynamicByteArray;  override;
-    function GetPort: int;
-    procedure SetPort(const value: int);
+    function Execute(buffer: DynamicByteArray): DynamicByteArray; overload; override;
     property Port: int read GetPort write SetPort;
   end;
 
