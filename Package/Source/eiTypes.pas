@@ -122,10 +122,13 @@ type
     property Timeout: int read GetTimeout write SetTimeout;
   end;
 
-  IUdpChannel = interface(IChannel)
+  INetworkChannel = interface(IChannel)
     function GetHost: string;
     procedure SetHost(const value: string);
     property Host: string read GetHost write SetHost;
+  end;
+
+  IUdpChannel = interface(INetworkChannel)
     function GetPort: int;
     procedure SetPort(const value: int);
     property Port: int read GetPort write SetPort;

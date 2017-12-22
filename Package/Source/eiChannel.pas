@@ -14,17 +14,18 @@ uses
   WinSock;
 
 type
-  TCustomChannel = class(TInterfacedObject)
+  TCustomChannel = class(TInterfacedObject, IChannel)
   private
     function GetTimeout: int;
     procedure SetTimeout(const value: int);
   protected
     FTimeout: int;
   public
+    function Execute(buffer: DynamicByteArray): DynamicByteArray; virtual; abstract;
     property Timeout: int read GetTimeout write SetTimeout default 2000;
   end;
 
-  TNetworkChannel = class(TCustomChannel)
+  TNetworkChannel = class(TCustomChannel, INetworkChannel)
   protected
     FHost: string;
     function GetLastErrorString: string;
@@ -41,7 +42,7 @@ type
     FTarget: TSockAddrIn;
   public
     constructor Create(host: string; port: int); overload;
-    function Execute(buffer: DynamicByteArray): DynamicByteArray; overload;
+    function Execute(buffer: DynamicByteArray): DynamicByteArray;  override;
     function GetPort: int;
     procedure SetPort(const value: int);
     property Port: int read GetPort write SetPort;
@@ -52,7 +53,7 @@ type
   protected
   public
     destructor Destroy; override;
-    function Execute(buffer: DynamicByteArray): DynamicByteArray; overload;
+    function Execute(buffer: DynamicByteArray): DynamicByteArray; overload; override;
     function Execute(packet: EasyIpPacket): EasyIpPacket; overload;
   end;
 
