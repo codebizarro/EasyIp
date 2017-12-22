@@ -116,6 +116,7 @@ type
   end;
 
   IChannel = interface
+    ['{D789650F-C76E-42B3-B358-D78E98AD82C7}']
     function GetTimeout: int;
     procedure SetTimeout(const value: int);
     function Execute(buffer: DynamicByteArray): DynamicByteArray;
@@ -123,27 +124,32 @@ type
   end;
 
   INetworkChannel = interface(IChannel)
+    ['{F5995BE4-509D-498D-9A4C-68AD721822DE}']
     function GetHost: string;
     procedure SetHost(const value: string);
     property Host: string read GetHost write SetHost;
   end;
 
   IUdpChannel = interface(INetworkChannel)
+    ['{C65D3A64-E4E8-4C4E-83AF-A670BEFFEACF}']
     function GetPort: int;
     procedure SetPort(const value: int);
     property Port: int read GetPort write SetPort;
   end;
 
   IEasyIpChannel = interface(IUdpChannel)
+    ['{D907A69A-7C89-404B-9F2A-7162E73596D0}']
     function Execute(packet: EasyIpPacket): EasyIpPacket;
   end;
 
   IProtocol = interface
+    ['{F48C0963-8ACD-4AC3-8911-B793DC2E94AC}']
     function GetBuffer: DynamicByteArray;
     property Buffer: DynamicByteArray read GetBuffer;
   end;
 
   IEasyIpProtocol = interface(IProtocol)
+    ['{790B9B4C-8B13-4862-9035-7CEA97708CBA}']
     function GetPacket: EasyIpPacket;
     function GetDataLength: DataLength;
     function GetDataOffset: ushort;
@@ -158,6 +164,11 @@ type
   end;
 
   IClient = interface
+    ['{D040CC40-3C64-48DA-88D0-EE3A005619A8}']
+  end;
+
+  IEasyIpClient = interface(IClient)
+    ['{5A5CB45B-B6D5-4916-B074-48FF471D8858}']
   end;
 
 implementation
