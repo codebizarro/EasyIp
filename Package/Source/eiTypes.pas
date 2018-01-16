@@ -165,20 +165,14 @@ type
     property Packet: EasyIpPacket read GetPacket;
   end;
 
-  IClient = interface
-    ['{D040CC40-3C64-48DA-88D0-EE3A005619A8}']
+  IEasyIpClient = interface
+    ['{5A5CB45B-B6D5-4916-B074-48FF471D8858}']
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
-  end;
-
-  IEasyIpClient = interface(IClient)
-    ['{5A5CB45B-B6D5-4916-B074-48FF471D8858}']
-    function GetChannel: IEasyIpChannel; stdcall;
+    function GetChannel: IEasyIpChannel;
     function GetProtocol: IEasyIpProtocol;
-    procedure SetChannel(const Value: IEasyIpChannel); stdcall;
-    procedure SetProtocol(const Value: IEasyIpProtocol);
-    property Channel: IEasyIpChannel read GetChannel write SetChannel;
-    property Protocol: IEasyIpProtocol read GetProtocol write SetProtocol;
+    property Channel: IEasyIpChannel read GetChannel;
+    property Protocol: IEasyIpProtocol read GetProtocol;
   end;
 
 implementation

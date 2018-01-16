@@ -8,7 +8,8 @@ uses
   ChannelTests in 'Source\ChannelTests.pas',
   ClientTests in 'Source\ClientTests.pas',
   UnitTests in 'Source\UnitTests.pas',
-  PacketWrapperTests in 'Source\PacketWrapperTests.pas';
+  PacketWrapperTests in 'Source\PacketWrapperTests.pas',
+  TestConstants in 'Source\TestConstants.pas';
 
 begin
   Application.Initialize;

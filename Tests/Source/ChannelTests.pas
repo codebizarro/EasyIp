@@ -33,15 +33,18 @@ type
 
 implementation
 
+uses
+  TestConstants;
+
 { TChannelTest }
 
 procedure TChannelTest.SetUp;
 begin
   inherited;
 //  FChannel := TMockChannel.Create('127.0.0.1', EASYIP_PORT);
-  FBufferChannel := TEasyIpChannel.Create('10.20.0.104', EASYIP_PORT);
-  FPacketChannel := TEasyIpChannel.Create('10.20.0.104', EASYIP_PORT);
-  FSendPacket := TPacketFactory.GetReadPacket(0, EASYIP_TYPE_FLAGWORD, 20);
+  FBufferChannel := TEasyIpChannel.Create(TEST_PLC_HOST, EASYIP_PORT);
+  FPacketChannel := TEasyIpChannel.Create(TEST_PLC_HOST, EASYIP_PORT);
+  FSendPacket := TPacketFactory.GetReadPacket(TEST_OFFSET, EASYIP_TYPE_FLAGWORD, 20);
   FSendBuffer := TPacketAdapter.ToByteArray(FSendPacket);
 end;
 
