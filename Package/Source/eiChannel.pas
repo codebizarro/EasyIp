@@ -42,7 +42,7 @@ type
     procedure SetPort(const value: int);
   protected
     FPort: int;
-    FTarget: TSockAddrIn;
+    FTarget: TSockAddrIn;//TODO: mode to TNetworkChannel!
   public
     constructor Create(host: string; port: int); overload;
     function Execute(buffer: DynamicByteArray): DynamicByteArray; overload; override;

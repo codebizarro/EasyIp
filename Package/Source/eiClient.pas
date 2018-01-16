@@ -25,7 +25,7 @@ type
     property Protocol: IEasyIpProtocol read GetProtocol implements IEasyIpProtocol;
   protected
   public
-    constructor Create;
+    constructor Create(_host: string); overload;
     destructor Destroy; override;
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
@@ -35,44 +35,65 @@ type
 
 implementation
 
-function TEasyIpClient.BlockRead(offset: short; dataType: DataTypeEnum;
-  length: byte): DynamicWordArray;
+function TEasyIpClient.BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
+var
+  returnedPacket: EasyIpPacket;
+  returnArray: DynamicWordArray;
+  arrayLength: int;
 begin
-
+  FProtocol := TEasyIpProtocol.Create(pmRead);
+  Protocol.DataOffset := offset;
+  Protocol.DataType := dataType;
+  Protocol.DataLength := length;
+  returnedPacket := Channel.Execute(Protocol.Packet);
+  arrayLength := returnedPacket.RequestDataSize * SHORT_SIZE;
+  SetLength(returnArray, length);
+  CopyMemory(returnArray, @returnedPacket.Data, arrayLength);
+  Result := returnArray;
 end;
 
-procedure TEasyIpClient.BlockWrite(offset: short; value: DynamicWordArray;
-  dataType: DataTypeEnum);
+procedure TEasyIpClient.BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
+var
+  sendedPacket: EasyIpPacket;
+  returnedPacket: EasyIpPacket;
+  returnArray: DynamicWordArray;
+  arrayLength: int;
+  dataLength: int;
 begin
+  dataLength := Length(value);
+  FProtocol := TEasyIpProtocol.Create(pmWrite);
+  Protocol.DataOffset := offset;
+  Protocol.DataType := dataType;
+  Protocol.DataLength := dataLength;
+  sendedPacket := Protocol.Packet;
 
+  arrayLength := dataLength * SHORT_SIZE;
+
+  CopyMemory(@sendedPacket.Data, value, arrayLength);
+
+  returnedPacket := Channel.Execute(sendedPacket);
+//  Sleep(0);
 end;
 
-constructor TEasyIpClient.Create;
+constructor TEasyIpClient.Create(_host: string);
 begin
-  inherited;
-  // TODO: create
+  inherited Create;
+  FChannel := TEasyIpChannel.Create(_host, EASYIP_PORT);
 end;
 
 destructor TEasyIpClient.Destroy;
 begin
   inherited;
-  // TODO: destroy
 end;
 
 function TEasyIpClient.GetChannel: IEasyIpChannel;
 begin
-  if Assigned(FChannel) then
-    Result := FChannel
-  else
-    Result := TEasyIpChannel.Create;
+  Result := FChannel;
 end;
 
 function TEasyIpClient.GetProtocol: IEasyIpProtocol;
 begin
-  if Assigned(FProtocol) then
-    Result := FProtocol
-  else
-    Result := TEasyIpProtocol.Create(pmRead);
+  Result := FProtocol;
 end;
 
 end.
