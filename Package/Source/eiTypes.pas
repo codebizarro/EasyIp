@@ -165,7 +165,11 @@ type
     property Packet: EasyIpPacket read GetPacket;
   end;
 
-  IEasyIpClient = interface
+  IClient = interface
+    ['{9D474F20-AAB6-4F67-90EC-31696084450E}']
+  end;
+
+  IEasyIpClient = interface(IClient)
     ['{5A5CB45B-B6D5-4916-B074-48FF471D8858}']
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);

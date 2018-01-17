@@ -16,6 +16,7 @@ uses
 type
   TCustomChannel = class(TInterfacedObject, IChannel)
   private
+    constructor Create;
     function GetTimeout: int;
     procedure SetTimeout(const value: int);
   protected
@@ -210,6 +211,12 @@ procedure TNetworkChannel.SetPort(const value: int);
 begin
   FPort := value;
   FTarget.sin_port := htons(FPort);
+end;
+
+constructor TCustomChannel.Create;
+begin
+  inherited;
+
 end;
 
 function TCustomChannel.GetTimeout: int;

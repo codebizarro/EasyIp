@@ -14,7 +14,12 @@ uses
   Windows;
 
 type
-  TEasyIpClient = class(TInterfacedObject, IEasyIpProtocol, IEasyIpChannel, IEasyIpClient)
+  TCustomClient = class(TInterfacedObject, IClient)
+  private
+    constructor Create;
+  end;
+
+  TEasyIpClient = class(TCustomClient, IEasyIpProtocol, IEasyIpChannel, IEasyIpClient)
   private
     FProtocol: IEasyIpProtocol;
     FChannel: IEasyIpChannel;
@@ -59,7 +64,7 @@ var
   arrayLength: int;
   dataLength: int;
 begin
-  dataLength := Length(value);
+  dataLength := length(value);
   FProtocol := TEasyIpProtocol.Create(pmWrite);
   Protocol.DataOffset := offset;
   Protocol.DataType := dataType;
@@ -92,6 +97,12 @@ end;
 function TEasyIpClient.GetProtocol: IEasyIpProtocol;
 begin
   Result := FProtocol;
+end;
+
+constructor TCustomClient.Create;
+begin
+  inherited;
+
 end;
 
 end.
