@@ -84,7 +84,7 @@ procedure TStopWatchTest.TestRun;
 const
   startSleepTime = 1;
   multiplier = 2;
-  stopSleepTime = 10000;
+  stopSleepTime = 500;
 var
   delta: int;
   sleepValue: int;

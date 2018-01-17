@@ -69,7 +69,7 @@ begin
 end;
 
 initialization
-  TestFramework.RegisterTest(TRepeatedTest.Create(TClientTest.Suite, 10));
+  TestFramework.RegisterTest(TRepeatedTest.Create(TClientTest.Suite, 2));
 
 end.
 

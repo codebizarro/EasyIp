@@ -82,7 +82,7 @@ end;
 
 initialization
   //TestFramework.RegisterTest(TChannelTest.Suite);
-  TestFramework.RegisterTest(TRepeatedTest.Create(TChannelTest.Suite, 1));
+  TestFramework.RegisterTest(TRepeatedTest.Create(TChannelTest.Suite, 2));
 
 end.
 
