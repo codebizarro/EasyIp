@@ -37,6 +37,7 @@ type
     FTarget: TSockAddrIn;
     function GetLastErrorString: string;
   public
+    constructor Create(host: string; port: int); overload;
     property Host: string read GetHost write SetHost;
     property Port: int read GetPort write SetPort;
   end;
@@ -63,7 +64,7 @@ type
   private
   protected
   public
-    constructor Create(host: string; port: int); overload;
+    constructor Create(host: string; port: int = EASYIP_PORT); overload;
     destructor Destroy; override;
     function Execute(packet: EasyIpPacket): EasyIpPacket; overload;
   end;
@@ -76,14 +77,7 @@ const
 
 constructor TUdpChannel.Create(host: string; port: int);
 begin
-  inherited Create;
-  Self.Host := host;
-  Self.Port := port;
-  Self.Timeout := 2000;
-  ZeroMemory(@FTarget, SizeOf(FTarget));
-  Self.FTarget.sin_port := htons(FPort);
-  Self.FTarget.sin_addr.S_addr := inet_addr(PChar(FHost));
-  Self.FTarget.sa_family := AF_INET;
+  inherited Create(host, port);
 end;
 
 destructor TMockChannel.Destroy;
@@ -157,7 +151,7 @@ begin
   Result := packet;
 end;
 
-constructor TEasyIpChannel.Create(host: string; port: int);
+constructor TEasyIpChannel.Create(host: string; port: int = EASYIP_PORT);
 begin
   inherited Create(host, port);
 
@@ -177,6 +171,15 @@ begin
   sendPacket := TPacketAdapter.ToByteArray(packet);
   recvPacket := inherited Execute(sendPacket);
   Result := TPacketAdapter.ToEasyIpPacket(recvPacket);
+end;
+
+constructor TNetworkChannel.Create(host: string; port: int);
+begin
+  ZeroMemory(@FTarget, SizeOf(FTarget));
+  FTarget.sa_family := AF_INET;
+  Self.Host := host;
+  Self.Port := port;
+  Timeout := 2000;
 end;
 
 function TNetworkChannel.GetHost: string;
@@ -200,13 +203,13 @@ end;
 procedure TNetworkChannel.SetHost(const value: string);
 begin
   FHost := value;
-  //TODO: Update FTarget
+  FTarget.sin_addr.S_addr := inet_addr(PChar(FHost));
 end;
 
 procedure TNetworkChannel.SetPort(const value: int);
 begin
   FPort := value;
-  //TODO: Update FTarget
+  FTarget.sin_port := htons(FPort);
 end;
 
 function TCustomChannel.GetTimeout: int;

@@ -26,7 +26,9 @@ type
   protected
     procedure SetUp; override;
     procedure TearDown; override;
+  public
   published
+    procedure TestChangeHost;
     procedure TestExecuteBuffer;
     procedure TestExecuteRecord;
   end;
@@ -42,8 +44,8 @@ procedure TChannelTest.SetUp;
 begin
   inherited;
 //  FChannel := TMockChannel.Create('127.0.0.1', EASYIP_PORT);
-  FBufferChannel := TEasyIpChannel.Create(TEST_PLC_HOST, EASYIP_PORT);
-  FPacketChannel := TEasyIpChannel.Create(TEST_PLC_HOST, EASYIP_PORT);
+  FBufferChannel := TEasyIpChannel.Create(TEST_PLC_HOST);
+  FPacketChannel := TEasyIpChannel.Create(TEST_PLC_HOST);
   FSendPacket := TPacketFactory.GetReadPacket(TEST_OFFSET, EASYIP_TYPE_FLAGWORD, 20);
   FSendBuffer := TPacketAdapter.ToByteArray(FSendPacket);
 end;
@@ -52,6 +54,14 @@ procedure TChannelTest.TearDown;
 begin
   inherited;
 
+end;
+
+procedure TChannelTest.TestChangeHost;
+begin
+  FBufferChannel.Host := TEST_SECOND_HOST;
+  FPacketChannel.Host := TEST_SECOND_HOST;
+  TestExecuteBuffer;
+  TestExecuteRecord;
 end;
 
 procedure TChannelTest.TestExecuteBuffer;

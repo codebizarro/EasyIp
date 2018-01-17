@@ -129,22 +129,4 @@ end;
 
 end.
 
- (*  //Usage example
- var
-   sw : TStopWatch;
-   elapsedMilliseconds : cardinal;
- begin
-   sw := TStopWatch.Create() ;
-   try
-     sw.Start;
-     //TimeOutThisFunction()
-     sw.Stop;
- 
-     elapsedMilliseconds := sw.ElapsedMilliseconds;
-   finally
-     sw.Free;
-   end;
- end;
- *)
-
 

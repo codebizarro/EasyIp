@@ -56,7 +56,6 @@ procedure TEasyIpClient.BlockWrite(offset: short; value: DynamicWordArray; dataT
 var
   sendedPacket: EasyIpPacket;
   returnedPacket: EasyIpPacket;
-  returnArray: DynamicWordArray;
   arrayLength: int;
   dataLength: int;
 begin
@@ -72,7 +71,6 @@ begin
   CopyMemory(@sendedPacket.Data, value, arrayLength);
 
   returnedPacket := Channel.Execute(sendedPacket);
-//  Sleep(0);
 end;
 
 constructor TEasyIpClient.Create(_host: string);
