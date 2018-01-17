@@ -28,25 +28,26 @@ type
   TNetworkChannel = class(TCustomChannel, INetworkChannel)
   private
     function GetHost: string;
+    function GetPort: int;
     procedure SetHost(const value: string);
+    procedure SetPort(const value: int);
   protected
     FHost: string;
+    FPort: int;
+    FTarget: TSockAddrIn;
     function GetLastErrorString: string;
   public
     property Host: string read GetHost write SetHost;
+    property Port: int read GetPort write SetPort;
   end;
 
   TUdpChannel = class(TNetworkChannel, IUdpChannel)
   private
-    function GetPort: int;
-    procedure SetPort(const value: int);
   protected
-    FPort: int;
-    FTarget: TSockAddrIn;//TODO: move to TNetworkChannel!
+
   public
     constructor Create(host: string; port: int); overload;
     function Execute(buffer: DynamicByteArray): DynamicByteArray; overload; override;
-    property Port: int read GetPort write SetPort;
   end;
 
   TMockChannel = class(TUdpChannel, IEasyIpChannel)
@@ -140,16 +141,6 @@ begin
   end;
 end;
 
-function TUdpChannel.GetPort: int;
-begin
-  Result := FPort;
-end;
-
-procedure TUdpChannel.SetPort(const value: int);
-begin
-  FPort := value;
-end;
-
 function TMockChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
 var
   temp: DynamicByteArray;
@@ -201,9 +192,21 @@ begin
   Result := Buffer;
 end;
 
+function TNetworkChannel.GetPort: int;
+begin
+  Result := FPort;
+end;
+
 procedure TNetworkChannel.SetHost(const value: string);
 begin
   FHost := value;
+  //TODO: Update FTarget
+end;
+
+procedure TNetworkChannel.SetPort(const value: int);
+begin
+  FPort := value;
+  //TODO: Update FTarget
 end;
 
 function TCustomChannel.GetTimeout: int;

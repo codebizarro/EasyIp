@@ -128,15 +128,15 @@ type
   INetworkChannel = interface(IChannel)
     ['{F5995BE4-509D-498D-9A4C-68AD721822DE}']
     function GetHost: string;
+    function GetPort: int;
     procedure SetHost(const value: string);
+    procedure SetPort(const value: int);
     property Host: string read GetHost write SetHost;
+    property Port: int read GetPort write SetPort;
   end;
 
   IUdpChannel = interface(INetworkChannel)
     ['{C65D3A64-E4E8-4C4E-83AF-A670BEFFEACF}']
-    function GetPort: int;
-    procedure SetPort(const value: int);
-    property Port: int read GetPort write SetPort;
   end;
 
   IEasyIpChannel = interface(IUdpChannel)
