@@ -22,6 +22,7 @@ type
   protected
     FTimeout: int;
   public
+    destructor Destroy; override;
     function Execute(buffer: DynamicByteArray): DynamicByteArray; virtual; abstract;
     property Timeout: int read GetTimeout write SetTimeout default 2000;
   end;
@@ -39,6 +40,7 @@ type
     function GetLastErrorString: string;
   public
     constructor Create(host: string; port: int); overload;
+    destructor Destroy; override;
     property Host: string read GetHost write SetHost;
     property Port: int read GetPort write SetPort;
   end;
@@ -46,9 +48,9 @@ type
   TUdpChannel = class(TNetworkChannel, IUdpChannel)
   private
   protected
-
   public
     constructor Create(host: string; port: int); overload;
+    destructor Destroy; override;
     function Execute(buffer: DynamicByteArray): DynamicByteArray; overload; override;
   end;
 
@@ -82,6 +84,12 @@ begin
 end;
 
 destructor TMockChannel.Destroy;
+begin
+  inherited;
+
+end;
+
+destructor TUdpChannel.Destroy;
 begin
   inherited;
 
@@ -183,6 +191,12 @@ begin
   Timeout := 2000;
 end;
 
+destructor TNetworkChannel.Destroy;
+begin
+  inherited;
+
+end;
+
 function TNetworkChannel.GetHost: string;
 begin
   Result := FHost;
@@ -214,6 +228,12 @@ begin
 end;
 
 constructor TCustomChannel.Create;
+begin
+  inherited;
+
+end;
+
+destructor TCustomChannel.Destroy;
 begin
   inherited;
 

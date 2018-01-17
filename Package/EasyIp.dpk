@@ -1,6 +1,7 @@
 package EasyIp;
 
 {$R *.RES}
+{$R eiClient.dcr}
 {$ALIGN ON}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}

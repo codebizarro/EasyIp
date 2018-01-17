@@ -14,31 +14,43 @@ uses
   Windows;
 
 type
-  TCustomClient = class(TInterfacedObject, IClient)
+  TCustomClient = class(TComponent, IClient)
   private
-    constructor Create;
+  protected
   end;
 
-  TEasyIpClient = class(TCustomClient, IEasyIpProtocol, IEasyIpChannel, IEasyIpClient)
+  TEasyIpClient = class(TCustomClient, IEasyIpClient)
   private
     FProtocol: IEasyIpProtocol;
     FChannel: IEasyIpChannel;
-    FHost: string;
     function GetChannel: IEasyIpChannel;
+    function GetHost: string;
+    function GetPort: int;
     function GetProtocol: IEasyIpProtocol;
-    property Channel: IEasyIpChannel read GetChannel implements IEasyIpChannel;
-    property Protocol: IEasyIpProtocol read GetProtocol implements IEasyIpProtocol;
+    procedure SetHost(const Value: string);
+    procedure SetPort(const Value: int);
+    property Channel: IEasyIpChannel read GetChannel;
+    property Protocol: IEasyIpProtocol read GetProtocol;
   protected
   public
-    constructor Create(_host: string); overload;
+    constructor Create(AOwner: TComponent); overload; override;
+    constructor Create(_host: string); reintroduce; overload;
     destructor Destroy; override;
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
   published
-    property Host: string read FHost write FHost;
+    property Host: string read GetHost write SetHost;
+    property Port: int read GetPort write SetPort;
   end;
 
+  procedure Register();
+
 implementation
+
+procedure Register();
+begin
+  RegisterComponents('AESoft', [TEasyIpClient]);
+end;
 
 function TEasyIpClient.BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
 var
@@ -78,9 +90,15 @@ begin
   returnedPacket := Channel.Execute(sendedPacket);
 end;
 
+constructor TEasyIpClient.Create(AOwner: TComponent);
+begin
+  inherited;
+  FChannel := TEasyIpChannel.Create('', EASYIP_PORT);
+end;
+
 constructor TEasyIpClient.Create(_host: string);
 begin
-  inherited Create;
+  inherited Create(nil);
   FChannel := TEasyIpChannel.Create(_host, EASYIP_PORT);
 end;
 
@@ -94,15 +112,29 @@ begin
   Result := FChannel;
 end;
 
+function TEasyIpClient.GetHost: string;
+begin
+  Result := Channel.Host;
+end;
+
+function TEasyIpClient.GetPort: int;
+begin
+  Result := Channel.Port;
+end;
+
 function TEasyIpClient.GetProtocol: IEasyIpProtocol;
 begin
   Result := FProtocol;
 end;
 
-constructor TCustomClient.Create;
+procedure TEasyIpClient.SetHost(const Value: string);
 begin
-  inherited;
+  Channel.Host := Value;
+end;
 
+procedure TEasyIpClient.SetPort(const Value: int);
+begin
+  Channel.Port := Value;
 end;
 
 end.

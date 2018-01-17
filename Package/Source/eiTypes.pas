@@ -173,10 +173,12 @@ type
     ['{5A5CB45B-B6D5-4916-B074-48FF471D8858}']
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
-    function GetChannel: IEasyIpChannel;
-    function GetProtocol: IEasyIpProtocol;
-    property Channel: IEasyIpChannel read GetChannel;
-    property Protocol: IEasyIpProtocol read GetProtocol;
+    function GetHost: string;
+    function GetPort: int;
+    procedure SetHost(const Value: string);
+    procedure SetPort(const Value: int);
+    property Host: string read GetHost write SetHost;
+    property Port: int read GetPort write SetPort;
   end;
 
 implementation

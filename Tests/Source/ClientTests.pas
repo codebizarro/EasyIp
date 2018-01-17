@@ -38,7 +38,8 @@ uses
 procedure TClientTest.SetUp;
 begin
   inherited;
-  FClient := TEasyIpClient.Create(TEST_PLC_HOST);
+  FClient := TEasyIpClient.Create(nil);
+  FClient.Host := TEST_PLC_HOST;
 end;
 
 procedure TClientTest.TearDown;
