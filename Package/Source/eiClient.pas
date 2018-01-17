@@ -21,8 +21,8 @@ type
 
   TEasyIpClient = class(TCustomClient, IEasyIpClient)
   private
-    FProtocol: IEasyIpProtocol;
     FChannel: IEasyIpChannel;
+    FProtocol: IEasyIpProtocol;
     function GetChannel: IEasyIpChannel;
     function GetHost: string;
     function GetPort: int;
@@ -31,10 +31,9 @@ type
     procedure SetPort(const Value: int);
     property Channel: IEasyIpChannel read GetChannel;
     property Protocol: IEasyIpProtocol read GetProtocol;
-  protected
   public
-    constructor Create(AOwner: TComponent); overload; override;
     constructor Create(_host: string); reintroduce; overload;
+    constructor Create(AOwner: TComponent); overload; override;
     destructor Destroy; override;
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
@@ -50,6 +49,23 @@ implementation
 procedure Register();
 begin
   RegisterComponents('AESoft', [TEasyIpClient]);
+end;
+
+constructor TEasyIpClient.Create(_host: string);
+begin
+  inherited Create(nil);
+  FChannel := TEasyIpChannel.Create(_host, EASYIP_PORT);
+end;
+
+constructor TEasyIpClient.Create(AOwner: TComponent);
+begin
+  inherited;
+  FChannel := TEasyIpChannel.Create('', EASYIP_PORT);
+end;
+
+destructor TEasyIpClient.Destroy;
+begin
+  inherited;
 end;
 
 function TEasyIpClient.BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
@@ -88,23 +104,6 @@ begin
   CopyMemory(@sendedPacket.Data, value, arrayLength);
 
   returnedPacket := Channel.Execute(sendedPacket);
-end;
-
-constructor TEasyIpClient.Create(AOwner: TComponent);
-begin
-  inherited;
-  FChannel := TEasyIpChannel.Create('', EASYIP_PORT);
-end;
-
-constructor TEasyIpClient.Create(_host: string);
-begin
-  inherited Create(nil);
-  FChannel := TEasyIpChannel.Create(_host, EASYIP_PORT);
-end;
-
-destructor TEasyIpClient.Destroy;
-begin
-  inherited;
 end;
 
 function TEasyIpClient.GetChannel: IEasyIpChannel;
