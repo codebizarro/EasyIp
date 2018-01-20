@@ -22,9 +22,10 @@ type
     function GetHost: string;
     function GetPort: int;
     function GetProtocol: IEasyIpProtocol;
+    procedure InitInterfaces(_host: string);
     procedure SetDebug(const Value: string);
-    procedure SetHost(const Value: string);
-    procedure SetPort(const Value: int);
+    procedure SetHost(const value: string);
+    procedure SetPort(const value: int);
     property Channel: IEasyIpChannel read GetChannel;
     property Debug: string write SetDebug;
     property Protocol: IEasyIpProtocol read GetProtocol;
@@ -51,13 +52,13 @@ end;
 constructor TEasyIpClient.Create(_host: string);
 begin
   inherited Create(nil);
-  FChannel := TEasyIpChannel.Create(_host, EASYIP_PORT);
+  InitInterfaces(_host);
 end;
 
 constructor TEasyIpClient.Create(AOwner: TComponent);
 begin
   inherited;
-  FChannel := TEasyIpChannel.Create('', EASYIP_PORT);
+  InitInterfaces('127.0.0.1');
 end;
 
 destructor TEasyIpClient.Destroy;
@@ -126,19 +127,25 @@ begin
   Result := FProtocol;
 end;
 
+procedure TEasyIpClient.InitInterfaces(_host: string);
+begin
+  FChannel := TEasyIpChannel.Create(_host, EASYIP_PORT);
+  FProtocol := TEasyIpProtocol.Create();
+end;
+
 procedure TEasyIpClient.SetDebug(const Value: string);
 begin
   OutputDebugString(PChar(Value));
 end;
 
-procedure TEasyIpClient.SetHost(const Value: string);
+procedure TEasyIpClient.SetHost(const value: string);
 begin
-  Channel.Host := Value;
+  Channel.Host := value;
 end;
 
-procedure TEasyIpClient.SetPort(const Value: int);
+procedure TEasyIpClient.SetPort(const value: int);
 begin
-  Channel.Port := Value;
+  Channel.Port := value;
 end;
 
 end.

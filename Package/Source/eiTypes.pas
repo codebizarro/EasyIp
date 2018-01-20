@@ -157,12 +157,15 @@ type
     function GetDataLength: DataLength;
     function GetDataOffset: ushort;
     function GetDataType: DataTypeEnum;
+    function GetMode: PacketModeEnum;
     procedure SetDataLength(const value: DataLength);
     procedure SetDataOffset(const value: ushort);
     procedure SetDataType(const value: DataTypeEnum);
+    procedure SetMode(const value: PacketModeEnum);
     property DataLength: DataLength read GetDataLength write SetDataLength;
     property DataOffset: ushort read GetDataOffset write SetDataOffset;
     property DataType: DataTypeEnum read GetDataType write SetDataType;
+    property Mode: PacketModeEnum read GetMode write SetMode;
     property Packet: EasyIpPacket read GetPacket;
   end;
 
@@ -176,8 +179,8 @@ type
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
     function GetHost: string;
     function GetPort: int;
-    procedure SetHost(const Value: string);
-    procedure SetPort(const Value: int);
+    procedure SetHost(const value: string);
+    procedure SetPort(const value: int);
     property Host: string read GetHost write SetHost;
     property Port: int read GetPort write SetPort;
   end;

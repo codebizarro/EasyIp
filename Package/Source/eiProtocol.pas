@@ -21,9 +21,11 @@ type
     function GetDataLength: DataLength;
     function GetDataOffset: ushort;
     function GetDataType: DataTypeEnum;
+    function GetMode: PacketModeEnum;
     procedure SetDataLength(const value: DataLength);
     procedure SetDataOffset(const value: ushort);
     procedure SetDataType(const value: DataTypeEnum);
+    procedure SetMode(const value: PacketModeEnum);
   public
     constructor Create(mode: PacketModeEnum); overload;
     destructor Destroy; override;
@@ -31,6 +33,7 @@ type
     property DataLength: DataLength read GetDataLength write SetDataLength;
     property DataOffset: ushort read GetDataOffset write SetDataOffset;
     property DataType: DataTypeEnum read GetDataType write SetDataType;
+    property Mode: PacketModeEnum read GetMode write SetMode;
     property Packet: EasyIpPacket read GetPacket;
   end;
 
@@ -116,6 +119,11 @@ begin
   end;
 end;
 
+function TEasyIpProtocol.GetMode: PacketModeEnum;
+begin
+  Result := FMode;
+end;
+
 function TEasyIpProtocol.GetPacket: EasyIpPacket;
 begin
   Result := FPacket;
@@ -158,6 +166,11 @@ begin
     FPacket.RequestDataType := dataType
   else
     FPacket.SendDataType := dataType;
+end;
+
+procedure TEasyIpProtocol.SetMode(const value: PacketModeEnum);
+begin
+  FMode := value;
 end;
 
 end.
