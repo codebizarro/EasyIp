@@ -83,18 +83,19 @@ const
 constructor TUdpChannel.Create(host: string; port: int);
 begin
   inherited Create(host, port);
+  Debug := Format(DEBUG_MESSAGE_CREATE, ['TUdpChannel']);
 end;
 
 destructor TMockChannel.Destroy;
 begin
+  Debug := Format(DEBUG_MESSAGE_DESTROY, ['TMockChannel']);
   inherited;
-  Debug := 'TMockChannel.Destroy';
 end;
 
 destructor TUdpChannel.Destroy;
 begin
+  Debug := Format(DEBUG_MESSAGE_DESTROY, ['TUdpChannel']);
   inherited;
-  Debug := 'TUdpChannel.Destroy';
 end;
 
 function TUdpChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
@@ -165,13 +166,13 @@ end;
 constructor TEasyIpChannel.Create(host: string; port: int = EASYIP_PORT);
 begin
   inherited Create(host, port);
-
+  Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpChannel']);
 end;
 
 destructor TEasyIpChannel.Destroy;
 begin
+  Debug := Format(DEBUG_MESSAGE_DESTROY, ['TEasyIpChannel']);
   inherited;
-  Debug := 'TEasyIpChannel.Destroy';
 end;
 
 function TEasyIpChannel.Execute(packet: EasyIpPacket): EasyIpPacket;
@@ -192,12 +193,13 @@ begin
   Self.Host := host;
   Self.Port := port;
   Timeout := 2000;
+  Debug := Format(DEBUG_MESSAGE_CREATE, ['TNetworkChannel']);
 end;
 
 destructor TNetworkChannel.Destroy;
 begin
+  Debug := Format(DEBUG_MESSAGE_DESTROY, ['TNetworkChannel']);
   inherited;
-  Debug := 'TNetworkChannel.Destroy';
 end;
 
 function TNetworkChannel.GetHost: string;
@@ -234,12 +236,13 @@ constructor TCustomChannel.Create;
 begin
   inherited;
   Timeout := CHANNEL_DEFAULT_TIMEOUT;
+  Debug := Format(DEBUG_MESSAGE_CREATE, ['TCustomChannel']);
 end;
 
 destructor TCustomChannel.Destroy;
 begin
+  Debug := Format(DEBUG_MESSAGE_DESTROY, ['TCustomChannel']);
   inherited;
-  Debug := 'TCustomChannel.Destroy';
 end;
 
 function TCustomChannel.GetTimeout: int;
