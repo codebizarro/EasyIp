@@ -30,6 +30,12 @@ const
   EASYIP_TYPE_TIMER = 5;
   EASYIP_TYPE_STRING = 11;
 
+  CHANNEL_DEFAULT_TIMEOUT = 2000;
+
+resourcestring
+  DEBUG_MESSAGE_DESTROY = '%s is destroyed';
+  DEBUG_MESSAGE_CREATE = '%s is created';
+
 implementation
 
 end.

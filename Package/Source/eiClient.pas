@@ -23,7 +23,7 @@ type
     function GetPort: int;
     function GetProtocol: IEasyIpProtocol;
     procedure InitInterfaces(_host: string);
-    procedure SetDebug(const Value: string);
+    procedure SetDebug(const value: string);
     procedure SetHost(const value: string);
     procedure SetPort(const value: int);
     property Channel: IEasyIpChannel read GetChannel;
@@ -66,7 +66,7 @@ begin
   inherited;
   FChannel := nil;
   FProtocol := nil;
-  Debug := 'TEasyIpClient.Destroy';
+  Debug := Format(DEBUG_MESSAGE_DESTROY, [ClassName]);
 end;
 
 function TEasyIpClient.BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
@@ -133,9 +133,9 @@ begin
   FProtocol := TEasyIpProtocol.Create();
 end;
 
-procedure TEasyIpClient.SetDebug(const Value: string);
+procedure TEasyIpClient.SetDebug(const value: string);
 begin
-  OutputDebugString(PChar(Value));
+  OutputDebugString(PChar(value));
 end;
 
 procedure TEasyIpClient.SetHost(const value: string);

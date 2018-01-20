@@ -18,7 +18,7 @@ type
   private
     constructor Create;
     function GetTimeout: int;
-    procedure SetDebug(const Value: string);
+    procedure SetDebug(const value: string);
     procedure SetTimeout(const value: int);
   protected
     FTimeout: int;
@@ -26,7 +26,7 @@ type
   public
     destructor Destroy; override;
     function Execute(buffer: DynamicByteArray): DynamicByteArray; virtual; abstract;
-    property Timeout: int read GetTimeout write SetTimeout default 2000;
+    property Timeout: int read GetTimeout write SetTimeout default CHANNEL_DEFAULT_TIMEOUT;
   end;
 
   TNetworkChannel = class(TCustomChannel, INetworkChannel)
@@ -186,6 +186,7 @@ end;
 
 constructor TNetworkChannel.Create(host: string; port: int);
 begin
+  inherited Create;
   ZeroMemory(@FTarget, SizeOf(FTarget));
   FTarget.sa_family := AF_INET;
   Self.Host := host;
@@ -232,7 +233,7 @@ end;
 constructor TCustomChannel.Create;
 begin
   inherited;
-
+  Timeout := CHANNEL_DEFAULT_TIMEOUT;
 end;
 
 destructor TCustomChannel.Destroy;
