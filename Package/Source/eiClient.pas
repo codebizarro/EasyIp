@@ -14,11 +14,6 @@ uses
   Windows;
 
 type
-  TCustomClient = class(TComponent, IClient)
-  private
-  protected
-  end;
-
   TEasyIpClient = class(TCustomClient, IEasyIpClient)
   private
     FChannel: IEasyIpChannel;
@@ -27,9 +22,11 @@ type
     function GetHost: string;
     function GetPort: int;
     function GetProtocol: IEasyIpProtocol;
+    procedure SetDebug(const Value: string);
     procedure SetHost(const Value: string);
     procedure SetPort(const Value: int);
     property Channel: IEasyIpChannel read GetChannel;
+    property Debug: string write SetDebug;
     property Protocol: IEasyIpProtocol read GetProtocol;
   public
     constructor Create(_host: string); reintroduce; overload;
@@ -66,6 +63,9 @@ end;
 destructor TEasyIpClient.Destroy;
 begin
   inherited;
+  FChannel := nil;
+  FProtocol := nil;
+  Debug := 'TEasyIpClient.Destroy';
 end;
 
 function TEasyIpClient.BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
@@ -124,6 +124,11 @@ end;
 function TEasyIpClient.GetProtocol: IEasyIpProtocol;
 begin
   Result := FProtocol;
+end;
+
+procedure TEasyIpClient.SetDebug(const Value: string);
+begin
+  OutputDebugString(PChar(Value));
 end;
 
 procedure TEasyIpClient.SetHost(const Value: string);

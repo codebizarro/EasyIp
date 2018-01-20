@@ -23,15 +23,27 @@ type
   protected
     procedure SetUp; override;
     procedure TearDown; override;
+  public
   published
     procedure TestBlockRead;
     procedure TestBlockWrite;
+    procedure LifeCycleTest;
   end;
 
 implementation
 
 uses
   TestConstants;
+
+procedure TClientTest.LifeCycleTest;
+var
+  ic: TEasyIpClient;
+begin
+;  ic := TEasyIpClient.Create(nil);
+  ic.Host := TEST_PLC_HOST;
+  //ic := nil;
+  ic.free
+end;
 
 { TClientTest }
 

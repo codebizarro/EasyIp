@@ -18,9 +18,11 @@ type
   private
     constructor Create;
     function GetTimeout: int;
+    procedure SetDebug(const Value: string);
     procedure SetTimeout(const value: int);
   protected
     FTimeout: int;
+    property Debug: string write SetDebug;
   public
     destructor Destroy; override;
     function Execute(buffer: DynamicByteArray): DynamicByteArray; virtual; abstract;
@@ -86,13 +88,13 @@ end;
 destructor TMockChannel.Destroy;
 begin
   inherited;
-
+  Debug := 'TMockChannel.Destroy';
 end;
 
 destructor TUdpChannel.Destroy;
 begin
   inherited;
-
+  Debug := 'TUdpChannel.Destroy';
 end;
 
 function TUdpChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
@@ -169,7 +171,7 @@ end;
 destructor TEasyIpChannel.Destroy;
 begin
   inherited;
-
+  Debug := 'TEasyIpChannel.Destroy';
 end;
 
 function TEasyIpChannel.Execute(packet: EasyIpPacket): EasyIpPacket;
@@ -194,7 +196,7 @@ end;
 destructor TNetworkChannel.Destroy;
 begin
   inherited;
-
+  Debug := 'TNetworkChannel.Destroy';
 end;
 
 function TNetworkChannel.GetHost: string;
@@ -236,12 +238,17 @@ end;
 destructor TCustomChannel.Destroy;
 begin
   inherited;
-
+  Debug := 'TCustomChannel.Destroy';
 end;
 
 function TCustomChannel.GetTimeout: int;
 begin
   Result := FTimeout;
+end;
+
+procedure TCustomChannel.SetDebug(const Value: string);
+begin
+  OutputDebugString(PChar(Value));
 end;
 
 procedure TCustomChannel.SetTimeout(const value: int);

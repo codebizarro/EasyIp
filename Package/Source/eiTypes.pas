@@ -1,6 +1,7 @@
 unit eiTypes;
 
 interface
+uses Classes;
 
 type
   PDynamicByteArray = ^DynamicByteArray;
@@ -179,6 +180,11 @@ type
     procedure SetPort(const Value: int);
     property Host: string read GetHost write SetHost;
     property Port: int read GetPort write SetPort;
+  end;
+
+  TCustomClient = class(TComponent, IClient)
+  private
+  protected
   end;
 
 implementation
