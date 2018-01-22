@@ -28,6 +28,7 @@ type
     procedure TestBlockRead;
     procedure TestBlockWrite;
     procedure LifeCycleTest;
+    procedure TestInfoRead;
   end;
 
 implementation
@@ -79,6 +80,15 @@ begin
   for i := 0 to TEST_LENGTH - 1 do
     values[i] := i + 1;
   FClient.BlockWrite(TEST_OFFSET, values, dtFlag);
+end;
+
+procedure TClientTest.TestInfoRead;
+var
+  data: DynamicWordArray;
+begin
+  data := FClient.InfoRead();
+  Check(data <> nil);
+  Check(Length(data) > 0);
 end;
 
 initialization

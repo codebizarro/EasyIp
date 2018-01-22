@@ -170,6 +170,16 @@ end;
 
 procedure TEasyIpProtocol.SetMode(const value: PacketModeEnum);
 begin
+  if value = pmInfo then
+  begin
+    FPacket.Flags := FPacket.Flags or EASYIP_FLAG_INFO;
+//    FPacket.Counter := FPacket.Counter + 1;
+
+    FPacket.RequestDataSize := 1;
+    FPacket.Data[1] := 1;
+  end
+  else
+    FPacket.Flags := 0;
   FMode := value;
 end;
 

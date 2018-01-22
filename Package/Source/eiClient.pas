@@ -33,6 +33,7 @@ type
     constructor Create(_host: string); reintroduce; overload;
     constructor Create(AOwner: TComponent); overload; override;
     destructor Destroy; override;
+    function InfoRead(): DynamicWordArray;
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
   published
@@ -75,7 +76,7 @@ var
   returnArray: DynamicWordArray;
   arrayLength: int;
 begin
-  FProtocol := TEasyIpProtocol.Create(pmRead);
+  Protocol.Mode := pmRead;
   Protocol.DataOffset := offset;
   Protocol.DataType := dataType;
   Protocol.DataLength := length;
@@ -94,7 +95,7 @@ var
   dataLength: int;
 begin
   dataLength := length(value);
-  FProtocol := TEasyIpProtocol.Create(pmWrite);
+  Protocol.Mode := pmWrite;
   Protocol.DataOffset := offset;
   Protocol.DataType := dataType;
   Protocol.DataLength := dataLength;
@@ -146,6 +147,20 @@ end;
 procedure TEasyIpClient.SetPort(const value: int);
 begin
   Channel.Port := value;
+end;
+
+function TEasyIpClient.InfoRead: DynamicWordArray;
+var
+  returnedPacket: EasyIpPacket;
+  returnArray: DynamicWordArray;
+  arrayLength: int;
+begin
+  Protocol.Mode := pmInfo;
+  returnedPacket := Channel.Execute(Protocol.Packet);
+  arrayLength := returnedPacket.RequestDataSize * SHORT_SIZE;
+  SetLength(returnArray, arrayLength); //38
+  CopyMemory(returnArray, @returnedPacket.Data, arrayLength);
+  Result := returnArray;
 end;
 
 end.

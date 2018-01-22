@@ -26,7 +26,7 @@ type
 
   DataTypeEnum = (dtUndefined, dtFlag, dtInput, dtOutput, dtRegister, dtTimer, dtString);
 
-  PacketModeEnum = (pmRead, pmWrite);
+  PacketModeEnum = (pmRead, pmWrite, pmInfo);
 
   DataLength = 1..256;
 
@@ -175,6 +175,7 @@ type
 
   IEasyIpClient = interface(IClient)
     ['{5A5CB45B-B6D5-4916-B074-48FF471D8858}']
+    function InfoRead(): DynamicWordArray;
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
     function GetHost: string;
