@@ -15,11 +15,12 @@ type
     class function GetReadPacket(offset: short; dataType, length: byte): EasyIpPacket;
     class function GetWritePacket(offset: short; dataType, length: byte): EasyIpPacket;
   end;
-
+  
   TPacketAdapter = class
   public
     class function ToByteArray(packet: EasyIpPacket): DynamicByteArray;
     class function ToEasyIpPacket(buffer: DynamicByteArray): EasyIpPacket;
+    class function ToEasyIpInfoPacket(packet: EasyIpPacket): EasyIpInfoPacket;
   end;
 
 implementation
@@ -90,6 +91,18 @@ begin
   ZeroMemory(@tPacket, SizeOf(tPacket));
   CopyMemory(@tPacket, buffer, length(buffer));
   Result := tPacket;
+end;
+
+class function TPacketAdapter.ToEasyIpInfoPacket(packet: EasyIpPacket):
+    EasyIpInfoPacket;
+var
+  infoPacket: EasyIpInfoPacket;
+  dataLength: int;
+begin
+  dataLength := SizeOf(infoPacket);
+  ZeroMemory(@infoPacket, dataLength);
+  CopyMemory(@infoPacket, @packet.Data, dataLength);
+  Result := infoPacket;
 end;
 
 end.
