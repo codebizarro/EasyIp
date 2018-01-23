@@ -46,7 +46,7 @@ type
 /// Bit 6 do not respond
 /// Bit 7 response packet
 /// </summary>
-    Flags: Byte;
+    Flags: byte;
 /// <summary>
 /// 1 byte
 /// Only used in response packets
@@ -56,18 +56,18 @@ type
 /// 4: size error
 /// 16: no support
 /// </summary>
-    Error: Byte;
+    Error: byte;
 /// <summary>
 /// 4 bytes
 /// Set by client, copied by server
 /// </summary>
-    Counter: Integer;
+    Counter: int;
 /// <summary>
 /// 1 byte
 /// Reserved
 /// Set to 0
 /// </summary>
-    Spare1: Byte;
+    Spare1: byte;
 /// <summary>
 /// 1 byte
 /// Type of operand, some types may not be available
@@ -78,47 +78,70 @@ type
 /// 5 timer
 /// 11 strings3
 /// </summary>
-    SendDataType: Byte;
+    SendDataType: byte;
 /// <summary>
 /// 2 bytes
 /// Number of words
 /// </summary>
-    SendDataSize: Word;
+    SendDataSize: ushort;
 /// <summary>
 /// 2 bytes
 /// Target offset in server
 /// </summary>
-    SendDataOffset: Word;
+    SendDataOffset: ushort;
 /// <summary>
 /// 1 byte
 /// Reserved
 /// Set to 0
-    Spare2: Byte;
+    Spare2: byte;
 /// <summary>
 /// 1 byte
 /// Type of operand, some types may not be available (see senddata type for list of types)
 /// </summary>
-    RequestDataType: Byte;
+    RequestDataType: byte;
 /// <summary>
 /// 2 bytes
 /// Number of words
 /// </summary>
-    RequestDataSize: Word;
+    RequestDataSize: ushort;
 /// <summary>
 /// 2 bytes
 /// Offset in server
 /// </summary>
-    RequestDataOffsetServer: Word;
+    RequestDataOffsetServer: ushort;
 /// <summary>
 /// 2 bytes
 /// Target offset in client
 /// </summary>
-    RequestDataOffsetClient: Word;
+    RequestDataOffsetClient: ushort;
 /// <summary>
 /// N*2 bytes
 /// Data send by client or requested data
 /// </summary>
-    Data: array[1..256] of Word;
+    Data: array[1..256] of ushort;
+  end;
+
+  PEasyIpInfoPacket = ^EasyIpInfoPacket;
+
+  EasyIpInfoPacket = packed record
+/// <summary>
+/// Type of information packet, 1=packet with
+/// controller and operand info.
+/// </summary>
+    InformationType: ushort;
+/// <summary>
+/// Type of controller: 1=FST, 2=MWT, 3=DOS etc
+/// </summary>
+    ControllerType: ushort;
+    ControllerRevisionHigh: ushort;
+    ControllerRevisioLow: ushort;
+    EasyIpRevisionHigh: ushort;
+    EasyIpRevisionLow: ushort;
+/// <summary>
+/// 0 if unavailable otherwise number of
+/// operands supported
+/// </summary>
+    OperandSize: array[1..32] of ushort;
   end;
 
   IChannel = interface
@@ -178,15 +201,18 @@ type
 
   IEasyIpClient = interface(IClient)
     ['{5A5CB45B-B6D5-4916-B074-48FF471D8858}']
-    function InfoRead(): DynamicWordArray;
+    function InfoRead(): EasyIpInfoPacket;
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
     function GetHost: string;
     function GetPort: int;
+    function GetTimeout: int;
     procedure SetHost(const value: string);
     procedure SetPort(const value: int);
+    procedure SetTimeout(const value: int);
     property Host: string read GetHost write SetHost;
     property Port: int read GetPort write SetPort;
+    property Timeout: int read GetTimeout write SetTimeout;
   end;
 
   TCustomClient = class(TComponent, IClient)
