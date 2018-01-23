@@ -44,7 +44,7 @@ type
     constructor Create(host: string; port: int); overload;
     destructor Destroy; override;
     property Host: string read GetHost write SetHost;
-    property Port: int read GetPort write SetPort;
+    property Port: int read GetPort write SetPort default EASYIP_PORT;
   end;
 
   TUdpChannel = class(TNetworkChannel, IUdpChannel)

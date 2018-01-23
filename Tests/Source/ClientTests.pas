@@ -84,11 +84,10 @@ end;
 
 procedure TClientTest.TestInfoRead;
 var
-  data: DynamicWordArray;
+  data: EasyIpInfoPacket;
 begin
   data := FClient.InfoRead();
-  Check(data <> nil);
-  Check(Length(data) > 0);
+  Check(data.InformationType = 1);
 end;
 
 initialization

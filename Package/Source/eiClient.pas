@@ -24,10 +24,12 @@ type
     function GetHost: string;
     function GetPort: int;
     function GetProtocol: IEasyIpProtocol;
+    function GetTimeout: int;
     procedure InitInterfaces(_host: string);
     procedure SetDebug(const value: string);
     procedure SetHost(const value: string);
     procedure SetPort(const value: int);
+    procedure SetTimeout(const value: int);
     property Channel: IEasyIpChannel read GetChannel;
     property Debug: string write SetDebug;
     property Protocol: IEasyIpProtocol read GetProtocol;
@@ -36,12 +38,13 @@ type
     constructor Create(_host: string); reintroduce; overload;
     constructor Create(AOwner: TComponent); overload; override;
     destructor Destroy; override;
-    function InfoRead(): DynamicWordArray;
+    function InfoRead: EasyIpInfoPacket;
     function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
   published
     property Host: string read GetHost write SetHost;
-    property Port: int read GetPort write SetPort;
+    property Port: int read GetPort write SetPort default EASYIP_PORT;
+    property Timeout: int read GetTimeout write SetTimeout default CHANNEL_DEFAULT_TIMEOUT;
     property OnException: TExceptionEvent read FOnException write FOnException;
   end;
 
@@ -63,7 +66,7 @@ end;
 constructor TEasyIpClient.Create(AOwner: TComponent);
 begin
   inherited;
-  InitInterfaces('127.0.0.1');
+  InitInterfaces('');
 end;
 
 destructor TEasyIpClient.Destroy;
@@ -155,6 +158,11 @@ begin
   Result := FProtocol;
 end;
 
+function TEasyIpClient.GetTimeout: int;
+begin
+  Result := Channel.Timeout;
+end;
+
 procedure TEasyIpClient.InitInterfaces(_host: string);
 begin
   FChannel := TEasyIpChannel.Create(_host, EASYIP_PORT);
@@ -176,11 +184,10 @@ begin
   Channel.Port := value;
 end;
 
-function TEasyIpClient.InfoRead: DynamicWordArray;
+function TEasyIpClient.InfoRead: EasyIpInfoPacket;
 var
   returnedPacket: EasyIpPacket;
-  returnArray: DynamicWordArray;
-  arrayLength: int;
+  returnPacket: EasyIpInfoPacket;
 begin
   Protocol.Mode := pmInfo;
   try
@@ -190,10 +197,13 @@ begin
       if DispatchException(E) then
         raise;
   end;
-  arrayLength := returnedPacket.RequestDataSize * SHORT_SIZE;
-  SetLength(returnArray, arrayLength); //38
-  CopyMemory(returnArray, @returnedPacket.Data, arrayLength);
-  Result := returnArray;
+  returnPacket := TPacketAdapter.ToEasyIpInfoPacket(returnedPacket);
+  Result := returnPacket;
+end;
+
+procedure TEasyIpClient.SetTimeout(const value: int);
+begin
+  Channel.Timeout := value;
 end;
 
 end.
