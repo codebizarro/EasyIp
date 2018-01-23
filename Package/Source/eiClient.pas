@@ -17,7 +17,9 @@ type
   TEasyIpClient = class(TCustomClient, IEasyIpClient)
   private
     FChannel: IEasyIpChannel;
+    FOnException: TExceptionEvent;
     FProtocol: IEasyIpProtocol;
+    function DispatchException(E: Exception): bool;
     function GetChannel: IEasyIpChannel;
     function GetHost: string;
     function GetPort: int;
@@ -29,6 +31,7 @@ type
     property Channel: IEasyIpChannel read GetChannel;
     property Debug: string write SetDebug;
     property Protocol: IEasyIpProtocol read GetProtocol;
+  protected
   public
     constructor Create(_host: string); reintroduce; overload;
     constructor Create(AOwner: TComponent); overload; override;
@@ -39,9 +42,10 @@ type
   published
     property Host: string read GetHost write SetHost;
     property Port: int read GetPort write SetPort;
+    property OnException: TExceptionEvent read FOnException write FOnException;
   end;
 
-  procedure Register();
+procedure Register();
 
 implementation
 
@@ -80,7 +84,13 @@ begin
   Protocol.DataOffset := offset;
   Protocol.DataType := dataType;
   Protocol.DataLength := length;
-  returnedPacket := Channel.Execute(Protocol.Packet);
+  try
+    returnedPacket := Channel.Execute(Protocol.Packet);
+  except
+    on E: Exception do
+      if DispatchException(E) then
+        raise;
+  end;
   arrayLength := returnedPacket.RequestDataSize * SHORT_SIZE;
   SetLength(returnArray, length);
   CopyMemory(returnArray, @returnedPacket.Data, arrayLength);
@@ -104,8 +114,25 @@ begin
   arrayLength := dataLength * SHORT_SIZE;
 
   CopyMemory(@sendedPacket.Data, value, arrayLength);
+  try
+    returnedPacket := Channel.Execute(sendedPacket);
+  except
+    on E: Exception do
+      if DispatchException(E) then
+        raise;
+  end;
+end;
 
-  returnedPacket := Channel.Execute(sendedPacket);
+function TEasyIpClient.DispatchException(E: Exception): bool;
+begin
+  Debug := E.Message;
+  if Assigned(FOnException) then
+  begin
+    FOnException(Self, E);
+    Result := False;
+  end
+  else
+    Result := True;
 end;
 
 function TEasyIpClient.GetChannel: IEasyIpChannel;
@@ -156,7 +183,13 @@ var
   arrayLength: int;
 begin
   Protocol.Mode := pmInfo;
-  returnedPacket := Channel.Execute(Protocol.Packet);
+  try
+    returnedPacket := Channel.Execute(Protocol.Packet);
+  except
+    on E: Exception do
+      if DispatchException(E) then
+        raise;
+  end;
   arrayLength := returnedPacket.RequestDataSize * SHORT_SIZE;
   SetLength(returnArray, arrayLength); //38
   CopyMemory(returnArray, @returnedPacket.Data, arrayLength);

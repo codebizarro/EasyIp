@@ -1,7 +1,10 @@
 unit eiTypes;
 
 interface
-uses Classes;
+
+uses
+  Classes,
+  SysUtils;
 
 type
   PDynamicByteArray = ^DynamicByteArray;
@@ -190,6 +193,8 @@ type
   private
   protected
   end;
+
+  TExceptionEvent = procedure(Sender: TObject; E: Exception) of object;
 
 implementation
 
