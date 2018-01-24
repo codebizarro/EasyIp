@@ -60,12 +60,14 @@ end;
 constructor TEasyIpClient.Create(_host: string);
 begin
   inherited Create(nil);
+  Debug := Format(DEBUG_MESSAGE_CREATE, [ClassName]);
   InitInterfaces(_host);
 end;
 
 constructor TEasyIpClient.Create(AOwner: TComponent);
 begin
   inherited;
+  Debug := Format(DEBUG_MESSAGE_CREATE, [ClassName]);
   InitInterfaces('');
 end;
 

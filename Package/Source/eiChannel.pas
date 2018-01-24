@@ -250,9 +250,9 @@ begin
   Result := FTimeout;
 end;
 
-procedure TCustomChannel.SetDebug(const Value: string);
+procedure TCustomChannel.SetDebug(const value: string);
 begin
-  OutputDebugString(PChar(Value));
+  OutputDebugString(PChar(value));
 end;
 
 procedure TCustomChannel.SetTimeout(const value: int);

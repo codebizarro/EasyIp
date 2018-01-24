@@ -26,7 +26,10 @@ type
     procedure SetDataLength(const value: DataLength);
     procedure SetDataOffset(const value: ushort);
     procedure SetDataType(const value: DataTypeEnum);
+    procedure SetDebug(const value: string);
     procedure SetMode(const value: PacketModeEnum);
+  protected
+    property Debug: string write SetDebug;
   public
     constructor Create(mode: PacketModeEnum); overload;
     destructor Destroy; override;
@@ -43,25 +46,28 @@ implementation
 constructor TEasyIpProtocol.Create(buffer: DynamicByteArray);
 begin
   inherited Create;
+  Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);
   FPacket := TPacketAdapter.ToEasyIpPacket(buffer);
 end;
 
 constructor TEasyIpProtocol.Create(packet: EasyIpPacket);
 begin
   inherited Create;
+  Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);
   FPacket := packet;
 end;
 
 constructor TEasyIpProtocol.Create(mode: PacketModeEnum);
 begin
   inherited Create;
+  Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);
   FMode := mode;
 end;
 
 destructor TEasyIpProtocol.Destroy;
 begin
   inherited;
-
+  Debug := Format(DEBUG_MESSAGE_DESTROY, ['TEasyIpProtocol']);
 end;
 
 function TEasyIpProtocol.GetBuffer: DynamicByteArray;
@@ -122,6 +128,8 @@ end;
 
 procedure TEasyIpProtocol.SetDataLength(const value: DataLength);
 begin
+  FPacket.RequestDataSize := 0;
+  FPacket.SendDataSize := 0;
   if (FMode = pmRead) then
     FPacket.RequestDataSize := value
   else if (FMode = pmWrite) then
@@ -153,10 +161,17 @@ begin
     dtString:
       dataType := EASYIP_TYPE_STRING;
   end;
+  FPacket.RequestDataType := byte(dtUndefined);
+  FPacket.SendDataType := byte(dtUndefined);
   if (FMode = pmRead) then
     FPacket.RequestDataType := dataType
   else
     FPacket.SendDataType := dataType;
+end;
+
+procedure TEasyIpProtocol.SetDebug(const value: string);
+begin
+  OutputDebugString(PChar(value));
 end;
 
 procedure TEasyIpProtocol.SetMode(const value: PacketModeEnum);
@@ -169,6 +184,7 @@ begin
     FPacket.RequestDataSize := 1;
     FPacket.Data[1] := 1;
   end
+
   else
     FPacket.Flags := 0;
   FMode := value;
