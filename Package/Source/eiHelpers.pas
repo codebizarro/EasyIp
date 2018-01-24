@@ -6,8 +6,7 @@ uses
   Windows,
   SysUtils,
   eiTypes,
-  eiConstants,
-  eiProtocol;
+  eiConstants;
 
 type
   TPacketFactory = class

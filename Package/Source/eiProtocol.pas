@@ -7,6 +7,7 @@ uses
   SysUtils,
   Classes,
   eiTypes,
+  eiHelpers,
   eiConstants;
 
 type
@@ -40,13 +41,9 @@ type
 implementation
 
 constructor TEasyIpProtocol.Create(buffer: DynamicByteArray);
-var
-  tPacket: EasyIpPacket;
 begin
   inherited Create;
-  ZeroMemory(@tPacket, SizeOf(tPacket));
-  CopyMemory(@tPacket, buffer, length(buffer));
-  FPacket := tPacket;
+  FPacket := TPacketAdapter.ToEasyIpPacket(buffer);
 end;
 
 constructor TEasyIpProtocol.Create(packet: EasyIpPacket);
@@ -68,14 +65,8 @@ begin
 end;
 
 function TEasyIpProtocol.GetBuffer: DynamicByteArray;
-var
-  tBuffer: DynamicByteArray;
-  length: int;
 begin
-  length := SizeOf(FPacket);
-  SetLength(tBuffer, length);
-  CopyMemory(tBuffer, @FPacket, length);
-  Result := tBuffer;
+  Result := TPacketAdapter.ToByteArray(FPacket);
 end;
 
 function TEasyIpProtocol.GetDataLength: DataLength;
