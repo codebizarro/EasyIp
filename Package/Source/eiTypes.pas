@@ -29,7 +29,9 @@ type
 
   DataTypeEnum = (dtUndefined, dtFlag, dtInput, dtOutput, dtRegister, dtTimer, dtString);
 
-  PacketModeEnum = (pmRead, pmWrite, pmInfo);
+  PacketModeEnum = (pmRead, pmWrite, pmBit, pmInfo);
+
+  BitModeEnum = (bmNormal, bmOr, bmAnd, bmXor);
 
   DataLength = 1..256;
 
