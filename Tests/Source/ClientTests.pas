@@ -31,6 +31,7 @@ type
     procedure TestBitOperation;
     procedure TestInfoRead;
     procedure TestReadWrite;
+    procedure TestWordReadWrite;
   end;
 
 implementation
@@ -142,6 +143,19 @@ begin
   for i := 0 to TEST_LENGTH - 1 do
     writed[i] := 0;
   FClient.BlockWrite(TEST_OFFSET, writed, dtFlag);
+end;
+
+procedure TClientTest.TestWordReadWrite;
+var
+  readed: short;
+  writed: short;
+begin
+  Randomize;
+  writed := Random(10000);
+  FClient.WordWrite(TEST_OFFSET, writed, dtFlag);
+  readed:= 0;
+  readed := FClient.WordRead(TEST_OFFSET, dtFlag);
+  Check(readed = writed);
 end;
 
 initialization
