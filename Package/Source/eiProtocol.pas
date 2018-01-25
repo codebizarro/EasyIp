@@ -76,7 +76,6 @@ end;
 
 function TEasyIpProtocol.GetBitMode: BitModeEnum;
 begin
-  // TODO -cMM: TEasyIpProtocol.GetBitMode default body inserted
   Result := FBitMode;
 end;
 

@@ -210,6 +210,8 @@ type
     function InfoRead(): EasyIpInfoPacket;
     function BlockRead(const offset: short; const dataType: DataTypeEnum; const length: byte): DynamicWordArray;
     procedure BlockWrite(const offset: short; const value: DynamicWordArray; const dataType: DataTypeEnum);
+    function WordRead(const offset: short; const dataType: DataTypeEnum): short;
+    procedure WordWrite(const offset: short; const value: short; const dataType: DataTypeEnum);
     procedure BitOperation(const offset: short; const dataType: DataTypeEnum; const mask: ushort; const bitMode: BitModeEnum);
     function GetHost: string;
     function GetPort: int;

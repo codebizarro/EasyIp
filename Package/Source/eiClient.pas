@@ -40,6 +40,8 @@ type
     procedure BitOperation(const offset: short; const dataType: DataTypeEnum; const mask: ushort; const bitMode: BitModeEnum);
     function BlockRead(const offset: short; const dataType: DataTypeEnum; const length: byte): DynamicWordArray;
     procedure BlockWrite(const offset: short; const value: DynamicWordArray; const dataType: DataTypeEnum);
+    function WordRead(const offset: short; const dataType: DataTypeEnum): short;
+    procedure WordWrite(const offset: short; const value: short; const dataType: DataTypeEnum);
     function InfoRead: EasyIpInfoPacket;
   published
     property Host: string read GetHost write SetHost;
@@ -233,6 +235,23 @@ end;
 procedure TEasyIpClient.SetTimeout(const value: int);
 begin
   Channel.Timeout := value;
+end;
+
+function TEasyIpClient.WordRead(const offset: short; const dataType: DataTypeEnum): short;
+var
+  readed: DynamicWordArray;
+begin
+  readed := BlockRead(offset, dataType, 1);
+  Result := readed[0];
+end;
+
+procedure TEasyIpClient.WordWrite(const offset, value: short; const dataType: DataTypeEnum);
+var
+  writed: DynamicWordArray;
+begin
+  SetLength(writed, 1);
+  writed[0] := value;
+  BlockWrite(offset, writed, dataType);
 end;
 
 end.
