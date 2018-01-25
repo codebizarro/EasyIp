@@ -27,7 +27,8 @@ type
 
   float = Single;
 
-  DataTypeEnum = (dtUndefined, dtFlag, dtInput, dtOutput, dtRegister, dtTimer, dtString);
+  DataTypeEnum = (dtUndefined, dtFlag, dtInput, dtOutput, dtRegister, dtTimer, _6, _7, _8, _9, _10, dtString);
+  //TODO: ^^^^^ (_6..._10) for delphi version less than 6
 
   PacketModeEnum = (pmRead, pmWrite, pmBit, pmInfo);
 
@@ -150,7 +151,7 @@ type
     ['{D789650F-C76E-42B3-B358-D78E98AD82C7}']
     function GetTimeout: int;
     procedure SetTimeout(const value: int);
-    function Execute(buffer: DynamicByteArray): DynamicByteArray;
+    function Execute(const buffer: DynamicByteArray): DynamicByteArray;
     property Timeout: int read GetTimeout write SetTimeout;
   end;
 
@@ -170,7 +171,7 @@ type
 
   IEasyIpChannel = interface(IUdpChannel)
     ['{D907A69A-7C89-404B-9F2A-7162E73596D0}']
-    function Execute(packet: EasyIpPacket): EasyIpPacket;
+    function Execute(const packet: EasyIpPacket): EasyIpPacket;
   end;
 
   IProtocol = interface
@@ -204,8 +205,9 @@ type
   IEasyIpClient = interface(IClient)
     ['{5A5CB45B-B6D5-4916-B074-48FF471D8858}']
     function InfoRead(): EasyIpInfoPacket;
-    function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
-    procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
+    function BlockRead(const offset: short; const dataType: DataTypeEnum; const length: byte): DynamicWordArray;
+    procedure BlockWrite(const offset: short; const value: DynamicWordArray; const dataType: DataTypeEnum);
+    procedure BitOperation(const mask: ushort; const mode: BitModeEnum);
     function GetHost: string;
     function GetPort: int;
     function GetTimeout: int;

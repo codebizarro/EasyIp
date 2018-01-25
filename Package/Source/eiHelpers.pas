@@ -11,24 +11,24 @@ uses
 type
   TPacketFactory = class
   public
-    class function GetReadPacket(offset: short; dataType, length: byte): EasyIpPacket;
-    class function GetWritePacket(offset: short; dataType, length: byte): EasyIpPacket;
+    class function GetReadPacket(const offset: short; const dataType: DataTypeEnum; const length: byte): EasyIpPacket;
+    class function GetWritePacket(const offset: short; const dataType: DataTypeEnum; const length: byte): EasyIpPacket;
   end;
-  
+
   TPacketAdapter = class
   public
-    class function ToByteArray(packet: EasyIpPacket): DynamicByteArray;
-    class function ToEasyIpPacket(buffer: DynamicByteArray): EasyIpPacket;
-    class function ToEasyIpInfoPacket(packet: EasyIpPacket): EasyIpInfoPacket;
+    class function ToByteArray(const packet: EasyIpPacket): DynamicByteArray;
+    class function ToEasyIpPacket(const buffer: DynamicByteArray): EasyIpPacket;
+    class function ToEasyIpInfoPacket(const packet: EasyIpPacket): EasyIpInfoPacket;
   end;
 
 implementation
 
-class function TPacketFactory.GetReadPacket(offset: short; dataType, length: byte): EasyIpPacket;
+class function TPacketFactory.GetReadPacket(const offset: short; const dataType: DataTypeEnum; const length: byte): EasyIpPacket;
 var
   packet: EasyIpPacket;
 begin
-  ZeroMemory(@packet, SizeOf(packet));
+  ZeroMemory(@packet, SizeOf(EasyIpPacket));
   with packet do
   begin
     Flags := 0;
@@ -39,7 +39,7 @@ begin
     SendDataSize := 0;
     SendDataOffset := offset;
     Spare2 := 0;
-    RequestDataType := dataType;
+    RequestDataType := byte(dataType);
     RequestDataSize := length;
     RequestDataOffsetServer := offset;
     RequestDataOffsetClient := 0;
@@ -47,18 +47,18 @@ begin
   Result := packet;
 end;
 
-class function TPacketFactory.GetWritePacket(offset: short; dataType, length: byte): EasyIpPacket;
+class function TPacketFactory.GetWritePacket(const offset: short; const dataType: DataTypeEnum; const length: byte): EasyIpPacket;
 var
   packet: EasyIpPacket;
 begin
-  ZeroMemory(@packet, SizeOf(packet));
+  ZeroMemory(@packet, SizeOf(EasyIpPacket));
   with packet do
   begin
     Flags := 0;
     Error := 0;
     Counter := 0;
     Spare1 := 0;
-    SendDataType := dataType;
+    SendDataType := byte(dataType);
     SendDataSize := length;
     SendDataOffset := offset;
     Spare2 := 0;
@@ -70,7 +70,7 @@ begin
   Result := packet;
 end;
 
-class function TPacketAdapter.ToByteArray(packet: EasyIpPacket): DynamicByteArray;
+class function TPacketAdapter.ToByteArray(const packet: EasyIpPacket): DynamicByteArray;
 var
   tBuffer: DynamicByteArray;
   bufferLength: int;
@@ -83,22 +83,21 @@ begin
   Result := tBuffer;
 end;
 
-class function TPacketAdapter.ToEasyIpPacket(buffer: DynamicByteArray): EasyIpPacket;
+class function TPacketAdapter.ToEasyIpPacket(const buffer: DynamicByteArray): EasyIpPacket;
 var
   tPacket: EasyIpPacket;
 begin
-  ZeroMemory(@tPacket, SizeOf(tPacket));
+  ZeroMemory(@tPacket, SizeOf(EasyIpPacket));
   CopyMemory(@tPacket, buffer, length(buffer));
   Result := tPacket;
 end;
 
-class function TPacketAdapter.ToEasyIpInfoPacket(packet: EasyIpPacket):
-    EasyIpInfoPacket;
+class function TPacketAdapter.ToEasyIpInfoPacket(const packet: EasyIpPacket): EasyIpInfoPacket;
 var
   infoPacket: EasyIpInfoPacket;
   dataLength: int;
 begin
-  dataLength := SizeOf(infoPacket);
+  dataLength := SizeOf(EasyIpInfoPacket);
   ZeroMemory(@infoPacket, dataLength);
   CopyMemory(@infoPacket, @packet.Data, dataLength);
   Result := infoPacket;

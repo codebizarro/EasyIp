@@ -46,7 +46,7 @@ begin
 //  FChannel := TMockChannel.Create('127.0.0.1', EASYIP_PORT);
   FBufferChannel := TEasyIpChannel.Create(TEST_PLC_HOST);
   FPacketChannel := TEasyIpChannel.Create(TEST_PLC_HOST);
-  FSendPacket := TPacketFactory.GetReadPacket(TEST_OFFSET, EASYIP_TYPE_FLAGWORD, 20);
+  FSendPacket := TPacketFactory.GetReadPacket(TEST_OFFSET, dtFlag, 20);
   FSendBuffer := TPacketAdapter.ToByteArray(FSendPacket);
 end;
 
@@ -76,7 +76,7 @@ begin
 
   receivePacket := TPacketAdapter.ToEasyIpPacket(receiveBuffer);
   Check(receivePacket.Error = 0);
-  Check(receivePacket.Flags = EASYIP_FLAG_RESPONSE);
+  Check(receivePacket.Flags and EASYIP_FLAG_RESPONSE <> 0);
 end;
 
 procedure TChannelTest.TestExecuteRecord;
@@ -87,7 +87,15 @@ begin
 
   Check(SizeOf(receivePacket) = SizeOf(FSendPacket));
   Check(receivePacket.Error = 0);
-  Check(receivePacket.Flags = EASYIP_FLAG_RESPONSE);
+  Check(receivePacket.Flags and EASYIP_FLAG_RESPONSE <> 0);
+
+  FSendPacket := TPacketFactory.GetWritePacket(TEST_OFFSET, dtFlag, 2);
+  FSendPacket.Data[1] := 1;
+  FSendPacket.Data[2] := 2;
+  receivePacket := FPacketChannel.Execute(FSendPacket);
+  Check(SizeOf(receivePacket) = SizeOf(FSendPacket));
+  Check(receivePacket.Error = 0);
+  Check(receivePacket.Flags and EASYIP_FLAG_RESPONSE <> 0);
 end;
 
 initialization

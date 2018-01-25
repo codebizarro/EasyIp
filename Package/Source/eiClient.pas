@@ -25,7 +25,7 @@ type
     function GetPort: int;
     function GetProtocol: IEasyIpProtocol;
     function GetTimeout: int;
-    procedure InitInterfaces(_host: string);
+    procedure InitInterfaces(const _host: string);
     procedure SetDebug(const value: string);
     procedure SetHost(const value: string);
     procedure SetPort(const value: int);
@@ -33,14 +33,14 @@ type
     property Channel: IEasyIpChannel read GetChannel;
     property Debug: string write SetDebug;
     property Protocol: IEasyIpProtocol read GetProtocol;
-  protected
   public
-    constructor Create(_host: string); reintroduce; overload;
+    constructor Create(const _host: string); reintroduce; overload;
     constructor Create(AOwner: TComponent); overload; override;
     destructor Destroy; override;
+    procedure BitOperation(const mask: ushort; const mode: BitModeEnum);
+    function BlockRead(const offset: short; const dataType: DataTypeEnum; const length: byte): DynamicWordArray;
+    procedure BlockWrite(const offset: short; const value: DynamicWordArray; const dataType: DataTypeEnum);
     function InfoRead: EasyIpInfoPacket;
-    function BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
-    procedure BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
   published
     property Host: string read GetHost write SetHost;
     property Port: int read GetPort write SetPort default EASYIP_PORT;
@@ -57,7 +57,7 @@ begin
   RegisterComponents('AESoft', [TEasyIpClient]);
 end;
 
-constructor TEasyIpClient.Create(_host: string);
+constructor TEasyIpClient.Create(const _host: string);
 begin
   inherited Create(nil);
   Debug := Format(DEBUG_MESSAGE_CREATE, [ClassName]);
@@ -79,7 +79,13 @@ begin
   Debug := Format(DEBUG_MESSAGE_DESTROY, [ClassName]);
 end;
 
-function TEasyIpClient.BlockRead(offset: short; dataType: DataTypeEnum; length: byte): DynamicWordArray;
+procedure TEasyIpClient.BitOperation(const mask: ushort; const mode:
+    BitModeEnum);
+begin
+  // TODO -cMM: TEasyIpClient.BitOperation default body inserted
+end;
+
+function TEasyIpClient.BlockRead(const offset: short; const dataType: DataTypeEnum; const length: byte): DynamicWordArray;
 var
   returnedPacket: EasyIpPacket;
   returnArray: DynamicWordArray;
@@ -102,7 +108,7 @@ begin
   Result := returnArray;
 end;
 
-procedure TEasyIpClient.BlockWrite(offset: short; value: DynamicWordArray; dataType: DataTypeEnum);
+procedure TEasyIpClient.BlockWrite(const offset: short; const value: DynamicWordArray; const dataType: DataTypeEnum);
 var
   sendedPacket: EasyIpPacket;
   returnedPacket: EasyIpPacket;
@@ -165,7 +171,24 @@ begin
   Result := Channel.Timeout;
 end;
 
-procedure TEasyIpClient.InitInterfaces(_host: string);
+function TEasyIpClient.InfoRead: EasyIpInfoPacket;
+var
+  returnedPacket: EasyIpPacket;
+  returnPacket: EasyIpInfoPacket;
+begin
+  Protocol.Mode := pmInfo;
+  try
+    returnedPacket := Channel.Execute(Protocol.Packet);
+  except
+    on E: Exception do
+      if DispatchException(E) then
+        raise;
+  end;
+  returnPacket := TPacketAdapter.ToEasyIpInfoPacket(returnedPacket);
+  Result := returnPacket;
+end;
+
+procedure TEasyIpClient.InitInterfaces(const _host: string);
 begin
   FChannel := TEasyIpChannel.Create(_host, EASYIP_PORT);
   FProtocol := TEasyIpProtocol.Create();
@@ -184,23 +207,6 @@ end;
 procedure TEasyIpClient.SetPort(const value: int);
 begin
   Channel.Port := value;
-end;
-
-function TEasyIpClient.InfoRead: EasyIpInfoPacket;
-var
-  returnedPacket: EasyIpPacket;
-  returnPacket: EasyIpInfoPacket;
-begin
-  Protocol.Mode := pmInfo;
-  try
-    returnedPacket := Channel.Execute(Protocol.Packet);
-  except
-    on E: Exception do
-      if DispatchException(E) then
-        raise;
-  end;
-  returnPacket := TPacketAdapter.ToEasyIpInfoPacket(returnedPacket);
-  Result := returnPacket;
 end;
 
 procedure TEasyIpClient.SetTimeout(const value: int);

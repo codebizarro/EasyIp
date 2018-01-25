@@ -15,8 +15,8 @@ type
   private
     FPacket: EasyIpPacket;
     FMode: PacketModeEnum;
-    constructor Create(buffer: DynamicByteArray); overload;
-    constructor Create(packet: EasyIpPacket); overload;
+    constructor Create(const buffer: DynamicByteArray); overload;
+    constructor Create(const packet: EasyIpPacket); overload;
     function GetPacket: EasyIpPacket;
     function GetBuffer: DynamicByteArray;
     function GetDataLength: DataLength;
@@ -31,7 +31,7 @@ type
   protected
     property Debug: string write SetDebug;
   public
-    constructor Create(mode: PacketModeEnum); overload;
+    constructor Create(const mode: PacketModeEnum); overload;
     destructor Destroy; override;
     property Buffer: DynamicByteArray read GetBuffer;
     property DataLength: DataLength read GetDataLength write SetDataLength;
@@ -43,21 +43,21 @@ type
 
 implementation
 
-constructor TEasyIpProtocol.Create(buffer: DynamicByteArray);
+constructor TEasyIpProtocol.Create(const buffer: DynamicByteArray);
 begin
   inherited Create;
   Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);
   FPacket := TPacketAdapter.ToEasyIpPacket(buffer);
 end;
 
-constructor TEasyIpProtocol.Create(packet: EasyIpPacket);
+constructor TEasyIpProtocol.Create(const packet: EasyIpPacket);
 begin
   inherited Create;
   Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);
   FPacket := packet;
 end;
 
-constructor TEasyIpProtocol.Create(mode: PacketModeEnum);
+constructor TEasyIpProtocol.Create(const mode: PacketModeEnum);
 begin
   inherited Create;
   Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);

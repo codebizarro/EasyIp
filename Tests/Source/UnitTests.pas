@@ -56,14 +56,14 @@ procedure TPacketFactoryTest.TestGetReadPacket;
 var
   readPacket: EasyIpPacket;
 begin
-  readPacket := TPacketFactory.GetReadPacket(0, EASYIP_TYPE_FLAGWORD, EASYIP_DATASIZE - 1);
+  readPacket := TPacketFactory.GetReadPacket(0, dtFlag, EASYIP_DATASIZE - 1);
 end;
 
 procedure TPacketFactoryTest.TestGetWritePacket;
 var
   writePacket: EasyIpPacket;
 begin
-  writePacket := TPacketFactory.GetWritePacket(0, EASYIP_TYPE_FLAGWORD, EASYIP_DATASIZE - 1);
+  writePacket := TPacketFactory.GetWritePacket(0, dtFlag, EASYIP_DATASIZE - 1);
 end;
 
 { TStopWatchTest }

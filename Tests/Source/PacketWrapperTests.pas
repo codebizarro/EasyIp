@@ -49,7 +49,7 @@ procedure TPacketWrapperTest.TestReadPacket;
 var
   i: int;
 begin
-  FPacket := TPacketFactory.GetReadPacket(FOffset, EASYIP_TYPE_FLAGWORD, FLength);
+  FPacket := TPacketFactory.GetReadPacket(FOffset, dtFlag, FLength);
   FWrapperPacket := TEasyIpProtocol.Create(pmRead);
   with FWrapperPacket do
   begin
@@ -73,7 +73,7 @@ procedure TPacketWrapperTest.TestWritePacket;
 var
   i: int;
 begin
-  FPacket := TPacketFactory.GetWritePacket(FOffset, EASYIP_TYPE_FLAGWORD, FLength);
+  FPacket := TPacketFactory.GetWritePacket(FOffset, dtFlag, FLength);
   FWrapperPacket := TEasyIpProtocol.Create(pmWrite);
   with FWrapperPacket do
   begin

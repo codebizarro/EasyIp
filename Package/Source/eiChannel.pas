@@ -25,7 +25,7 @@ type
     property Debug: string write SetDebug;
   public
     destructor Destroy; override;
-    function Execute(buffer: DynamicByteArray): DynamicByteArray; virtual; abstract;
+    function Execute(const buffer: DynamicByteArray): DynamicByteArray; virtual; abstract;
     property Timeout: int read GetTimeout write SetTimeout default CHANNEL_DEFAULT_TIMEOUT;
   end;
 
@@ -41,7 +41,7 @@ type
     FTarget: TSockAddrIn;
     function GetLastErrorString: string;
   public
-    constructor Create(host: string; port: int); overload;
+    constructor Create(const host: string; const port: int); overload;
     destructor Destroy; override;
     property Host: string read GetHost write SetHost;
     property Port: int read GetPort write SetPort default EASYIP_PORT;
@@ -51,9 +51,9 @@ type
   private
   protected
   public
-    constructor Create(host: string; port: int); overload;
+    constructor Create(const host: string; const port: int); overload;
     destructor Destroy; override;
-    function Execute(buffer: DynamicByteArray): DynamicByteArray; overload; override;
+    function Execute(const buffer: DynamicByteArray): DynamicByteArray; overload; override;
   end;
 
   TMockChannel = class(TUdpChannel, IEasyIpChannel)
@@ -61,17 +61,17 @@ type
   protected
   public
     destructor Destroy; override;
-    function Execute(buffer: DynamicByteArray): DynamicByteArray; overload; override;
-    function Execute(packet: EasyIpPacket): EasyIpPacket; overload;
+    function Execute(const buffer: DynamicByteArray): DynamicByteArray; overload; override;
+    function Execute(const packet: EasyIpPacket): EasyIpPacket; overload;
   end;
 
   TEasyIpChannel = class(TUdpChannel, IEasyIpChannel)
   private
   protected
   public
-    constructor Create(host: string; port: int = EASYIP_PORT); overload;
+    constructor Create(const host: string; const port: int = EASYIP_PORT); overload;
     destructor Destroy; override;
-    function Execute(packet: EasyIpPacket): EasyIpPacket; overload;
+    function Execute(const packet: EasyIpPacket): EasyIpPacket; overload;
   end;
 
 implementation
@@ -80,7 +80,7 @@ const
   WINSOCK_VERSION = $0202;
   LANG_ID = $400;
 
-constructor TUdpChannel.Create(host: string; port: int);
+constructor TUdpChannel.Create(const host: string; const port: int);
 begin
   inherited Create(host, port);
   Debug := Format(DEBUG_MESSAGE_CREATE, ['TUdpChannel']);
@@ -98,7 +98,7 @@ begin
   inherited;
 end;
 
-function TUdpChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
+function TUdpChannel.Execute(const buffer: DynamicByteArray): DynamicByteArray;
 var
   init: TWSAData;
   sock: TSocket;
@@ -147,7 +147,7 @@ begin
   end;
 end;
 
-function TMockChannel.Execute(buffer: DynamicByteArray): DynamicByteArray;
+function TMockChannel.Execute(const buffer: DynamicByteArray): DynamicByteArray;
 var
   temp: DynamicByteArray;
 begin
@@ -157,13 +157,17 @@ begin
   Result := temp;
 end;
 
-function TMockChannel.Execute(packet: EasyIpPacket): EasyIpPacket;
+function TMockChannel.Execute(const packet: EasyIpPacket): EasyIpPacket;
+var
+  returnPacket: EasyIpPacket;
 begin
-  packet.Flags := $80;
-  Result := packet;
+  ZeroMemory(@returnPacket, SizeOf(EasyIpPacket));
+  returnPacket := packet;
+  returnPacket.Flags := $80;
+  Result := returnPacket;
 end;
 
-constructor TEasyIpChannel.Create(host: string; port: int = EASYIP_PORT);
+constructor TEasyIpChannel.Create(const host: string; const port: int = EASYIP_PORT);
 begin
   inherited Create(host, port);
   Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpChannel']);
@@ -175,7 +179,7 @@ begin
   inherited;
 end;
 
-function TEasyIpChannel.Execute(packet: EasyIpPacket): EasyIpPacket;
+function TEasyIpChannel.Execute(const packet: EasyIpPacket): EasyIpPacket;
 var
   sendPacket: DynamicByteArray;
   recvPacket: DynamicByteArray;
@@ -185,10 +189,10 @@ begin
   Result := TPacketAdapter.ToEasyIpPacket(recvPacket);
 end;
 
-constructor TNetworkChannel.Create(host: string; port: int);
+constructor TNetworkChannel.Create(const host: string; const port: int);
 begin
   inherited Create;
-  ZeroMemory(@FTarget, SizeOf(FTarget));
+  ZeroMemory(@FTarget, SizeOf(TSockAddrIn));
   FTarget.sa_family := AF_INET;
   Self.Host := host;
   Self.Port := port;
