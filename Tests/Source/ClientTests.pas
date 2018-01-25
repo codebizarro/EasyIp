@@ -28,6 +28,7 @@ type
     procedure TestBlockRead;
     procedure TestBlockWrite;
     procedure LifeCycleTest;
+    procedure TestBitOperation;
     procedure TestInfoRead;
     procedure TestReadWrite;
   end;
@@ -61,6 +62,38 @@ procedure TClientTest.TearDown;
 begin
   inherited;
   FClient := nil;
+end;
+
+procedure TClientTest.TestBitOperation;
+var
+  writed: DynamicWordArray;
+  readed: DynamicWordArray;
+  i: int;
+const
+  VALUE = $FF00; //1
+  MASKAND = $F000; //2
+  MASKOR = $0F0F; //3
+  MASKXOR = $FF00; //4
+  exAND = $F000;
+  exOR = $FF0F;
+  exXOR = $000F;
+begin
+  SetLength(writed, 1);
+  for i := 0 to 1 - 1 do
+    writed[i] := VALUE;
+  FClient.BlockWrite(TEST_OFFSET, writed, dtFlag);
+
+  FClient.BitOperation(TEST_OFFSET, dtFlag, MASKAND, bmAnd);
+  readed := FClient.BlockRead(TEST_OFFSET, dtFlag, 1);
+  Check(readed[0] = exAND);
+
+  FClient.BitOperation(TEST_OFFSET, dtFlag, MASKOR, bmOr);
+  readed := FClient.BlockRead(TEST_OFFSET, dtFlag, 1);
+  Check(readed[0] = exOR);
+
+  FClient.BitOperation(TEST_OFFSET, dtFlag, MASKXOR, bmXor);
+  readed := FClient.BlockRead(TEST_OFFSET, dtFlag, 1);
+  Check(readed[0] = exXOR);
 end;
 
 procedure TClientTest.TestBlockRead;
