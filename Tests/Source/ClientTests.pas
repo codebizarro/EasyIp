@@ -29,6 +29,7 @@ type
     procedure TestBlockWrite;
     procedure LifeCycleTest;
     procedure TestInfoRead;
+    procedure TestReadWrite;
   end;
 
 implementation
@@ -40,7 +41,8 @@ procedure TClientTest.LifeCycleTest;
 var
   ic: TEasyIpClient;
 begin
-;  ic := TEasyIpClient.Create(nil);
+  ;
+  ic := TEasyIpClient.Create(nil);
   ic.Host := TEST_PLC_HOST;
   //ic := nil;
   ic.free
@@ -88,6 +90,25 @@ var
 begin
   data := FClient.InfoRead();
   Check(data.InformationType = 1);
+end;
+
+procedure TClientTest.TestReadWrite;
+var
+  writed: DynamicWordArray;
+  readed: DynamicWordArray;
+  i: int;
+begin
+  SetLength(writed, TEST_LENGTH);
+  Randomize;
+  for i := 0 to TEST_LENGTH - 1 do
+    writed[i] := i + Random(10000);
+  FClient.BlockWrite(TEST_OFFSET, writed, dtFlag);
+  readed := FClient.BlockRead(TEST_OFFSET, dtFlag, TEST_LENGTH);
+  for i := 0 to TEST_LENGTH - 1 do
+    Check(writed[i] = readed[i]);
+  for i := 0 to TEST_LENGTH - 1 do
+    writed[i] := 0;
+  FClient.BlockWrite(TEST_OFFSET, writed, dtFlag);
 end;
 
 initialization
