@@ -37,7 +37,7 @@ type
     constructor Create(const _host: string); reintroduce; overload;
     constructor Create(AOwner: TComponent); overload; override;
     destructor Destroy; override;
-    procedure BitOperation(const mask: ushort; const mode: BitModeEnum);
+    procedure BitOperation(const offset: short; const dataType: DataTypeEnum; const mask: ushort; const bitMode: BitModeEnum);
     function BlockRead(const offset: short; const dataType: DataTypeEnum; const length: byte): DynamicWordArray;
     procedure BlockWrite(const offset: short; const value: DynamicWordArray; const dataType: DataTypeEnum);
     function InfoRead: EasyIpInfoPacket;
@@ -79,10 +79,31 @@ begin
   Debug := Format(DEBUG_MESSAGE_DESTROY, [ClassName]);
 end;
 
-procedure TEasyIpClient.BitOperation(const mask: ushort; const mode:
-    BitModeEnum);
+procedure TEasyIpClient.BitOperation(const offset: short; const dataType: DataTypeEnum; const mask: ushort; const bitMode: BitModeEnum);
+var
+  sendedPacket: EasyIpPacket;
+  returnedPacket: EasyIpPacket;
+  arrayLength: int;
+  dataLength: int;
 begin
-  // TODO -cMM: TEasyIpClient.BitOperation default body inserted
+  dataLength := 1;
+  Protocol.Mode := pmBit;
+  Protocol.BitMode := bitMode;
+  Protocol.DataOffset := offset;
+  Protocol.DataType := dataType;
+  Protocol.DataLength := dataLength;
+  sendedPacket := Protocol.Packet;
+
+  arrayLength := dataLength * SHORT_SIZE;
+
+  CopyMemory(@sendedPacket.Data, @mask, arrayLength);
+  try
+    returnedPacket := Channel.Execute(sendedPacket);
+  except
+    on E: Exception do
+      if DispatchException(E) then
+        raise;
+  end;
 end;
 
 function TEasyIpClient.BlockRead(const offset: short; const dataType: DataTypeEnum; const length: byte): DynamicWordArray;

@@ -182,6 +182,7 @@ type
 
   IEasyIpProtocol = interface(IProtocol)
     ['{790B9B4C-8B13-4862-9035-7CEA97708CBA}']
+    function GetBitMode: BitModeEnum;
     function GetPacket: EasyIpPacket;
     function GetDataLength: DataLength;
     function GetDataOffset: ushort;
@@ -190,7 +191,9 @@ type
     procedure SetDataLength(const value: DataLength);
     procedure SetDataOffset(const value: ushort);
     procedure SetDataType(const value: DataTypeEnum);
+    procedure SetBitMode(const value: BitModeEnum);
     procedure SetMode(const value: PacketModeEnum);
+    property BitMode: BitModeEnum read GetBitMode write SetBitMode;
     property DataLength: DataLength read GetDataLength write SetDataLength;
     property DataOffset: ushort read GetDataOffset write SetDataOffset;
     property DataType: DataTypeEnum read GetDataType write SetDataType;
@@ -207,7 +210,7 @@ type
     function InfoRead(): EasyIpInfoPacket;
     function BlockRead(const offset: short; const dataType: DataTypeEnum; const length: byte): DynamicWordArray;
     procedure BlockWrite(const offset: short; const value: DynamicWordArray; const dataType: DataTypeEnum);
-    procedure BitOperation(const mask: ushort; const mode: BitModeEnum);
+    procedure BitOperation(const offset: short; const dataType: DataTypeEnum; const mask: ushort; const bitMode: BitModeEnum);
     function GetHost: string;
     function GetPort: int;
     function GetTimeout: int;

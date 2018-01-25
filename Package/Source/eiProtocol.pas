@@ -15,14 +15,17 @@ type
   private
     FPacket: EasyIpPacket;
     FMode: PacketModeEnum;
+    FBitMode: BitModeEnum;
     constructor Create(const buffer: DynamicByteArray); overload;
     constructor Create(const packet: EasyIpPacket); overload;
+    function GetBitMode: BitModeEnum;
     function GetPacket: EasyIpPacket;
     function GetBuffer: DynamicByteArray;
     function GetDataLength: DataLength;
     function GetDataOffset: ushort;
     function GetDataType: DataTypeEnum;
     function GetMode: PacketModeEnum;
+    procedure SetBitMode(const value: BitModeEnum);
     procedure SetDataLength(const value: DataLength);
     procedure SetDataOffset(const value: ushort);
     procedure SetDataType(const value: DataTypeEnum);
@@ -33,6 +36,7 @@ type
   public
     constructor Create(const mode: PacketModeEnum); overload;
     destructor Destroy; override;
+    property BitMode: BitModeEnum read GetBitMode write SetBitMode;
     property Buffer: DynamicByteArray read GetBuffer;
     property DataLength: DataLength read GetDataLength write SetDataLength;
     property DataOffset: ushort read GetDataOffset write SetDataOffset;
@@ -68,6 +72,12 @@ destructor TEasyIpProtocol.Destroy;
 begin
   inherited;
   Debug := Format(DEBUG_MESSAGE_DESTROY, ['TEasyIpProtocol']);
+end;
+
+function TEasyIpProtocol.GetBitMode: BitModeEnum;
+begin
+  // TODO -cMM: TEasyIpProtocol.GetBitMode default body inserted
+  Result := FBitMode;
 end;
 
 function TEasyIpProtocol.GetBuffer: DynamicByteArray;
@@ -124,6 +134,29 @@ end;
 function TEasyIpProtocol.GetPacket: EasyIpPacket;
 begin
   Result := FPacket;
+  //TODO: building packet
+  //ZeroMemory(@FPacket, SizeOf(EasyIpPacket));
+end;
+
+procedure TEasyIpProtocol.SetBitMode(const value: BitModeEnum);
+begin
+  if FMode = pmBit then
+  begin
+    FBitMode := value;
+    FPacket.Flags := 0;
+    case value of
+      bmNormal:
+        FPacket.Flags := 0;
+      bmOr:
+        FPacket.Flags := EASYIP_FLAG_BIT_OR;
+      bmAnd:
+        FPacket.Flags := EASYIP_FLAG_BIT_AND;
+      bmXor:
+        FPacket.Flags := EASYIP_FLAG_BIT_OR or EASYIP_FLAG_BIT_AND;
+    else
+      FPacket.Flags := 0;
+    end;
+  end;
 end;
 
 procedure TEasyIpProtocol.SetDataLength(const value: DataLength);
@@ -133,7 +166,9 @@ begin
   if (FMode = pmRead) then
     FPacket.RequestDataSize := value
   else if (FMode = pmWrite) then
-    FPacket.SendDataSize := value;
+    FPacket.SendDataSize := value
+  else if (FMode = pmBit) then
+    FPacket.SendDataSize := 1;
 end;
 
 procedure TEasyIpProtocol.SetDataOffset(const value: ushort);
@@ -176,17 +211,25 @@ end;
 
 procedure TEasyIpProtocol.SetMode(const value: PacketModeEnum);
 begin
-  if value = pmInfo then
-  begin
-    FPacket.Flags := FPacket.Flags or EASYIP_FLAG_INFO;
-//    FPacket.Counter := FPacket.Counter + 1;
+  case value of
+    pmInfo:
+      begin
+        FPacket.Flags := 0;
+        FPacket.Flags := FPacket.Flags or EASYIP_FLAG_INFO;
+        FPacket.RequestDataSize := 1;
+        FPacket.Data[1] := 1;
+      end;
+    pmRead, pmWrite:
+      begin
+        FPacket.Flags := 0;
+      end;
+    pmBit:
+      begin
 
-    FPacket.RequestDataSize := 1;
-    FPacket.Data[1] := 1;
-  end
-
+      end;
   else
     FPacket.Flags := 0;
+  end;
   FMode := value;
 end;
 
