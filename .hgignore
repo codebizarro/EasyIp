@@ -11,3 +11,4 @@ Tests/Dcu/**
 *.exe
 *.dll
 *.bpl
+*.~dfm

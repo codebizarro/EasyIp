@@ -1,15 +1,15 @@
 program Application;
-{$APPTYPE CONSOLE}
+//{$APPTYPE CONSOLE}
 uses
+  Forms,
   SysUtils,
-  eiChannel in '..\Package\Source\eiChannel.pas',
-  eiClient in '..\Package\Source\eiClient.pas',
-  eiConstants in '..\Package\Source\eiConstants.pas',
-  eiExceptions in '..\Package\Source\eiExceptions.pas',
-  eiHelpers in '..\Package\Source\eiHelpers.pas',
-  eiTypes in '..\Package\Source\eiTypes.pas',
-  eiProtocol in '..\Package\Source\eiProtocol.pas';
+  UMainForm in 'Source\UMainForm.pas' {mainForm},
+  UTypes in 'Source\UTypes.pas',
+  UDefaultPresenter in 'Source\UDefaultPresenter.pas',
+  UEasyIpService in 'Source\UEasyIpService.pas';
 
 begin
-  // Insert user code here
+  Forms.Application.Initialize;
+  Forms.Application.CreateForm(TmainForm, mainForm);
+  Forms.Application.Run;
 end.
