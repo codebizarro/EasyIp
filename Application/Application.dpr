@@ -6,7 +6,8 @@ uses
   UMainForm in 'Source\UMainForm.pas' {mainForm},
   UTypes in 'Source\UTypes.pas',
   UDefaultPresenter in 'Source\UDefaultPresenter.pas',
-  UEasyIpService in 'Source\UEasyIpService.pas';
+  UEasyIpService in 'Source\UEasyIpService.pas',
+  UHelperThread in 'Source\UHelperThread.pas';
 
 begin
   Forms.Application.Initialize;

@@ -1,17 +1,21 @@
 unit UTypes;
 
 interface
+
 uses
   eiTypes;
 
 type
   ViewModeEnum = (vmSingle, vmBlock, vmInfo);
 
+  HelperTypeEnum = (htNone, htStatusClear);
+
   IView = interface
+    procedure ClearStatus();
     function GetAddress: int;
     function GetDataType: DataTypeEnum;
     function GetHost: string;
-    function GetViewMode: ViewModeEnum; 
+    function GetViewMode: ViewModeEnum;
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
     property Address: int read GetAddress;

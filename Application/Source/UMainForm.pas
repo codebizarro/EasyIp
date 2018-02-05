@@ -14,6 +14,7 @@ uses
   eiTypes,
   UTypes,
   UDefaultPresenter,
+  UHelperThread,
   StdCtrls,
   ComCtrls;
 
@@ -30,13 +31,14 @@ type
     Label4: TLabel;
     pager: TPageControl;
     sheetBlockRead: TTabSheet;
+    sheetInfo: TTabSheet;
     sheetOnePoint: TTabSheet;
     statusBar: TStatusBar;
-    sheetInfo: TTabSheet;
     procedure btnRefreshClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     FPresenter: IPresenter;
+    FThread: THelperThread;
     function GetAddress: int;
     function GetDataType: DataTypeEnum;
     function GetHost: string;
@@ -44,6 +46,7 @@ type
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
   public
+    procedure ClearStatus();
     property Address: int read GetAddress;
     property DataType: DataTypeEnum read GetDataType;
     property Host: string read GetHost;
@@ -62,6 +65,11 @@ implementation
 procedure TmainForm.btnRefreshClick(Sender: TObject);
 begin
   FPresenter.Refresh();
+end;
+
+procedure TmainForm.ClearStatus;
+begin
+  statusBar.SimpleText := '';
 end;
 
 procedure TmainForm.FormCreate(Sender: TObject);
@@ -94,12 +102,17 @@ begin
       Result := vmBlock;
     2:
       Result := vmInfo;
+  else
+    Result := vmInfo;
   end;
 end;
 
 procedure TmainForm.SetStatus(const value: string);
 begin
   statusBar.SimpleText := value;
+  FThread := THelperThread.Create(true, self, htStatusClear);
+  FThread.FreeOnTerminate := true;
+  FThread.Resume();
 end;
 
 procedure TmainForm.SetValue(const value: Integer);
