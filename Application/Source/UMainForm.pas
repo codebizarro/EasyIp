@@ -34,6 +34,7 @@ type
     sheetInfo: TTabSheet;
     sheetOnePoint: TTabSheet;
     statusBar: TStatusBar;
+    memoInfo: TMemo;
     procedure btnRefreshClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -47,6 +48,7 @@ type
     procedure SetValue(const value: Integer);
   public
     procedure ClearStatus();
+    procedure SetInfoValues(const values: TStrings);
     property Address: int read GetAddress;
     property DataType: DataTypeEnum read GetDataType;
     property Host: string read GetHost;
@@ -105,6 +107,11 @@ begin
   else
     Result := vmInfo;
   end;
+end;
+
+procedure TmainForm.SetInfoValues(const values: TStrings);
+begin
+  memoInfo.Lines := values;
 end;
 
 procedure TmainForm.SetStatus(const value: string);

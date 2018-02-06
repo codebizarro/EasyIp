@@ -1,9 +1,11 @@
 object mainForm: TmainForm
   Left = 571
   Top = 235
-  Width = 461
-  Height = 414
-  Caption = 'mainForm'
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'EasyIp Demo application'
+  ClientHeight = 387
+  ClientWidth = 453
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -75,6 +77,15 @@ object mainForm: TmainForm
     object sheetInfo: TTabSheet
       Caption = 'Read device info'
       ImageIndex = 2
+      object memoInfo: TMemo
+        Left = 10
+        Top = 10
+        Width = 386
+        Height = 216
+        ReadOnly = True
+        ScrollBars = ssVertical
+        TabOrder = 0
+      end
     end
   end
   object editHost: TEdit

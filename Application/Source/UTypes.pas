@@ -3,6 +3,7 @@ unit UTypes;
 interface
 
 uses
+  Classes,
   eiTypes;
 
 type
@@ -18,6 +19,7 @@ type
     function GetViewMode: ViewModeEnum;
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
+    procedure SetInfoValues(const values: TStrings);
     property Address: int read GetAddress;
     property DataType: DataTypeEnum read GetDataType;
     property Host: string read GetHost;
@@ -32,6 +34,7 @@ type
 
   IPlcService = interface
     function Read(host: string; offset: Integer; dataType: DataTypeEnum): Word;
+    function ReadInfo(host: string): EasyIpInfoPacket;
   end;
 
 implementation
