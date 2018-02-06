@@ -16,13 +16,16 @@ type
     function GetAddress: int;
     function GetDataType: DataTypeEnum;
     function GetHost: string;
+    function GetLength: byte;
     function GetViewMode: ViewModeEnum;
+    procedure SetInfoValues(const values: TStrings);
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
-    procedure SetInfoValues(const values: TStrings);
+    procedure SetValues(const values: TStrings);
     property Address: int read GetAddress;
     property DataType: DataTypeEnum read GetDataType;
     property Host: string read GetHost;
+    property Length: byte read GetLength;
     property Status: string write SetStatus;
     property Value: Integer write SetValue;
     property ViewMode: ViewModeEnum read GetViewMode;
@@ -34,6 +37,7 @@ type
 
   IPlcService = interface
     function Read(host: string; offset: Integer; dataType: DataTypeEnum): Word;
+    function ReadBlock(host: string; offset: Integer; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     function ReadInfo(host: string): EasyIpInfoPacket;
   end;
 

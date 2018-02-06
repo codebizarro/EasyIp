@@ -16,7 +16,8 @@ uses
   UDefaultPresenter,
   UHelperThread,
   StdCtrls,
-  ComCtrls;
+  ComCtrls,
+  Spin;
 
 type
   TmainForm = class(TForm, IView)
@@ -29,12 +30,16 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    listValues: TListBox;
+    memoInfo: TMemo;
     pager: TPageControl;
     sheetBlockRead: TTabSheet;
     sheetInfo: TTabSheet;
     sheetOnePoint: TTabSheet;
+    spinLength: TSpinEdit;
     statusBar: TStatusBar;
-    memoInfo: TMemo;
     procedure btnRefreshClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -43,15 +48,18 @@ type
     function GetAddress: int;
     function GetDataType: DataTypeEnum;
     function GetHost: string;
+    function GetLength: byte;
     function GetViewMode: ViewModeEnum;
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
+    procedure SetValues(const values: TStrings);
   public
     procedure ClearStatus();
     procedure SetInfoValues(const values: TStrings);
     property Address: int read GetAddress;
     property DataType: DataTypeEnum read GetDataType;
     property Host: string read GetHost;
+    property Length: byte read GetLength;
     property Status: string write SetStatus;
     property Value: Integer write SetValue;
     property ViewMode: ViewModeEnum read GetViewMode;
@@ -95,6 +103,11 @@ begin
   Result := editHost.Text;
 end;
 
+function TmainForm.GetLength: byte;
+begin
+  Result := spinLength.Value;
+end;
+
 function TmainForm.GetViewMode: ViewModeEnum;
 begin
   case pager.ActivePageIndex of
@@ -125,6 +138,11 @@ end;
 procedure TmainForm.SetValue(const value: Integer);
 begin
   editValue.Text := IntToStr(value);
+end;
+
+procedure TmainForm.SetValues(const values: TStrings);
+begin
+  listValues.Items := values;
 end;
 
 end.

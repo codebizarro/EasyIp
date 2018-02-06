@@ -51,9 +51,20 @@ begin
 end;
 
 procedure TDefaultPresenter.RefreshBlock;
+var
+  returned: DynamicWordArray;
+  values: TStrings;
+  i: int;
+  addr: int;
 begin
-  // TODO -cMM: TDefaultPresenter.RefreshBlock default body inserted
   FView.Status := 'Reading data block ...';
+  FView.SetValues(TStringList.Create());
+  returned := FPlcService.ReadBlock(FView.Host, FView.Address, FView.DataType, FView.Length);
+  //addr := FView.Address - 1;
+  values := TStringList.Create();
+  for i := 0 to Length(returned) - 1 do
+    values.Add('FW' + IntToStr(FView.Address + i) + ' - ' + IntToStr(returned[i]));
+  FView.SetValues(values);  
 end;
 
 procedure TDefaultPresenter.RefreshInfo;
@@ -62,7 +73,7 @@ var
   values: TStrings;
   plcType: string;
   operandSizes: string;
-  i : int;
+  i: int;
 begin
   try
     FView.Status := 'Reading device info ...';
@@ -84,9 +95,9 @@ begin
       Append('Controller type - ' + plcType);
       Append('Controller version - ' + IntToHex(ControllerRevisionHigh, 2) + '.' + IntToHex(ControllerRevisioLow, 2));
       Append('EasyIp version - ' + IntToStr(EasyIpRevisionHigh) + '.' + IntToStr(EasyIpRevisionLow));
-      operandSizes := 'Operand sizes - '+ #13#10;
+      operandSizes := 'Operand sizes - ' + #13#10;
       for i := 1 to Length(OperandSize) do
-      operandSizes := operandSizes + IntToStr(OperandSize[i]) + #13#10;
+        operandSizes := operandSizes + IntToStr(OperandSize[i]) + #13#10;
       Append(operandSizes);
     end;
     FView.SetInfoValues(values);
