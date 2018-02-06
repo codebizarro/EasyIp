@@ -15,6 +15,7 @@ uses
   UTypes,
   UDefaultPresenter,
   UHelperThread,
+  USettings,
   StdCtrls,
   ComCtrls,
   Spin;
@@ -40,11 +41,12 @@ type
     sheetOnePoint: TTabSheet;
     spinLength: TSpinEdit;
     statusBar: TStatusBar;
-    procedure FormDestroy(Sender: TObject);
     procedure btnRefreshClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     FPresenter: IPresenter;
+    FSettings: ISettings;
     FThread: THelperThread;
     function GetAddress: int;
     function GetDataType: DataTypeEnum;
@@ -52,15 +54,17 @@ type
     function GetLength: byte;
     function GetStatus: string;
     function GetViewMode: ViewModeEnum;
+    procedure SetAddress(const value: int);
+    procedure SetHost(const value: string);
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
     procedure SetValues(const values: TStrings);
   public
     procedure ClearStatus();
     procedure SetInfoValues(const values: TStrings);
-    property Address: int read GetAddress;
+    property Address: int read GetAddress write SetAddress;
     property DataType: DataTypeEnum read GetDataType;
-    property Host: string read GetHost;
+    property Host: string read GetHost write SetHost;
     property Length: byte read GetLength;
     property Status: string read GetStatus write SetStatus;
     property Value: Integer write SetValue;
@@ -73,12 +77,6 @@ var
 implementation
 
 {$R *.DFM}
-
-procedure TmainForm.FormDestroy(Sender: TObject);
-begin
-  FThread.Terminate();
-  FPresenter := nil;
-end;
 
 procedure TmainForm.btnRefreshClick(Sender: TObject);
 begin
@@ -94,9 +92,19 @@ procedure TmainForm.FormCreate(Sender: TObject);
 begin
   comboDataType.ItemIndex := 1;
   FPresenter := TDefaultPresenter.Create(self);
+  FSettings := TSettings.Create();
+  FSettings.Load(Self);
   FThread := THelperThread.Create(true, self, htStatusClear);
   FThread.FreeOnTerminate := true;
   FThread.Resume();
+end;
+
+procedure TmainForm.FormDestroy(Sender: TObject);
+begin
+  FThread.Terminate();
+  FPresenter := nil;
+  FSettings.Save(Self);
+  FSettings := nil;
 end;
 
 function TmainForm.GetAddress: int;
@@ -136,6 +144,16 @@ begin
   else
     Result := vmInfo;
   end;
+end;
+
+procedure TmainForm.SetAddress(const value: int);
+begin
+  editOffset.Text := IntToStr(value);
+end;
+
+procedure TmainForm.SetHost(const value: string);
+begin
+  editHost.Text := value;
 end;
 
 procedure TmainForm.SetInfoValues(const values: TStrings);

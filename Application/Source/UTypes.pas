@@ -19,13 +19,15 @@ type
     function GetLength: byte;
     function GetStatus: string;
     function GetViewMode: ViewModeEnum;
+    procedure SetAddress(const value: int);
+    procedure SetHost(const value: string);
     procedure SetInfoValues(const values: TStrings);
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
     procedure SetValues(const values: TStrings);
-    property Address: int read GetAddress;
+    property Address: int read GetAddress write SetAddress;
     property DataType: DataTypeEnum read GetDataType;
-    property Host: string read GetHost;
+    property Host: string read GetHost write SetHost;
     property Length: byte read GetLength;
     property Status: string read GetStatus write SetStatus;
     property Value: Integer write SetValue;
@@ -40,6 +42,11 @@ type
     function Read(host: string; offset: Integer; dataType: DataTypeEnum): Word;
     function ReadBlock(host: string; offset: Integer; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     function ReadInfo(host: string): EasyIpInfoPacket;
+  end;
+
+  ISettings = interface
+    procedure Load(view: IView);
+    procedure Save(view: IView);
   end;
 
 implementation

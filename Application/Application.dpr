@@ -7,7 +7,8 @@ uses
   UTypes in 'Source\UTypes.pas',
   UDefaultPresenter in 'Source\UDefaultPresenter.pas',
   UEasyIpService in 'Source\UEasyIpService.pas',
-  UHelperThread in 'Source\UHelperThread.pas';
+  UHelperThread in 'Source\UHelperThread.pas',
+  USettings in 'Source\USettings.pas';
 
 begin
   Forms.Application.Initialize;

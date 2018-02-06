@@ -120,7 +120,6 @@ object mainForm: TmainForm
     Width = 121
     Height = 21
     TabOrder = 1
-    Text = '10.20.0.104'
   end
   object comboDataType: TComboBox
     Left = 160
@@ -161,6 +160,5 @@ object mainForm: TmainForm
     Width = 121
     Height = 21
     TabOrder = 5
-    Text = '5000'
   end
 end
