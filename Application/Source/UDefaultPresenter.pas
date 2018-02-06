@@ -56,13 +56,18 @@ var
   values: TStrings;
   i: int;
 begin
-  FView.Status := 'Reading data block ...';
-  FView.SetValues(TStringList.Create());
-  returned := FPlcService.ReadBlock(FView.Host, FView.Address, FView.DataType, FView.Length);
-  values := TStringList.Create();
-  for i := 0 to Length(returned) - 1 do
-    values.Add('FW' + IntToStr(FView.Address + i) + ' - ' + IntToStr(returned[i]));
-  FView.SetValues(values);  
+  try
+    FView.Status := 'Reading data block ...';
+    FView.SetValues(TStringList.Create());
+    returned := FPlcService.ReadBlock(FView.Host, FView.Address, FView.DataType, FView.Length);
+    values := TStringList.Create();
+    for i := 0 to Length(returned) - 1 do
+      values.Add('FW' + IntToStr(FView.Address + i) + ' - ' + IntToStr(returned[i]));
+    FView.SetValues(values);
+  except
+    on Ex: Exception do
+      FView.Status := Ex.Message;
+  end;
 end;
 
 procedure TDefaultPresenter.RefreshInfo;
