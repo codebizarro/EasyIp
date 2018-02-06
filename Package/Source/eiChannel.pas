@@ -113,9 +113,6 @@ begin
       raise ESocketException.Create(GetLastErrorString());
     try
       sock := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-      returnCode := connect(sock, FTarget, SizeOf(FTarget));
-      if (returnCode = SOCKET_ERROR) then
-        raise ESocketException.Create(GetLastErrorString());
       setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, @FTimeout, SizeOf(FTimeout));
       setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, @FTimeout, SizeOf(FTimeout));
 
