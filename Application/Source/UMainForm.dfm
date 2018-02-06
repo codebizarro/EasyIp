@@ -13,6 +13,7 @@ object mainForm: TmainForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
@@ -89,7 +90,7 @@ object mainForm: TmainForm
         MaxValue = 256
         MinValue = 1
         TabOrder = 0
-        Value = 0
+        Value = 1
       end
       object listValues: TListBox
         Left = 155

@@ -27,6 +27,7 @@ const
   SECTION_DEVICE = 'DEVICE';
   PARAM_HOST = 'Host';
   PARAM_ADDRESS = 'Address';
+  PARAM_LENGTH = 'Length';
 
 constructor TSettings.Create;
 var
@@ -48,13 +49,15 @@ end;
 procedure TSettings.Load(view: IView);
 begin
   view.Host := FIniFile.ReadString(SECTION_DEVICE, PARAM_HOST, '');
-  view.Address := StrToInt(FIniFile.ReadString(SECTION_DEVICE, PARAM_ADDRESS, '0'));
+  view.Address := FIniFile.ReadInteger(SECTION_DEVICE, PARAM_ADDRESS, 0);
+  view.Length :=  FIniFile.ReadInteger(SECTION_DEVICE, PARAM_LENGTH, 1);
 end;
 
 procedure TSettings.Save(view: IView);
 begin
   FIniFile.WriteString(SECTION_DEVICE, PARAM_HOST, view.Host);
-  FIniFile.WriteString(SECTION_DEVICE, PARAM_ADDRESS, IntToStr(view.Address));
+  FIniFile.WriteInteger(SECTION_DEVICE, PARAM_ADDRESS, view.Address);
+  FIniFile.WriteInteger(SECTION_DEVICE, PARAM_LENGTH, view.Length);
 end;
 
 end.

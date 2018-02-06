@@ -56,6 +56,7 @@ type
     function GetViewMode: ViewModeEnum;
     procedure SetAddress(const value: int);
     procedure SetHost(const value: string);
+    procedure SetLength(const value: byte);
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
     procedure SetValues(const values: TStrings);
@@ -65,7 +66,7 @@ type
     property Address: int read GetAddress write SetAddress;
     property DataType: DataTypeEnum read GetDataType;
     property Host: string read GetHost write SetHost;
-    property Length: byte read GetLength;
+    property Length: byte read GetLength write SetLength;
     property Status: string read GetStatus write SetStatus;
     property Value: Integer write SetValue;
     property ViewMode: ViewModeEnum read GetViewMode;
@@ -159,6 +160,11 @@ end;
 procedure TmainForm.SetInfoValues(const values: TStrings);
 begin
   memoInfo.Lines := values;
+end;
+
+procedure TmainForm.SetLength(const value: byte);
+begin
+  spinLength.Value := value;
 end;
 
 procedure TmainForm.SetStatus(const value: string);
