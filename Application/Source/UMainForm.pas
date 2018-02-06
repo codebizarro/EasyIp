@@ -27,12 +27,6 @@ type
     editHost: TEdit;
     editOffset: TEdit;
     editValue: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label6: TLabel;
-    Label7: TLabel;
     listValues: TListBox;
     memoInfo: TMemo;
     pager: TPageControl;
@@ -181,6 +175,9 @@ procedure TmainForm.SetValues(const values: TStrings);
 begin
   listValues.Items := values;
 end;
+
+initialization
+  RegisterClass(TLabel);
 
 end.
 
