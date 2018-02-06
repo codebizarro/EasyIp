@@ -55,12 +55,10 @@ var
   returned: DynamicWordArray;
   values: TStrings;
   i: int;
-  addr: int;
 begin
   FView.Status := 'Reading data block ...';
   FView.SetValues(TStringList.Create());
   returned := FPlcService.ReadBlock(FView.Host, FView.Address, FView.DataType, FView.Length);
-  //addr := FView.Address - 1;
   values := TStringList.Create();
   for i := 0 to Length(returned) - 1 do
     values.Add('FW' + IntToStr(FView.Address + i) + ' - ' + IntToStr(returned[i]));

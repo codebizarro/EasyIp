@@ -17,6 +17,7 @@ type
     function GetDataType: DataTypeEnum;
     function GetHost: string;
     function GetLength: byte;
+    function GetStatus: string;
     function GetViewMode: ViewModeEnum;
     procedure SetInfoValues(const values: TStrings);
     procedure SetStatus(const value: string);
@@ -26,7 +27,7 @@ type
     property DataType: DataTypeEnum read GetDataType;
     property Host: string read GetHost;
     property Length: byte read GetLength;
-    property Status: string write SetStatus;
+    property Status: string read GetStatus write SetStatus;
     property Value: Integer write SetValue;
     property ViewMode: ViewModeEnum read GetViewMode;
   end;

@@ -5,6 +5,7 @@ interface
 uses
   Windows,
   Classes,
+  SysUtils,
   UTypes;
 
 type
@@ -12,6 +13,7 @@ type
   private
     FView: IView;
     FHelperType: HelperTypeEnum;
+    FPreviousStatus: string;
     procedure ClearStatus;
   protected
     procedure Execute; override;
@@ -27,6 +29,7 @@ begin
   inherited Create(createSuspended);
   FView := view;
   FHelperType := helperType;
+  FPreviousStatus := FView.Status;
 end;
 
 destructor THelperThread.Destroy;
@@ -37,20 +40,24 @@ end;
 
 procedure THelperThread.ClearStatus;
 begin
-  FView.ClearStatus();
+  if (Length(FView.Status) > 0) and (FPreviousStatus = FView.Status) then
+    FView.ClearStatus();
+  FPreviousStatus := FView.Status;
 end;
 
 procedure THelperThread.Execute;
 begin
-  case FHelperType of
-    htNone:
-      Self.Terminate;
-    htStatusClear:
-      begin
-        Sleep(2000);
-        Synchronize(ClearStatus);
+  while true do
+  begin
+    case FHelperType of
+      htNone:
         Self.Terminate;
-      end;
+      htStatusClear:
+        begin
+          Sleep(2000);
+          Synchronize(ClearStatus);
+        end;
+    end;
   end;
 end;
 

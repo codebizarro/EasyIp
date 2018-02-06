@@ -40,6 +40,7 @@ type
     sheetOnePoint: TTabSheet;
     spinLength: TSpinEdit;
     statusBar: TStatusBar;
+    procedure FormDestroy(Sender: TObject);
     procedure btnRefreshClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -49,6 +50,7 @@ type
     function GetDataType: DataTypeEnum;
     function GetHost: string;
     function GetLength: byte;
+    function GetStatus: string;
     function GetViewMode: ViewModeEnum;
     procedure SetStatus(const value: string);
     procedure SetValue(const value: Integer);
@@ -60,7 +62,7 @@ type
     property DataType: DataTypeEnum read GetDataType;
     property Host: string read GetHost;
     property Length: byte read GetLength;
-    property Status: string write SetStatus;
+    property Status: string read GetStatus write SetStatus;
     property Value: Integer write SetValue;
     property ViewMode: ViewModeEnum read GetViewMode;
   end;
@@ -71,6 +73,12 @@ var
 implementation
 
 {$R *.DFM}
+
+procedure TmainForm.FormDestroy(Sender: TObject);
+begin
+  FThread.Terminate();
+  FPresenter := nil;
+end;
 
 procedure TmainForm.btnRefreshClick(Sender: TObject);
 begin
@@ -86,6 +94,9 @@ procedure TmainForm.FormCreate(Sender: TObject);
 begin
   comboDataType.ItemIndex := 1;
   FPresenter := TDefaultPresenter.Create(self);
+  FThread := THelperThread.Create(true, self, htStatusClear);
+  FThread.FreeOnTerminate := true;
+  FThread.Resume();
 end;
 
 function TmainForm.GetAddress: int;
@@ -106,6 +117,11 @@ end;
 function TmainForm.GetLength: byte;
 begin
   Result := spinLength.Value;
+end;
+
+function TmainForm.GetStatus: string;
+begin
+  Result := statusBar.SimpleText;
 end;
 
 function TmainForm.GetViewMode: ViewModeEnum;
@@ -130,9 +146,6 @@ end;
 procedure TmainForm.SetStatus(const value: string);
 begin
   statusBar.SimpleText := value;
-  FThread := THelperThread.Create(true, self, htStatusClear);
-  FThread.FreeOnTerminate := true;
-  FThread.Resume();
 end;
 
 procedure TmainForm.SetValue(const value: Integer);
