@@ -34,6 +34,7 @@ implementation
 constructor TEasyIpServer.Create;
 begin
   Create(TConsoleLogger.Create());
+  //Create(TDebugLogger.Create());
 end;
 
 constructor TEasyIpServer.Create(logger: ILogger);
