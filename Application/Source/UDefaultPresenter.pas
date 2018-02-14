@@ -64,6 +64,7 @@ begin
     for i := 0 to Length(returned) - 1 do
       values.Add('FW' + IntToStr(FView.Address + i) + ' - ' + IntToStr(returned[i]));
     FView.SetValues(values);
+    values.Free();
   except
     on Ex: Exception do
       FView.Status := Ex.Message;
@@ -104,6 +105,7 @@ begin
       Append(operandSizes);
     end;
     FView.SetInfoValues(values);
+    values.Free();
   except
     on Ex: Exception do
       FView.Status := Ex.Message;

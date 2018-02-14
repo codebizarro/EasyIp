@@ -76,10 +76,6 @@ type
 
 implementation
 
-const
-  WINSOCK_VERSION = $0202;
-  LANG_ID = $400;
-
 constructor TUdpChannel.Create(const host: string; const port: int);
 begin
   inherited Create(host, port);
