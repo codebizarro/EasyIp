@@ -2,6 +2,9 @@ unit UServerTypes;
 
 interface
 
+uses
+  eiTypes;
+
 type
   ILogger = interface
     procedure Log(messageText: string);
@@ -9,6 +12,10 @@ type
 
   IEasyIpServer = interface
     procedure Run;
+  end;
+
+  IPacketDispatcher = interface
+    function Process(packet: DynamicByteArray): DynamicByteArray;
   end;
 
 implementation

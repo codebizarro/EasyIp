@@ -8,7 +8,7 @@ uses
   UServerTypes;
 
 type
-  TDefaultLogger = class(TInterfacedObject, ILogger)
+  TConsoleLogger = class(TInterfacedObject, ILogger)
     procedure Log(messageText: string);
   public
     constructor Create;
@@ -17,17 +17,17 @@ type
 
 implementation
 
-constructor TDefaultLogger.Create;
+constructor TConsoleLogger.Create;
 begin
   inherited;
 end;
 
-destructor TDefaultLogger.Destroy;
+destructor TConsoleLogger.Destroy;
 begin
   inherited;
 end;
 
-procedure TDefaultLogger.Log(messageText: string);
+procedure TConsoleLogger.Log(messageText: string);
 var
   sDateTime: string;
 const

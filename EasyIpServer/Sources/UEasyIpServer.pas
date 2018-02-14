@@ -11,12 +11,14 @@ uses
   eiExceptions,
   eiConstants,
   UServerTypes,
-  ULogger;
+  ULogger,
+  UPacketDispatcher;
 
 type
   TEasyIpServer = class(TInterfacedObject, IEasyIpServer)
   private
     FLogger: ILogger;
+    FPacketDispatcher: IPacketDispatcher;
     FSocket: TSocket;
     FTarget: TSockAddrIn;
     function GetLastErrorString: string;
@@ -31,7 +33,7 @@ implementation
 
 constructor TEasyIpServer.Create;
 begin
-  Create(TDefaultLogger.Create());
+  Create(TConsoleLogger.Create());
 end;
 
 constructor TEasyIpServer.Create(logger: ILogger);
@@ -42,6 +44,7 @@ begin
   inherited Create();
   FLogger := logger;
   FLogger.Log('Starting server...');
+  FPacketDispatcher := TPacketDispatcher.Create(FLogger);
   code := WSAStartup(WINSOCK_VERSION, init);
   if code <> 0 then
     raise ESocketException.Create(GetLastErrorString());
@@ -55,6 +58,7 @@ begin
   code := bind(FSocket, FTarget, SizeOf(FTarget));
   if code < 0 then
     raise ESocketException.Create(GetLastErrorString());
+  FLogger.Log('Server is started.');
 end;
 
 destructor TEasyIpServer.Destroy;
@@ -62,6 +66,7 @@ begin
   FLogger.Log('Stopping server...');
   closesocket(FSocket);
   WSACleanup();
+  FLogger.Log('Server is stopped.');
   inherited;
 end;
 
@@ -75,28 +80,34 @@ end;
 
 procedure TEasyIpServer.Run;
 var
-  code: int;
+  returnLength: int;
   sendBuffer: DynamicByteArray;
   recvBuffer: DynamicByteArray;
-  lenFrom: int;
+  len: int;
 begin
   while true do
   begin
     try
       SetLength(recvBuffer, High(short));
-      lenFrom := SizeOf(FTarget);
-      code := recvfrom(FSocket, Pointer(recvBuffer)^, Length(recvBuffer), 0, FTarget, lenFrom);
-      if (code = SOCKET_ERROR) then
+      len := SizeOf(FTarget);
+      returnLength := recvfrom(FSocket, Pointer(recvBuffer)^, Length(recvBuffer), 0, FTarget, len);
+      if (returnLength = SOCKET_ERROR) then
         raise ESocketException.Create(GetLastErrorString());
-      FLogger.Log('Data length ' + IntToStr(code));
+      SetLength(recvBuffer, returnLength);
+      FLogger.Log('Inbound data length ' + IntToStr(returnLength));
+
+      sendBuffer := FPacketDispatcher.Process(recvBuffer);
+
+      returnLength := sendto(FSocket, Pointer(sendBuffer)^, Length(sendBuffer), 0, FTarget, len);
+      if (returnLength = SOCKET_ERROR) then
+        raise ESocketException.Create(GetLastErrorString());
+      FLogger.Log('Outbound data length ' + IntToStr(returnLength));
     except
       on Ex: Exception do
         FLogger.Log(Ex.Message);
     end;
   end;
 end;
-
-
 
 end.
 
