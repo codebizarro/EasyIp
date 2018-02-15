@@ -9,8 +9,11 @@ uses
 
 type
   TConsoleLogger = class(TInterfacedObject, ILogger)
+  private
+    FOemConvert: bool;
+    function StringToOem(const value: string): AnsiString;
   public
-    constructor Create;
+    constructor Create(oemConvert: bool = true);
     destructor Destroy; override;
     procedure Log(messageText: string);
   end;
@@ -33,9 +36,10 @@ type
 
 implementation
 
-constructor TConsoleLogger.Create;
+constructor TConsoleLogger.Create(oemConvert: bool = true);
 begin
-  inherited;
+  inherited Create();
+  FOemConvert := oemConvert;
 end;
 
 destructor TConsoleLogger.Destroy;
@@ -46,12 +50,23 @@ end;
 procedure TConsoleLogger.Log(messageText: string);
 var
   sDateTime: string;
+  sOut: string;
 const
   LOG_MESSAGE = '%s %s';
   DATETIME_FORMAT = 'yyyy-mm-dd hh:nn:ss.zzz';
 begin
   sDateTime := FormatDateTime(DATETIME_FORMAT, Now);
-  Writeln(Format(LOG_MESSAGE, [sDateTime, messageText]));
+  sOut := Format(LOG_MESSAGE, [sDateTime, messageText]);
+  if FOemConvert then
+    sOut := StringToOem(sOut);
+  Writeln(sOut);
+end;
+
+function TConsoleLogger.StringToOem(const value: string): AnsiString;
+begin
+  SetLength(Result, Length(value));
+  if value <> '' then
+    CharToOem(PChar(value), PAnsiChar(Result));
 end;
 
 constructor TDebugLogger.Create;
