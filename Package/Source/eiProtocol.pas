@@ -61,11 +61,13 @@ begin
   FPacket := packet;
   if (FPacket.Flags and EASYIP_FLAG_INFO) = EASYIP_FLAG_INFO then
     FMode := pmInfo
-//TODO: To add bit mode
   else if (FPacket.SendDataSize = 0) and (FPacket.RequestDataSize > 0) then
     FMode := pmRead
   else if (FPacket.SendDataSize > 0) and (FPacket.RequestDataSize = 0) then
-    FMode := pmWrite;
+    FMode := pmWrite
+  else if ((FPacket.Flags and EASYIP_FLAG_BIT_OR) = EASYIP_FLAG_BIT_OR) or
+  ((FPacket.Flags and EASYIP_FLAG_BIT_AND) = EASYIP_FLAG_BIT_AND) then
+    FMode := pmBit;
 end;
 
 constructor TEasyIpProtocol.Create(const mode: PacketModeEnum);
