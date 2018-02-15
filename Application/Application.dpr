@@ -1,5 +1,5 @@
 program Application;
-//{$APPTYPE CONSOLE}
+
 uses
   Forms,
   SysUtils,
@@ -10,8 +10,11 @@ uses
   UHelperThread in 'Source\UHelperThread.pas',
   USettings in 'Source\USettings.pas';
 
+{$R *.RES}
+
 begin
   Forms.Application.Initialize;
   Forms.Application.CreateForm(TmainForm, mainForm);
   Forms.Application.Run;
 end.
+

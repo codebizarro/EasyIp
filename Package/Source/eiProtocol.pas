@@ -16,8 +16,6 @@ type
     FPacket: EasyIpPacket;
     FMode: PacketModeEnum;
     FBitMode: BitModeEnum;
-    constructor Create(const buffer: DynamicByteArray); overload;
-    constructor Create(const packet: EasyIpPacket); overload;
     function GetBitMode: BitModeEnum;
     function GetPacket: EasyIpPacket;
     function GetBuffer: DynamicByteArray;
@@ -35,6 +33,8 @@ type
     property Debug: string write SetDebug;
   public
     constructor Create(const mode: PacketModeEnum); overload;
+    constructor Create(const packet: EasyIpPacket); overload;
+    constructor Create(const buffer: DynamicByteArray); overload;
     destructor Destroy; override;
     property BitMode: BitModeEnum read GetBitMode write SetBitMode;
     property Buffer: DynamicByteArray read GetBuffer;
@@ -51,7 +51,7 @@ constructor TEasyIpProtocol.Create(const buffer: DynamicByteArray);
 begin
   inherited Create;
   Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);
-  FPacket := TPacketAdapter.ToEasyIpPacket(buffer);
+  Create(TPacketAdapter.ToEasyIpPacket(buffer));
 end;
 
 constructor TEasyIpProtocol.Create(const packet: EasyIpPacket);
@@ -59,6 +59,13 @@ begin
   inherited Create;
   Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);
   FPacket := packet;
+  if (FPacket.Flags and EASYIP_FLAG_INFO) = EASYIP_FLAG_INFO then
+    FMode := pmInfo
+//TODO: To add bit mode
+  else if (FPacket.SendDataSize = 0) and (FPacket.RequestDataSize > 0) then
+    FMode := pmRead
+  else if (FPacket.SendDataSize > 0) and (FPacket.RequestDataSize = 0) then
+    FMode := pmWrite;
 end;
 
 constructor TEasyIpProtocol.Create(const mode: PacketModeEnum);
