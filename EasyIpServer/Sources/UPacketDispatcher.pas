@@ -7,7 +7,6 @@ uses
   eiTypes,
   eiHelpers,
   eiProtocol,
-  eiConstants,
   UServerTypes;
 
 type
@@ -68,10 +67,7 @@ end;
 function TPacketDispatcher.ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;
 var
   infoPacket: EasyIpInfoPacket;
-  returnPacket: EasyIpPacket;
-  returnBuffer: DynamicByteArray;
 begin
-  returnPacket := protocol.Packet;
   infoPacket := TPacketAdapter.ToEasyIpInfoPacket(protocol.Packet);
 
   infoPacket.ControllerType := 1;
@@ -85,12 +81,7 @@ begin
   infoPacket.OperandSize[4] := 256;
   infoPacket.OperandSize[5] := 256;
 
-  SetLength(returnBuffer, EASYIP_HEADERSIZE + SizeOf(EasyIpInfoPacket));
-  CopyMemory(@returnPacket.Data, @infoPacket, SizeOf(infoPacket));
-  CopyMemory(returnBuffer, @returnPacket, Length(returnBuffer));
-
-  Result := returnBuffer;
-  sleep(0)
+  Result := TPacketAdapter.ToByteArray(protocol.Packet, infoPacket);
 end;
 
 end.

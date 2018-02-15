@@ -17,9 +17,10 @@ type
 
   TPacketAdapter = class
   public
-    class function ToByteArray(const packet: EasyIpPacket): DynamicByteArray;
-    class function ToEasyIpPacket(const buffer: DynamicByteArray): EasyIpPacket;
+    class function ToByteArray(const packet: EasyIpPacket; const infoPacket: EasyIpInfoPacket): DynamicByteArray; overload;
+    class function ToByteArray(const packet: EasyIpPacket): DynamicByteArray; overload;
     class function ToEasyIpInfoPacket(const packet: EasyIpPacket): EasyIpInfoPacket;
+    class function ToEasyIpPacket(const buffer: DynamicByteArray): EasyIpPacket;
   end;
 
 implementation
@@ -70,6 +71,16 @@ begin
   Result := packet;
 end;
 
+class function TPacketAdapter.ToByteArray(const packet: EasyIpPacket; const infoPacket: EasyIpInfoPacket): DynamicByteArray;
+var
+  returnBuffer: DynamicByteArray;
+begin
+  SetLength(returnBuffer, EASYIP_HEADERSIZE + SizeOf(EasyIpInfoPacket));
+  CopyMemory(@packet.Data, @infoPacket, SizeOf(infoPacket));
+  CopyMemory(returnBuffer, @packet, Length(returnBuffer));
+  Result := returnBuffer;
+end;
+
 class function TPacketAdapter.ToByteArray(const packet: EasyIpPacket): DynamicByteArray;
 var
   tBuffer: DynamicByteArray;
@@ -83,15 +94,6 @@ begin
   Result := tBuffer;
 end;
 
-class function TPacketAdapter.ToEasyIpPacket(const buffer: DynamicByteArray): EasyIpPacket;
-var
-  tPacket: EasyIpPacket;
-begin
-  ZeroMemory(@tPacket, SizeOf(EasyIpPacket));
-  CopyMemory(@tPacket, buffer, length(buffer));
-  Result := tPacket;
-end;
-
 class function TPacketAdapter.ToEasyIpInfoPacket(const packet: EasyIpPacket): EasyIpInfoPacket;
 var
   infoPacket: EasyIpInfoPacket;
@@ -101,6 +103,15 @@ begin
   ZeroMemory(@infoPacket, dataLength);
   CopyMemory(@infoPacket, @packet.Data, dataLength);
   Result := infoPacket;
+end;
+
+class function TPacketAdapter.ToEasyIpPacket(const buffer: DynamicByteArray): EasyIpPacket;
+var
+  tPacket: EasyIpPacket;
+begin
+  ZeroMemory(@tPacket, SizeOf(EasyIpPacket));
+  CopyMemory(@tPacket, buffer, length(buffer));
+  Result := tPacket;
 end;
 
 end.
