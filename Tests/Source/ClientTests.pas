@@ -25,6 +25,7 @@ type
     procedure TearDown; override;
   public
   published
+    procedure BenchmarkTest;
     procedure TestBlockRead;
     procedure TestBlockWrite;
     procedure LifeCycleTest;
@@ -34,10 +35,60 @@ type
     procedure TestWordReadWrite;
   end;
 
+type
+  ClientThread = class(TThread)
+  private
+    FClient: IEasyIpClient;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(client: IEasyIpClient; suspended: bool = true);
+  end;
+
 implementation
 
 uses
   TestConstants;
+
+constructor ClientThread.Create(client: IEasyIpClient; suspended: bool = true);
+begin
+  inherited Create(suspended);
+  FClient := client;
+end;
+
+procedure ClientThread.Execute;
+var
+  infoPacket: EasyIpInfoPacket;
+  //i: int;
+begin
+  //for i := 0 to 10 do
+  begin
+    try
+      infoPacket := FClient.InfoRead();
+      OutputDebugString('InfoRead - Ok');
+    except
+      OutputDebugString('InfoRead - Fail');
+    end;
+  end;
+end;
+
+procedure TClientTest.BenchmarkTest;
+const
+  COUNT = 50;
+var
+  i: int;
+  clients: array[0..COUNT] of ClientThread;
+begin
+  for i := 0 to COUNT do
+  begin
+    clients[i] := ClientThread.Create(TEasyIpClient.Create(TEST_PLC_HOST));
+    clients[i].FreeOnTerminate := true;
+  end;
+  for i := 0 to COUNT do
+  begin
+    clients[i].Resume;
+  end;
+end;
 
 procedure TClientTest.LifeCycleTest;
 var
@@ -153,7 +204,7 @@ begin
   Randomize;
   writed := Random(10000);
   FClient.WordWrite(TEST_OFFSET, writed, dtFlag);
-  readed:= 0;
+  readed := 0;
   readed := FClient.WordRead(TEST_OFFSET, dtFlag);
   Check(readed = writed);
 end;
