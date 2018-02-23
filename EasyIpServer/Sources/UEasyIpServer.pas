@@ -65,6 +65,7 @@ end;
 destructor TEasyIpServer.Destroy;
 begin
   FLogger.Log('Stopping server...');
+  shutdown(FSocket, 2);
   closesocket(FSocket);
   WSACleanup();
   FLogger.Log('Server is stopped.');

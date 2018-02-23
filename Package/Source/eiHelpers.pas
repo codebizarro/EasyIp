@@ -75,7 +75,8 @@ class function TPacketAdapter.ToByteArray(const packet: EasyIpPacket; const info
 var
   returnBuffer: DynamicByteArray;
 begin
-  SetLength(returnBuffer, EASYIP_HEADERSIZE + SizeOf(EasyIpInfoPacket));
+  //Length must be equal to EasyIpPacket
+  SetLength(returnBuffer, SizeOf(EasyIpPacket));
   CopyMemory(@packet.Data, @infoPacket, SizeOf(infoPacket));
   CopyMemory(returnBuffer, @packet, Length(returnBuffer));
   Result := returnBuffer;
@@ -94,6 +95,7 @@ begin
   Result := tBuffer;
 end;
 
+//For application using, not for exchange data between PC<->PLC
 class function TPacketAdapter.ToEasyIpInfoPacket(const packet: EasyIpPacket): EasyIpInfoPacket;
 var
   infoPacket: EasyIpInfoPacket;

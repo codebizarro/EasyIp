@@ -7,6 +7,7 @@ uses
   eiTypes,
   eiHelpers,
   eiProtocol,
+  eiConstants,
   UServerTypes;
 
 type
@@ -55,33 +56,47 @@ end;
 function TPacketDispatcher.ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
 begin
   //TODO: To implement packet dispatching
+  FLogger.Log('Dispatching bit request...');
   Result := TPacketAdapter.ToByteArray(protocol.Packet);
 end;
 
 function TPacketDispatcher.ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
+var
+  packet: EasyIpPacket;
 begin
   //TODO: To implement packet dispatching
+  FLogger.Log('Dispatching data request...');
+  packet := protocol.Packet;
   Result := TPacketAdapter.ToByteArray(protocol.Packet);
 end;
 
 function TPacketDispatcher.ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;
 var
   infoPacket: EasyIpInfoPacket;
+  packet: EasyIpPacket;
 begin
-  infoPacket := TPacketAdapter.ToEasyIpInfoPacket(protocol.Packet);
+  FLogger.Log('Dispatching info request...');
+  packet := protocol.Packet;
+  infoPacket := TPacketAdapter.ToEasyIpInfoPacket(packet);
 
   infoPacket.ControllerType := 1;
   infoPacket.ControllerRevisionHigh := 1;
   infoPacket.ControllerRevisioLow := 2;
   infoPacket.EasyIpRevisionHigh := 1;
   infoPacket.EasyIpRevisionLow := 2;
+
+  //Operand sizes depends on concrete device
   infoPacket.OperandSize[1] := 10000;
   infoPacket.OperandSize[2] := 256;
   infoPacket.OperandSize[3] := 256;
   infoPacket.OperandSize[4] := 256;
   infoPacket.OperandSize[5] := 256;
 
-  Result := TPacketAdapter.ToByteArray(protocol.Packet, infoPacket);
+  //Required by documentation
+  packet.Flags := packet.Flags or EASYIP_FLAG_RESPONSE or EASYIP_FLAG_INFO;
+  packet.RequestDataSize := 38;
+
+  Result := TPacketAdapter.ToByteArray(packet, infoPacket);
 end;
 
 end.
