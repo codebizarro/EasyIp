@@ -7,7 +7,8 @@ uses
 
 type
   ILogger = interface
-    procedure Log(messageText: string);
+    procedure Log(messageText: string); overload;
+    procedure Log(messageText: string; formatString: string); overload;
   end;
 
   IEasyIpServer = interface

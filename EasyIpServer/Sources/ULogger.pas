@@ -15,14 +15,16 @@ type
   public
     constructor Create(oemConvert: bool = true);
     destructor Destroy; override;
-    procedure Log(messageText: string);
+    procedure Log(messageText: string); overload;
+    procedure Log(messageText: string; formatString: string); overload;
   end;
 
   TDebugLogger = class(TInterfacedObject, ILogger)
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Log(messageText: string);
+    procedure Log(messageText: string); overload;
+    procedure Log(messageText: string; formatString: string); overload;
   end;
 
   TFileLogger = class(TInterfacedObject, ILogger)
@@ -31,7 +33,16 @@ type
   public
     constructor Create(fileName: string);
     destructor Destroy; override;
-    procedure Log(messageText: string); virtual; abstract; //TODO: need to implement
+    procedure Log(messageText: string); overload; virtual; abstract; //TODO: need to implement
+    procedure Log(messageText: string; formatString: string); overload; virtual; abstract; //TODO: need to implement
+  end;
+
+  TStubLogger = class(TInterfacedObject, ILogger)
+  public
+    constructor Create(fileName: string);
+    destructor Destroy; override;
+    procedure Log(messageText: string); overload;
+    procedure Log(messageText: string; formatString: string); overload;
   end;
 
 implementation
@@ -62,6 +73,11 @@ begin
   Writeln(sOut);
 end;
 
+procedure TConsoleLogger.Log(messageText, formatString: string);
+begin
+  Self.Log(Format(formatString, [messageText]));
+end;
+
 function TConsoleLogger.StringToOem(const value: string): AnsiString;
 begin
   SetLength(Result, Length(value));
@@ -84,6 +100,11 @@ begin
   OutputDebugString(PChar(messageText));
 end;
 
+procedure TDebugLogger.Log(messageText, formatString: string);
+begin
+  Self.Log(Format(formatString, [messageText]));
+end;
+
 constructor TFileLogger.Create(fileName: string);
 begin
   inherited Create();
@@ -93,6 +114,26 @@ end;
 destructor TFileLogger.Destroy;
 begin
   inherited;
+end;
+
+constructor TStubLogger.Create(fileName: string);
+begin
+
+end;
+
+destructor TStubLogger.Destroy;
+begin
+  inherited;
+end;
+
+procedure TStubLogger.Log(messageText: string);
+begin
+  Exit;
+end;
+
+procedure TStubLogger.Log(messageText, formatString: string);
+begin
+  Exit;
 end;
 
 end.
