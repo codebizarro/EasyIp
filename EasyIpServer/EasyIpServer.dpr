@@ -7,7 +7,8 @@ uses
   UEasyIpServer in 'Sources\UEasyIpServer.pas',
   UServerTypes in 'Sources\UServerTypes.pas',
   ULogger in 'Sources\ULogger.pas',
-  UPacketDispatcher in 'Sources\UPacketDispatcher.pas';
+  UPacketDispatcher in 'Sources\UPacketDispatcher.pas',
+  UDevices in 'Sources\UDevices.pas';
 
 procedure Main();
 var
