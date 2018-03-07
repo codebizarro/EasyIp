@@ -93,7 +93,7 @@ begin
 end;
 
 initialization
-  TestFramework.RegisterTest(TPacketWrapperTest.Suite);
+//  TestFramework.RegisterTest(TPacketWrapperTest.Suite);
 
 end.
 

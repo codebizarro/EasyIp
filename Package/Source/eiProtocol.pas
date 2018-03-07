@@ -222,9 +222,9 @@ begin
   case value of
     pmInfo:
       begin
-        FPacket.Flags := 0;
+        ZeroMemory(@FPacket, SizeOf(FPacket));
         FPacket.Flags := FPacket.Flags or EASYIP_FLAG_INFO;
-        FPacket.RequestDataSize := 1;
+        FPacket.RequestDataSize := 38;
         FPacket.Data[1] := 1;
       end;
     pmRead, pmWrite:

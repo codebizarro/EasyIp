@@ -21,7 +21,8 @@ type
     FLogger: ILogger;
     FPacketDispatcher: IPacketDispatcher;
     FSocket: TSocket;
-    FTarget: TSockAddrIn;
+    FClientAddr: TSockAddrIn;
+    FLocalAddr: TSockAddrIn;
     function GetLastErrorString: string;
   public
     constructor Create; overload;
@@ -58,12 +59,12 @@ begin
     if FSocket = INVALID_SOCKET then
       raise ESocketException.Create(GetLastErrorString());
 
-    ZeroMemory(@FTarget, SizeOf(TSockAddrIn));
-    FTarget.sin_family := AF_INET;
-    FTarget.sin_port := htons(EASYIP_PORT);
-    FTarget.sin_addr.s_addr := INADDR_ANY;
-    
-    code := bind(FSocket, FTarget, SizeOf(FTarget));
+    ZeroMemory(@FLocalAddr, SizeOf(FLocalAddr));
+    FLocalAddr.sin_family := AF_INET;
+    FLocalAddr.sin_port := htons(EASYIP_PORT);
+    FLocalAddr.sin_addr.s_addr := INADDR_ANY;
+
+    code := bind(FSocket, FLocalAddr, SizeOf(FLocalAddr));
     if code < 0 then
       raise ESocketException.Create(GetLastErrorString());
 
@@ -116,19 +117,21 @@ begin
     begin
       try
         SetLength(recvBuffer, High(short));
-        len := SizeOf(FTarget);
-        returnLength := recvfrom(FSocket, Pointer(recvBuffer)^, Length(recvBuffer), 0, FTarget, len);
+        len := SizeOf(FClientAddr);
+        returnLength := recvfrom(FSocket, Pointer(recvBuffer)^, Length(recvBuffer), 0, FClientAddr, len);
         if (returnLength = SOCKET_ERROR) then
           raise ESocketException.Create(GetLastErrorString());
         SetLength(recvBuffer, returnLength);
         FLogger.Log('Inbound data length ' + IntToStr(returnLength));
+        FLogger.Log('From ' + inet_ntoa(FClientAddr.sin_addr));
 
         sendBuffer := FPacketDispatcher.Process(recvBuffer);
 
-        returnLength := sendto(FSocket, Pointer(sendBuffer)^, Length(sendBuffer), 0, FTarget, len);
+        returnLength := sendto(FSocket, Pointer(sendBuffer)^, Length(sendBuffer), 0, FClientAddr, len);
         if (returnLength = SOCKET_ERROR) then
           raise ESocketException.Create(GetLastErrorString());
         FLogger.Log('Outbound data length ' + IntToStr(returnLength));
+        FLogger.Log('To ' + inet_ntoa(FClientAddr.sin_addr));
       except
         on Ex: Exception do
           FLogger.Log(Ex.Message);

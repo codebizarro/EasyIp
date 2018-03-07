@@ -210,7 +210,7 @@ begin
 end;
 
 initialization
-  TestFramework.RegisterTest(TRepeatedTest.Create(TClientTest.Suite, 2));
+  TestFramework.RegisterTest(TRepeatedTest.Create(TClientTest.Suite, 1));
 
 end.
 
