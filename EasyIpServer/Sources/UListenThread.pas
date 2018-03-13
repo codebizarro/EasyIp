@@ -18,15 +18,18 @@ type
   TListenSocketThread = class(TBaseSocketThread)
   private
     FLocalAddr: TSockAddrIn;
+    FReceiveEvent: TReceiveEvent;
+    procedure DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
   public
-    constructor Create(logger: ILogger);
+    constructor Create(logger: ILogger; listenPort: int);
     destructor Destroy; override;
     procedure Execute; override;
+    property OnReceive: TReceiveEvent read FReceiveEvent write FReceiveEvent;
   end;
 
 implementation
 
-constructor TListenSocketThread.Create(logger: ILogger);
+constructor TListenSocketThread.Create(logger: ILogger; listenPort: int);
 var
   code: int;
 begin
@@ -44,7 +47,7 @@ begin
 
     ZeroMemory(@FLocalAddr, SizeOf(FLocalAddr));
     FLocalAddr.sin_family := AF_INET;
-    FLocalAddr.sin_port := htons(EASYIP_PORT);
+    FLocalAddr.sin_port := htons(listenPort);
     FLocalAddr.sin_addr.s_addr := INADDR_ANY;
     code := bind(FSocket, FLocalAddr, SizeOf(FLocalAddr));
     if code < 0 then
@@ -63,28 +66,33 @@ begin
   inherited;
 end;
 
+procedure TListenSocketThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
+begin
+  if Assigned(FReceiveEvent) then
+    FReceiveEvent(Self, clientAddr, buffer);
+end;
+
 procedure TListenSocketThread.Execute;
 var
   returnLength: int;
-  recvBuffer: DynamicByteArray;
   len: int;
+  FBuffer: DynamicByteArray;
   FClientAddr: TSockAddrIn;
 begin
   while not Terminated do
   begin
     try
-      SetLength(recvBuffer, High(short));
+      SetLength(FBuffer, High(short));
       len := SizeOf(FClientAddr);
-      returnLength := recvfrom(FSocket, Pointer(recvBuffer)^, Length(recvBuffer), 0, FClientAddr, len);
+      returnLength := recvfrom(FSocket, Pointer(FBuffer)^, Length(FBuffer), 0, FClientAddr, len);
       if (returnLength = SOCKET_ERROR) then
         raise ESocketException.Create(GetLastErrorString());
 
-      SetLength(recvBuffer, returnLength);
+      SetLength(FBuffer, returnLength);
       FLogger.Log('Inbound data length ' + IntToStr(returnLength));
       FLogger.Log('From ' + inet_ntoa(FClientAddr.sin_addr));
 
-      with TResponseSocketThread.Create(FLogger, FClientAddr, recvBuffer) do
-        Resume;
+      DoReceiveEvent(FClientAddr, FBuffer);
     except
       on Ex: Exception do
         FLogger.Log(Ex.Message);

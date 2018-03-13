@@ -21,16 +21,14 @@ type
     FPacketDispatcher: IPacketDispatcher;
     FBuffer: DynamicByteArray;
   public
-    constructor Create(logger: ILogger; const target: TSockAddrIn; const buffer:
-        DynamicByteArray);
+    constructor Create(logger: ILogger; const target: TSockAddrIn; const buffer: DynamicByteArray);
     destructor Destroy; override;
     procedure Execute; override;
   end;
 
 implementation
 
-constructor TResponseSocketThread.Create(logger: ILogger; const target:
-    TSockAddrIn; const buffer: DynamicByteArray);
+constructor TResponseSocketThread.Create(logger: ILogger; const target: TSockAddrIn; const buffer: DynamicByteArray);
 var
   code: int;
   bufferLength: int;
