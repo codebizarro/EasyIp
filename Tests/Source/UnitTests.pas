@@ -104,8 +104,8 @@ begin
 end;
 
 initialization
-  TestFramework.RegisterTest(TPacketFactoryTest.Suite);
-  TestFramework.RegisterTest(TRepeatedTest.Create(TStopWatchTest.Suite, 2));
+//  TestFramework.RegisterTest(TPacketFactoryTest.Suite);
+//  TestFramework.RegisterTest(TRepeatedTest.Create(TStopWatchTest.Suite, 2));
 
 end.
 

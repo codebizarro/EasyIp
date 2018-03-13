@@ -11,6 +11,7 @@ type
   TConsoleLogger = class(TInterfacedObject, ILogger)
   private
     FOemConvert: bool;
+    FCritical: TRTLCriticalSection;
     function StringToOem(const value: string): AnsiString;
   public
     constructor Create(oemConvert: bool = true);
@@ -51,10 +52,12 @@ constructor TConsoleLogger.Create(oemConvert: bool = true);
 begin
   inherited Create();
   FOemConvert := oemConvert;
+  InitializeCriticalSection(FCritical);
 end;
 
 destructor TConsoleLogger.Destroy;
 begin
+  DeleteCriticalSection(FCritical);
   inherited;
 end;
 
@@ -70,7 +73,12 @@ begin
   sOut := Format(LOG_MESSAGE, [sDateTime, messageText]);
   if FOemConvert then
     sOut := StringToOem(sOut);
-  Writeln(sOut);
+  try
+    EnterCriticalSection(FCritical);
+    Writeln(sOut);
+  finally
+    LeaveCriticalSection(FCritical);
+  end;
 end;
 
 procedure TConsoleLogger.Log(messageText, formatString: string);

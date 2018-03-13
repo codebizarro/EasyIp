@@ -3,6 +3,7 @@ unit UServerTypes;
 interface
 
 uses
+  WinSock,
   eiTypes;
 
 type
@@ -29,6 +30,8 @@ type
     function TryGetData(offset: int; count: byte; out OutResult): DynamicWordArray;
     procedure TrySetData(offset: int; data: DynamicWordArray; out OutResult);
   end;
+
+  TReceiveEvent = procedure(Sender: TObject; target: TSockAddrIn; buffer: DynamicByteArray) of object;
 
 implementation
 
