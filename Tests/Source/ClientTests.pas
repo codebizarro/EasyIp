@@ -74,7 +74,7 @@ end;
 
 procedure TClientTest.BenchmarkTest;
 const
-  COUNT = 50;
+  COUNT = 500;
 var
   i: int;
   clients: array[0..COUNT] of ClientThread;
