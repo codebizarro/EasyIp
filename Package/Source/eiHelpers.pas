@@ -95,9 +95,10 @@ end;
 class function TPacketAdapter.ToByteArray(const packet: EasyIpPacket; const infoPacket: EasyIpInfoPacket): DynamicByteArray;
 var
   returnBuffer: DynamicByteArray;
+  bufferLength: int;
 begin
-  //Length must be equal to EasyIpPacket
-  SetLength(returnBuffer, SizeOf(EasyIpPacket));
+  bufferLength := EASYIP_HEADERSIZE + packet.RequestDataSize * SHORT_SIZE;
+  SetLength(returnBuffer, bufferLength);
   CopyMemory(@packet.Data, @infoPacket, SizeOf(infoPacket));
   CopyMemory(returnBuffer, @packet, Length(returnBuffer));
   Result := returnBuffer;

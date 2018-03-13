@@ -74,7 +74,7 @@ end;
 
 procedure TClientTest.BenchmarkTest;
 const
-  COUNT = 50;
+  COUNT = 500;
 var
   i: int;
   clients: array[0..COUNT] of ClientThread;
@@ -210,7 +210,7 @@ begin
 end;
 
 initialization
-  TestFramework.RegisterTest(TRepeatedTest.Create(TClientTest.Suite, 2));
+  TestFramework.RegisterTest(TRepeatedTest.Create(TClientTest.Suite, 1));
 
 end.
 
