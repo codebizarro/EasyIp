@@ -21,19 +21,22 @@ type
     FPacketDispatcher: IPacketDispatcher;
     FBuffer: DynamicByteArray;
   public
-    constructor Create(const target: TSockAddrIn; const buffer: DynamicByteArray);
+    constructor Create(logger: ILogger; const target: TSockAddrIn; const buffer:
+        DynamicByteArray);
     destructor Destroy; override;
     procedure Execute; override;
   end;
 
 implementation
 
-constructor TResponseSocketThread.Create(const target: TSockAddrIn; const buffer: DynamicByteArray);
+constructor TResponseSocketThread.Create(logger: ILogger; const target:
+    TSockAddrIn; const buffer: DynamicByteArray);
 var
   code: int;
   bufferLength: int;
 begin
   inherited Create(true);
+  FLogger := logger;
   try
     ZeroMemory(@FClientAddr, SizeOf(TSockAddrIn));
     CopyMemory(@FClientAddr, @target, SizeOf(TSockAddrIn));

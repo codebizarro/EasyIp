@@ -15,16 +15,17 @@ uses
 type
   TBaseSocketThread = class(TThread)
   private
-
   protected
     FLogger: ILogger;
     FSocket: TSocket;
     FWsaData: TWSAData;
+    FCancel: bool;
     function GetLastErrorString: string;
     procedure Execute; override;
   public
     constructor Create(createSuspended: bool = true);
     destructor Destroy; override;
+    procedure Cancel;
   end;
 
 implementation
@@ -33,13 +34,22 @@ constructor TBaseSocketThread.Create(createSuspended: bool = true);
 begin
   inherited Create(createSuspended);
   FreeOnTerminate := true;
-  FLogger := TDebugLogger.Create();
 end;
 
 destructor TBaseSocketThread.Destroy;
+begin
+  if not FCancel then
+    Cancel;
+  FLogger.Log('Base thread destroyed.');
+  inherited;
+end;
+
+procedure TBaseSocketThread.Cancel;
 var
   shutResult: int;
 begin
+  FCancel := true;
+  Terminate;
   shutResult := shutdown(FSocket, 2);
   if shutResult = SOCKET_ERROR then
   begin
@@ -47,8 +57,6 @@ begin
   end;
   closesocket(FSocket);
   WSACleanup();
-  FLogger.Log('Base thread destroyed.');
-  inherited;
 end;
 
 procedure TBaseSocketThread.Execute;
@@ -66,3 +74,4 @@ begin
 end;
 
 end.
+

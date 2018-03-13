@@ -19,18 +19,19 @@ type
   private
     FLocalAddr: TSockAddrIn;
   public
-    constructor Create;
+    constructor Create(logger: ILogger);
     destructor Destroy; override;
     procedure Execute; override;
   end;
 
 implementation
 
-constructor TListenSocketThread.Create;
+constructor TListenSocketThread.Create(logger: ILogger);
 var
   code: int;
 begin
   inherited Create(true);
+  FLogger := logger;
   try
     ZeroMemory(@FWsaData, SizeOf(TWsaData));
     code := WSAStartup(WINSOCK_VERSION, FWsaData);
@@ -69,7 +70,7 @@ var
   len: int;
   FClientAddr: TSockAddrIn;
 begin
-  while true do
+  while not Terminated do
   begin
     try
       SetLength(recvBuffer, High(short));
@@ -77,12 +78,12 @@ begin
       returnLength := recvfrom(FSocket, Pointer(recvBuffer)^, Length(recvBuffer), 0, FClientAddr, len);
       if (returnLength = SOCKET_ERROR) then
         raise ESocketException.Create(GetLastErrorString());
-        
+
       SetLength(recvBuffer, returnLength);
       FLogger.Log('Inbound data length ' + IntToStr(returnLength));
       FLogger.Log('From ' + inet_ntoa(FClientAddr.sin_addr));
 
-      with TResponseSocketThread.Create(FClientAddr, recvBuffer) do
+      with TResponseSocketThread.Create(FLogger, FClientAddr, recvBuffer) do
         Resume;
     except
       on Ex: Exception do

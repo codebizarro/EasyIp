@@ -17,14 +17,21 @@ uses
 procedure Main();
 var
   server: IEasyIpServer;
+  buffer: string;
+  logger: ILogger;
 begin
   SetConsoleTitle('EasyIp Server');
-  server := TEasyIpServer.Create();
-//  with DiscoverResponseThread.Create() do
-//    Resume();
+  logger := TConsoleLogger.Create();
+  Writeln('Type q and press Enter for exit');
+  server := TEasyIpServer.Create(logger);
   server.Run();
+  repeat
+    ReadLn(buffer);
+    if buffer = 'q' then
+      Break;
+  until false;
   server := nil;
-  Sleep(1000);
+//  Sleep(10000);
 end;
 
 begin
