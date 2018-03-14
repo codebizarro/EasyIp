@@ -17,7 +17,7 @@ uses
   UDiscoverResponseThread;
 
 type
-  TServer = class(TInterfacedObject, IEasyIpServer)
+  TServer = class(TInterfacedObject, IServer)
   private
     FLogger: ILogger;
     FEasyIpListener: TListenSocketThread;

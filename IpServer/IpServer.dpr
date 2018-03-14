@@ -16,7 +16,7 @@ uses
 
 procedure Main();
 var
-  server: IEasyIpServer;
+  server: IServer;
   buffer: string;
   logger: ILogger;
 begin
