@@ -18,13 +18,13 @@ default: $(PROJECTS)
 Tests.exe: Tests\Tests.dpr
   $(DCC)
 
-EasyIp.bpl: Package\EasyIp.dpk
-  $(DCC)
-
 Application.exe: Application\Application.dpr
   $(DCC)
 
 IpServer.exe: IpServer\IpServer.dpr
+  $(DCC)
+
+EasyIp.bpl: EasyIp\EasyIp.dpk
   $(DCC)
 
 

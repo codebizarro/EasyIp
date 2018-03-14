@@ -1,5 +1,5 @@
-mkdir .\Package\Bin
-mkdir .\Package\Dcu
+mkdir .\EasyIp\Bin
+mkdir .\EasyIp\Dcu
 mkdir .\Tests\Bin
 mkdir .\Tests\Dcu
 mkdir .\Application\Bin

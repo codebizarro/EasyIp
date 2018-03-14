@@ -1,6 +1,6 @@
 syntax: glob
-Package/Bin/**
-Package/Dcu/**
+EasyIp/Bin/**
+EasyIp/Dcu/**
 Tests/Bin/**
 Tests/Dcu/**
 IpServer/Bin/**
