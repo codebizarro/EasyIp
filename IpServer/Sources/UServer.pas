@@ -1,4 +1,4 @@
-unit UEasyIpServer;
+unit UServer;
 
 interface
 

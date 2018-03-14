@@ -4,7 +4,7 @@ program EasyIpServer;
 uses
   Windows,
   SysUtils,
-  UEasyIpServer in 'Sources\UEasyIpServer.pas',
+  UServer in 'Sources\UServer.pas',
   UServerTypes in 'Sources\UServerTypes.pas',
   ULogger in 'Sources\ULogger.pas',
   UPacketDispatcher in 'Sources\UPacketDispatcher.pas',
