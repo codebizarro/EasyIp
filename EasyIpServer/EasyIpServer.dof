@@ -45,7 +45,7 @@ PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=
 Packages=Vcl50;Vclx50;VclSmp50;Vcldb50;vclado50;Vclbde50;vcldbx50;Qrpt50;Vclmid50;vclie50;Inetdb50;Inet50;NMFast50;webmid50;dclocx50;CryptPack;DclYuPack;LogPack;IcsDel50;FlexCel50;FlexCelXLS50;Indy50;tdbf_d5r;TeeUI85;Tee85;TeeDB85;TeeGL85;TeeQR85;TeePro85;TeeLanguage85;A258_R50;RxCtl5;JvStringGrig1;TwoDesk_D5R;K102_R50;GridPackd5
-Conditionals=
+Conditionals=DEBUG
 DebugSourceDirs=
 UsePackages=0
 [Parameters]

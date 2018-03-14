@@ -40,7 +40,7 @@ type
 
   TStubLogger = class(TInterfacedObject, ILogger)
   public
-    constructor Create(fileName: string);
+    constructor Create;
     destructor Destroy; override;
     procedure Log(messageText: string); overload;
     procedure Log(messageText: string; formatString: string); overload;
@@ -124,7 +124,7 @@ begin
   inherited;
 end;
 
-constructor TStubLogger.Create(fileName: string);
+constructor TStubLogger.Create;
 begin
 
 end;

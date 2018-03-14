@@ -21,7 +21,11 @@ var
   logger: ILogger;
 begin
   SetConsoleTitle('EasyIp Server');
+  {$IFDEF DEBUG}
   logger := TConsoleLogger.Create();
+  {$ELSE}
+  logger := TStubLogger.Create();
+  {$ENDIF}
   Writeln('Type q and press Enter for exit');
   server := TEasyIpServer.Create(logger);
   server.Run();
