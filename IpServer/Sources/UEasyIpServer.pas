@@ -17,7 +17,7 @@ uses
   UDiscoverResponseThread;
 
 type
-  TEasyIpServer = class(TInterfacedObject, IEasyIpServer)
+  TServer = class(TInterfacedObject, IEasyIpServer)
   private
     FLogger: ILogger;
     FEasyIpListener: TListenSocketThread;
@@ -32,19 +32,19 @@ type
 
 implementation
 
-constructor TEasyIpServer.Create;
+constructor TServer.Create;
 begin
 
 end;
 
-constructor TEasyIpServer.Create(logger: ILogger);
+constructor TServer.Create(logger: ILogger);
 begin
   inherited Create();
   FLogger := logger;
   FLogger.Log('Starting server...', '%s');
 end;
 
-destructor TEasyIpServer.Destroy;
+destructor TServer.Destroy;
 begin
   FLogger.Log('Stopping server...');
   FEasyIpListener.Cancel;
@@ -52,14 +52,14 @@ begin
   inherited;
 end;
 
-procedure TEasyIpServer.OnEasyIpRequest(Sender: TObject; target: TSockAddrIn; buffer: DynamicByteArray);
+procedure TServer.OnEasyIpRequest(Sender: TObject; target: TSockAddrIn; buffer: DynamicByteArray);
 begin
   FLogger.Log('OnEasyIpRequest occured');
   with TResponseSocketThread.Create(FLogger, target, buffer) do
     Resume;
 end;
 
-procedure TEasyIpServer.Run;
+procedure TServer.Run;
 begin
   FEasyIpListener := TListenSocketThread.Create(FLogger, EASYIP_PORT);
   FEasyIpListener.OnReceive := OnEasyIpRequest;

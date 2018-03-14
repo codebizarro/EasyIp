@@ -27,7 +27,7 @@ begin
   logger := TStubLogger.Create();
   {$ENDIF}
   Writeln('Type q and press Enter for exit');
-  server := TEasyIpServer.Create(logger);
+  server := TServer.Create(logger);
   server.Run();
   repeat
     ReadLn(buffer);
