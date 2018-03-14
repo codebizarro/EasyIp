@@ -9,7 +9,7 @@ MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
 DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
-PROJECTS = EasyIp.bpl Application.exe Tests.exe EasyIpServer.exe
+PROJECTS = EasyIp.bpl Application.exe Tests.exe IpServer.exe
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ EasyIp.bpl: Package\EasyIp.dpk
 Application.exe: Application\Application.dpr
   $(DCC)
 
-EasyIpServer.exe: EasyIpServer\EasyIpServer.dpr
+IpServer.exe: IpServer\IpServer.dpr
   $(DCC)
 
 

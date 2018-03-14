@@ -3,6 +3,8 @@ Package/Bin/**
 Package/Dcu/**
 Tests/Bin/**
 Tests/Dcu/**
+IpServer/Bin/**
+IpServer/Dcu/**
 *.~dpk
 *.~bpg
 *.~pas
