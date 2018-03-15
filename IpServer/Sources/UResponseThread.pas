@@ -15,7 +15,7 @@ uses
   UPacketDispatcher;
 
 type
-  TResponseSocketThread = class(TBaseSocketThread)
+  TUdpResponseThread = class(TBaseSocketThread)
   private
     FClientAddr: TSockAddrIn;
     FPacketDispatcher: IPacketDispatcher;
@@ -28,7 +28,7 @@ type
 
 implementation
 
-constructor TResponseSocketThread.Create(logger: ILogger; const request: RequestStruct);
+constructor TUdpResponseThread.Create(logger: ILogger; const request: RequestStruct);
 var
   code: int;
   bufferLength: int;
@@ -60,13 +60,13 @@ begin
   end;
 end;
 
-destructor TResponseSocketThread.Destroy;
+destructor TUdpResponseThread.Destroy;
 begin
   FLogger.Log('Response thread destroyed');
   inherited;
 end;
 
-procedure TResponseSocketThread.Execute;
+procedure TUdpResponseThread.Execute;
 var
   returnLength: int;
   sendBuffer: DynamicByteArray;

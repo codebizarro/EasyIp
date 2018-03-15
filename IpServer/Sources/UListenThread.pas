@@ -15,7 +15,7 @@ uses
   UResponseThread;
 
 type
-  TListenSocketThread = class(TBaseSocketThread)
+  TUdpListenThread = class(TBaseSocketThread)
   private
     FLocalAddr: TSockAddrIn;
     FReceiveEvent: TRequestEvent;
@@ -29,7 +29,7 @@ type
 
 implementation
 
-constructor TListenSocketThread.Create(logger: ILogger; listenPort: int);
+constructor TUdpListenThread.Create(logger: ILogger; listenPort: int);
 var
   code: int;
 begin
@@ -60,13 +60,13 @@ begin
   end;
 end;
 
-destructor TListenSocketThread.Destroy;
+destructor TUdpListenThread.Destroy;
 begin
   FLogger.Log('Listen thread destroyed');
   inherited;
 end;
 
-procedure TListenSocketThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
+procedure TUdpListenThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
 var
   request: RequestStruct;
 begin
@@ -78,7 +78,7 @@ begin
   end;
 end;
 
-procedure TListenSocketThread.Execute;
+procedure TUdpListenThread.Execute;
 var
   returnLength: int;
   len: int;

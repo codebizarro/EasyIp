@@ -21,8 +21,8 @@ type
   TServer = class(TInterfacedObject, IServer)
   private
     FLogger: ILogger;
-    FEasyIpListener: TListenSocketThread;
-    FEchoListener: TListenSocketThread;
+    FEasyIpListener: TUdpListenThread;
+    FEchoListener: TUdpListenThread;
 //    FDiscoverThread: TDiscoverResponseThread;
     constructor Create; overload;
     procedure OnEasyIpRequest(Sender: TObject; request: RequestStruct);
@@ -59,7 +59,7 @@ procedure TServer.OnEasyIpRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnEasyIpRequest occured');
   request.Dispather := TEasyIpPacketDispatcher.Create(FLogger);
-  with TResponseSocketThread.Create(FLogger, request) do
+  with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
 
@@ -67,15 +67,15 @@ procedure TServer.OnEchoRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnEasyIpRequest occured');
   request.Dispather := TEchoPacketDispatcher.Create(FLogger);
-  with TResponseSocketThread.Create(FLogger, request) do
+  with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
 
 procedure TServer.Run;
 begin
-  FEasyIpListener := TListenSocketThread.Create(FLogger, EASYIP_PORT);
+  FEasyIpListener := TUdpListenThread.Create(FLogger, EASYIP_PORT);
   FEasyIpListener.OnReceive := OnEasyIpRequest;
-  FEchoListener := TListenSocketThread.Create(FLogger, 7);
+  FEchoListener := TUdpListenThread.Create(FLogger, 7);
   FEchoListener.OnReceive := OnEchoRequest;
 
   FEasyIpListener.Resume();
