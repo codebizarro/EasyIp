@@ -21,14 +21,14 @@ type
     FPacketDispatcher: IPacketDispatcher;
     FBuffer: DynamicByteArray;
   public
-    constructor Create(logger: ILogger; const target: TSockAddrIn; const buffer: DynamicByteArray);
+    constructor Create(logger: ILogger; const request: RequestStruct);
     destructor Destroy; override;
     procedure Execute; override;
   end;
 
 implementation
 
-constructor TResponseSocketThread.Create(logger: ILogger; const target: TSockAddrIn; const buffer: DynamicByteArray);
+constructor TResponseSocketThread.Create(logger: ILogger; const request: RequestStruct);
 var
   code: int;
   bufferLength: int;
@@ -37,12 +37,12 @@ begin
   FLogger := logger;
   try
     ZeroMemory(@FClientAddr, SizeOf(TSockAddrIn));
-    CopyMemory(@FClientAddr, @target, SizeOf(TSockAddrIn));
+    CopyMemory(@FClientAddr, @request.Target, SizeOf(TSockAddrIn));
 //    FClientAddr := target;
-    bufferLength := Length(buffer);
+    bufferLength := Length(request.Buffer);
     SetLength(FBuffer, bufferLength);
-    CopyMemory(FBuffer, buffer, bufferLength);
-    FPacketDispatcher := TPacketDispatcher.Create(FLogger);
+    CopyMemory(FBuffer, request.Buffer, bufferLength);
+    FPacketDispatcher := request.Dispather;
 
     ZeroMemory(@FWsaData, SizeOf(TWsaData));
     code := WSAStartup(WINSOCK_VERSION, FWsaData);

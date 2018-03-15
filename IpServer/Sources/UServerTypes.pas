@@ -33,6 +33,12 @@ type
 
   TReceiveEvent = procedure(Sender: TObject; target: TSockAddrIn; buffer: DynamicByteArray) of object;
 
+  RequestStruct = record
+   Target: TSockAddrIn;
+   Buffer: DynamicByteArray;
+   Dispather: IPacketDispatcher;
+  end;
+
 implementation
 
 end.

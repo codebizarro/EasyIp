@@ -14,6 +14,7 @@ uses
   ULogger,
   UListenThread,
   UResponseThread,
+  UPacketDispatcher,
   UDiscoverResponseThread;
 
 type
@@ -53,9 +54,14 @@ begin
 end;
 
 procedure TServer.OnEasyIpRequest(Sender: TObject; target: TSockAddrIn; buffer: DynamicByteArray);
+var
+  request: RequestStruct;
 begin
   FLogger.Log('OnEasyIpRequest occured');
-  with TResponseSocketThread.Create(FLogger, target, buffer) do
+  request.Target := target;
+  request.Buffer := buffer;
+  request.Dispather := TEasyIpPacketDispatcher.Create(FLogger);
+  with TResponseSocketThread.Create(FLogger, request) do
     Resume;
 end;
 

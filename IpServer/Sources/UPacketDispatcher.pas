@@ -11,7 +11,7 @@ uses
   UServerTypes;
 
 type
-  TPacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
+  TEasyIpPacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
   private
     FLogger: ILogger;
     function ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
@@ -22,20 +22,28 @@ type
     function Process(packet: DynamicByteArray): DynamicByteArray;
   end;
 
+  TEchoPacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
+  private
+    FLogger: ILogger;
+  public
+    constructor Create(logger: ILogger);
+    function Process(packet: DynamicByteArray): DynamicByteArray;
+  end;
+
 implementation
 
-constructor TPacketDispatcher.Create(logger: ILogger);
+constructor TEasyIpPacketDispatcher.Create(logger: ILogger);
 begin
   inherited Create();
   FLogger := logger;
 end;
 
-function TPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
+function TEasyIpPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
 var
   eInPacket: EasyIpPacket;
   protocol: IEasyIpProtocol;
 begin
-  FLogger.Log('Packet dispatching ...');
+  FLogger.Log('EasyIp packet dispatching ...');
 
   //TODO: To implement packet dispatching
   eInPacket := TPacketAdapter.ToEasyIpPacket(packet);
@@ -50,17 +58,17 @@ begin
   else if (protocol.Mode = pmBit) then
     Result := ProcessBitPacket(protocol);
 
-  FLogger.Log('Packet processing is done');
+  FLogger.Log('EasyIp packet processing is done');
 end;
 
-function TPacketDispatcher.ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
+function TEasyIpPacketDispatcher.ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
 begin
   //TODO: To implement packet dispatching
   FLogger.Log('Dispatching bit request...');
   Result := TPacketAdapter.ToByteArray(protocol.Packet);
 end;
 
-function TPacketDispatcher.ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
+function TEasyIpPacketDispatcher.ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
 var
   packet: EasyIpPacket;
 begin
@@ -70,7 +78,7 @@ begin
   Result := TPacketAdapter.ToByteArray(protocol.Packet);
 end;
 
-function TPacketDispatcher.ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;
+function TEasyIpPacketDispatcher.ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;
 var
   infoPacket: EasyIpInfoPacket;
   packet: EasyIpPacket;
@@ -97,6 +105,20 @@ begin
   packet.RequestDataSize := 38;
 
   Result := TPacketAdapter.ToByteArray(packet, infoPacket);
+end;
+
+constructor TEchoPacketDispatcher.Create(logger: ILogger);
+begin
+  FLogger := logger;
+end;
+
+function TEchoPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
+begin
+  FLogger.Log('Echo packet dispatching ...');
+
+  Result := packet;
+
+  FLogger.Log('Echo packet processing is done');
 end;
 
 end.
