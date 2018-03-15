@@ -11,31 +11,43 @@ uses
   UServerTypes;
 
 type
-  TEasyIpPacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
+  TBasePacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
   private
     FLogger: ILogger;
+  public
+    constructor Create(logger: ILogger);
+    function Process(packet: DynamicByteArray): DynamicByteArray; virtual; abstract;
+  end;
+
+  TEasyIpPacketDispatcher = class(TBasePacketDispatcher)
+  private
     function ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
     function ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
     function ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;
   public
     constructor Create(logger: ILogger);
-    function Process(packet: DynamicByteArray): DynamicByteArray;
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
   end;
 
-  TEchoPacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
+  TEchoPacketDispatcher = class(TBasePacketDispatcher)
   private
-    FLogger: ILogger;
   public
     constructor Create(logger: ILogger);
-    function Process(packet: DynamicByteArray): DynamicByteArray;
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
+  end;
+
+  TChargenPacketDispatcher = class(TBasePacketDispatcher)
+  private
+  public
+    constructor Create(logger: ILogger);
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
   end;
 
 implementation
 
 constructor TEasyIpPacketDispatcher.Create(logger: ILogger);
 begin
-  inherited Create();
-  FLogger := logger;
+  inherited Create(logger);
 end;
 
 function TEasyIpPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
@@ -109,7 +121,7 @@ end;
 
 constructor TEchoPacketDispatcher.Create(logger: ILogger);
 begin
-  FLogger := logger;
+  inherited Create(logger);
 end;
 
 function TEchoPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
@@ -119,6 +131,54 @@ begin
   Result := packet;
 
   FLogger.Log('Echo packet processing is done');
+end;
+
+constructor TChargenPacketDispatcher.Create(logger: ILogger);
+begin
+  inherited Create(logger);
+end;
+
+//TODO: need to test
+function TChargenPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
+const
+  rowlength = 75;
+var
+  s: string;
+  i, row, ln: integer;
+  c: Char;
+begin
+  SetLength(s, rowlength);
+  i := 1;
+  c := '0';
+  s := '';
+  ln := Random(512);
+  row := 0;
+  while i <= ln do
+  begin
+    if c > #95 then
+    begin
+      c := '0';
+    end;
+    if i mod (rowlength + 1) = 0 then
+    begin
+      s := s + #13;
+      c := chr(ord('0') + row mod (95 - ord('0')));
+      inc(row);
+    end
+    else
+    begin
+      s := s + c;
+    end;
+    inc(i);
+    inc(c);
+  end;
+  CopyMemory(Result, @s[1], rowlength);
+end;
+
+constructor TBasePacketDispatcher.Create(logger: ILogger);
+begin
+  inherited Create();
+  FLogger := logger;
 end;
 
 end.
