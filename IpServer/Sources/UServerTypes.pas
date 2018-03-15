@@ -31,13 +31,13 @@ type
     procedure TrySetData(offset: int; data: DynamicWordArray; out OutResult);
   end;
 
-  TReceiveEvent = procedure(Sender: TObject; target: TSockAddrIn; buffer: DynamicByteArray) of object;
-
   RequestStruct = record
-   Target: TSockAddrIn;
-   Buffer: DynamicByteArray;
-   Dispather: IPacketDispatcher;
+    Target: TSockAddrIn;
+    Buffer: DynamicByteArray;
+    Dispather: IPacketDispatcher;
   end;
+
+  TRequestEvent = procedure(Sender: TObject; request: RequestStruct) of object;
 
 implementation
 

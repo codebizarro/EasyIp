@@ -18,13 +18,13 @@ type
   TListenSocketThread = class(TBaseSocketThread)
   private
     FLocalAddr: TSockAddrIn;
-    FReceiveEvent: TReceiveEvent;
+    FReceiveEvent: TRequestEvent;
     procedure DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
   public
     constructor Create(logger: ILogger; listenPort: int);
     destructor Destroy; override;
     procedure Execute; override;
-    property OnReceive: TReceiveEvent read FReceiveEvent write FReceiveEvent;
+    property OnReceive: TRequestEvent read FReceiveEvent write FReceiveEvent;
   end;
 
 implementation
@@ -67,9 +67,15 @@ begin
 end;
 
 procedure TListenSocketThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
+var
+  request: RequestStruct;
 begin
   if Assigned(FReceiveEvent) then
-    FReceiveEvent(Self, clientAddr, buffer);
+  begin
+    request.Target := clientAddr;
+    request.Buffer := buffer;
+    FReceiveEvent(Self, request);
+  end;
 end;
 
 procedure TListenSocketThread.Execute;
