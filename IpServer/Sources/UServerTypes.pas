@@ -13,7 +13,7 @@ type
     procedure Log(messageText: string; formatString: string); overload;
   end;
 
-  IEasyIpServer = interface
+  IServer = interface
     ['{545E0E6C-4416-4578-8A27-26957BC16646}']
     procedure Run;
   end;
@@ -31,7 +31,13 @@ type
     procedure TrySetData(offset: int; data: DynamicWordArray; out OutResult);
   end;
 
-  TReceiveEvent = procedure(Sender: TObject; target: TSockAddrIn; buffer: DynamicByteArray) of object;
+  RequestStruct = record
+    Target: TSockAddrIn;
+    Buffer: DynamicByteArray;
+    Dispather: IPacketDispatcher;
+  end;
+
+  TRequestEvent = procedure(Sender: TObject; request: RequestStruct) of object;
 
 implementation
 

@@ -1,9 +1,9 @@
-mkdir .\Package\Bin
-mkdir .\Package\Dcu
+mkdir .\EasyIp\Bin
+mkdir .\EasyIp\Dcu
 mkdir .\Tests\Bin
 mkdir .\Tests\Dcu
 mkdir .\Application\Bin
 mkdir .\Application\Dcu
-mkdir .\EasyIpServer\Bin
-mkdir .\EasyIpServer\Dcu
+mkdir .\IpServer\Bin
+mkdir .\IpServer\Dcu
 

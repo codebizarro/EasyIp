@@ -4,7 +4,7 @@ program EasyIpServer;
 uses
   Windows,
   SysUtils,
-  UEasyIpServer in 'Sources\UEasyIpServer.pas',
+  UServer in 'Sources\UServer.pas',
   UServerTypes in 'Sources\UServerTypes.pas',
   ULogger in 'Sources\ULogger.pas',
   UPacketDispatcher in 'Sources\UPacketDispatcher.pas',
@@ -16,14 +16,18 @@ uses
 
 procedure Main();
 var
-  server: IEasyIpServer;
+  server: IServer;
   buffer: string;
   logger: ILogger;
 begin
   SetConsoleTitle('EasyIp Server');
+  {$IFDEF DEBUG}
   logger := TConsoleLogger.Create();
+  {$ELSE}
+  logger := TStubLogger.Create();
+  {$ENDIF}
   Writeln('Type q and press Enter for exit');
-  server := TEasyIpServer.Create(logger);
+  server := TServer.Create(logger);
   server.Run();
   repeat
     ReadLn(buffer);

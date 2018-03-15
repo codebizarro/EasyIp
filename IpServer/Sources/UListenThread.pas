@@ -15,21 +15,21 @@ uses
   UResponseThread;
 
 type
-  TListenSocketThread = class(TBaseSocketThread)
+  TUdpListenThread = class(TBaseSocketThread)
   private
     FLocalAddr: TSockAddrIn;
-    FReceiveEvent: TReceiveEvent;
+    FReceiveEvent: TRequestEvent;
     procedure DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
   public
     constructor Create(logger: ILogger; listenPort: int);
     destructor Destroy; override;
     procedure Execute; override;
-    property OnReceive: TReceiveEvent read FReceiveEvent write FReceiveEvent;
+    property OnReceive: TRequestEvent read FReceiveEvent write FReceiveEvent;
   end;
 
 implementation
 
-constructor TListenSocketThread.Create(logger: ILogger; listenPort: int);
+constructor TUdpListenThread.Create(logger: ILogger; listenPort: int);
 var
   code: int;
 begin
@@ -60,19 +60,25 @@ begin
   end;
 end;
 
-destructor TListenSocketThread.Destroy;
+destructor TUdpListenThread.Destroy;
 begin
   FLogger.Log('Listen thread destroyed');
   inherited;
 end;
 
-procedure TListenSocketThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
+procedure TUdpListenThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
+var
+  request: RequestStruct;
 begin
   if Assigned(FReceiveEvent) then
-    FReceiveEvent(Self, clientAddr, buffer);
+  begin
+    request.Target := clientAddr;
+    request.Buffer := buffer;
+    FReceiveEvent(Self, request);
+  end;
 end;
 
-procedure TListenSocketThread.Execute;
+procedure TUdpListenThread.Execute;
 var
   returnLength: int;
   len: int;
