@@ -53,7 +53,7 @@ begin
     if code < 0 then
       raise ESocketException.Create(GetLastErrorString());
 
-    FLogger.Log('Listen thread created');
+    FLogger.Log('Listen thread created on ' + IntToStr(listenPort) + #9' port');
   except
     on Ex: Exception do
       FLogger.Log(Ex.Message);

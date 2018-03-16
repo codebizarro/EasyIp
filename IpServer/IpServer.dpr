@@ -35,6 +35,7 @@ begin
       Break;
   until false;
   server := nil;
+  logger := nil;
 //  Sleep(10000);
 end;
 
