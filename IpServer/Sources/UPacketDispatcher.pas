@@ -64,7 +64,7 @@ var
   eInPacket: EasyIpPacket;
   protocol: IEasyIpProtocol;
 begin
-  StartMessage('EasyIp');
+  StartMessage(ClassName);
 
   //TODO: To implement packet dispatching
   eInPacket := TPacketAdapter.ToEasyIpPacket(packet);
@@ -79,7 +79,7 @@ begin
   else if (protocol.Mode = pmBit) then
     Result := ProcessBitPacket(protocol);
 
-  DoneMessage('EasyIp');
+  DoneMessage(ClassName);
 end;
 
 function TEasyIpPacketDispatcher.ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
@@ -135,11 +135,11 @@ end;
 
 function TEchoPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
 begin
-  StartMessage('Echo');
+  StartMessage(ClassName);
 
   Result := packet;
 
-  DoneMessage('Echo');
+  DoneMessage(ClassName);
 end;
 
 constructor TChargenPacketDispatcher.Create(logger: ILogger);
@@ -156,7 +156,7 @@ var
   i, row, ln: integer;
   c: Char;
 begin
-  StartMessage('Chargen');
+  StartMessage(ClassName);
   Randomize();
   SetLength(s, rowlength);
   i := 1;
@@ -185,7 +185,7 @@ begin
   end;
   SetLength(Result, rowlength);
   CopyMemory(Result, @s[1], rowlength);
-  DoneMessage('Chargen');
+  DoneMessage(ClassName);
 end;
 
 constructor TBasePacketDispatcher.Create(logger: ILogger);
@@ -204,23 +204,23 @@ function TDaytimePacketDispatcher.Process(packet: DynamicByteArray): DynamicByte
 var
   sDateTime: string;
 begin
-  StartMessage('Daytime');
+  StartMessage(ClassName);
 
   sDateTime := FLogger.LogPrefix;
   SetLength(Result, Length(sDateTime));
   CopyMemory(Result, @sDateTime[1], Length(sDateTime));
 
-  DoneMessage('Daytime');
+  DoneMessage(ClassName);
 end;
 
 procedure TBasePacketDispatcher.DoneMessage(message: string);
 begin
-  FLogger.Log(message + '  packet processing is done');
+  FLogger.Log(message + ' is done');
 end;
 
 procedure TBasePacketDispatcher.StartMessage(message: string);
 begin
-  FLogger.Log(message + ' packet dispatching ...');
+  FLogger.Log(message + ' is starting ...');
 end;
 
 end.
