@@ -28,7 +28,7 @@ begin
   {$ENDIF}
   Writeln('Type q and press Enter for exit');
   server := TServer.Create(logger);
-  server.Run();
+  server.Start();
   repeat
     ReadLn(buffer);
     if buffer = 'q' then

@@ -9,13 +9,15 @@ uses
 type
   ILogger = interface
     ['{8178CD30-F04B-4B24-948E-734C8832FB94}']
+    function LogPrefix(): string;
     procedure Log(messageText: string); overload;
     procedure Log(messageText: string; formatString: string); overload;
   end;
 
   IServer = interface
     ['{545E0E6C-4416-4578-8A27-26957BC16646}']
-    procedure Run;
+    procedure Start;
+    procedure Stop;
   end;
 
   IPacketDispatcher = interface
