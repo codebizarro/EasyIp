@@ -92,14 +92,18 @@ begin
 end;
 
 procedure TServer.Start;
+const
+  ECHO_PORT = 7;
+  CHARGEN_PORT = 19;
+  DAYTIME_PORT = 13;
 begin
   FEasyIpListener := TUdpListenThread.Create(FLogger, EASYIP_PORT);
   FEasyIpListener.OnReceive := OnEasyIpRequest;
-  FEchoListener := TUdpListenThread.Create(FLogger, 7);
+  FEchoListener := TUdpListenThread.Create(FLogger, ECHO_PORT);
   FEchoListener.OnReceive := OnEchoRequest;
-  FChargenListener := TUdpListenThread.Create(FLogger, 19);
+  FChargenListener := TUdpListenThread.Create(FLogger, CHARGEN_PORT);
   FChargenListener.OnReceive := OnChargenRequest;
-  FDaytimeListener := TUdpListenThread.Create(FLogger, 13);
+  FDaytimeListener := TUdpListenThread.Create(FLogger, DAYTIME_PORT);
   FDaytimeListener.OnReceive := OnDaytimeRequest;
 
   FEasyIpListener.Resume();
