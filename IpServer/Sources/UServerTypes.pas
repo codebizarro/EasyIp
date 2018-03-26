@@ -28,10 +28,9 @@ type
 
   IDevice = interface
     ['{73C0D5DE-D613-4EE7-AEA6-F79CB198B24C}']
-    function GetDataBlock(offset: int; count: byte): DynamicWordArray;
-    procedure SetDataBlock(offset: int; data: DynamicWordArray);
-    function TryGetDataBlock(offset: int; count: byte; out OutResult): DynamicWordArray;
-    procedure TrySetDataBlock(offset: int; data: DynamicWordArray; out OutResult);
+    function BlockRead(const offset: short; const dataType: DataTypeEnum; const dataLength: byte): DynamicWordArray;
+    procedure BlockWrite(const offset: short; const value: DynamicWordArray; const dataType: DataTypeEnum);
+    function RangeCheck(const offset: short; const dataType: DataTypeEnum; const dataLength: byte): short;
   end;
 
   RequestStruct = record
