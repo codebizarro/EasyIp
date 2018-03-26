@@ -8,7 +8,8 @@ uses
   eiHelpers,
   eiProtocol,
   eiConstants,
-  UServerTypes;
+  UServerTypes,
+  UDevices;
 
 type
   TBasePacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
@@ -23,11 +24,12 @@ type
 
   TEasyIpPacketDispatcher = class(TBasePacketDispatcher)
   private
+    FDevice: IDevice;
     function ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
     function ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
     function ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;
   public
-    constructor Create(logger: ILogger);
+    constructor Create(logger: ILogger; device: IDevice);
     function Process(packet: DynamicByteArray): DynamicByteArray; override;
   end;
 
@@ -54,9 +56,10 @@ type
 
 implementation
 
-constructor TEasyIpPacketDispatcher.Create(logger: ILogger);
+constructor TEasyIpPacketDispatcher.Create(logger: ILogger; device: IDevice);
 begin
   inherited Create(logger);
+  FDevice := device;
 end;
 
 function TEasyIpPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
@@ -96,18 +99,37 @@ var
   dataType: DataTypeEnum;
   offset: ushort;
   length: DataLength;
+  resultData: DynamicWordArray;
+  errorFlag: short;
 begin
-  //TODO: To implement packet dispatching
   FLogger.Log('Dispatching data request...');
   packet := protocol.Packet;
   mode := protocol.Mode;
   dataType := protocol.DataType;
   offset := protocol.DataOffset;
   length := protocol.DataLength;
-
   FLogger.Log('mode: %d  dataType: %d offset: %d length: %d', [Byte(mode), Byte(dataType), offset, length]);
 
-  Result := TPacketAdapter.ToByteArray(protocol.Packet);
+  SetLength(resultData, length);
+  errorFlag := FDevice.RangeCheck(offset, dataType, length);
+  if errorFlag = 0 then
+  begin
+    if mode = pmRead then
+    begin
+      FLogger.Log('Reading data ...');
+      resultData := FDevice.BlockRead(offset, dataType, length);
+      CopyMemory(@packet.Data, resultData, length * SHORT_SIZE);
+    end;
+    if mode = pmWrite then
+    begin
+      FLogger.Log('Writing data request...');
+      CopyMemory(resultData, @packet.Data, length * SHORT_SIZE);
+      FDevice.BlockWrite(offset, resultData, dataType);
+    end;
+  end;
+  packet.Flags := EASYIP_FLAG_RESPONSE;
+  packet.Error := errorFlag;
+  Result := TPacketAdapter.ToByteArray(packet);
 end;
 
 function TEasyIpPacketDispatcher.ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;

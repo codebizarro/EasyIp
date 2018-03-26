@@ -15,7 +15,8 @@ uses
   UListenThread,
   UResponseThread,
   UPacketDispatcher,
-  UDiscoverResponseThread;
+  UDiscoverResponseThread,
+  UDevices;
 
 type
   TServer = class(TInterfacedObject, IServer)
@@ -25,6 +26,7 @@ type
     FEchoListener: TUdpListenThread;
     FChargenListener: TUdpListenThread;
     FDaytimeListener: TUdpListenThread;
+    FEasyIpDevice: IDevice;
 //    FDiscoverThread: TDiscoverResponseThread;
     constructor Create; overload;
     procedure OnEasyIpRequest(Sender: TObject; request: RequestStruct);
@@ -49,6 +51,7 @@ constructor TServer.Create(logger: ILogger);
 begin
   inherited Create();
   FLogger := logger;
+  FEasyIpDevice := TEasyIpDevice.Create(logger);
   FLogger.Log('Starting server...', '%s');
 end;
 
@@ -70,7 +73,7 @@ end;
 procedure TServer.OnEasyIpRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnEasyIpRequest occured');
-  request.Dispather := TEasyIpPacketDispatcher.Create(FLogger);
+  request.Dispather := TEasyIpPacketDispatcher.Create(FLogger, FEasyIpDevice);
   with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
