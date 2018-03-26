@@ -50,11 +50,10 @@ const
   EASYIP_TYPE_REGISTER = 4;
   EASYIP_TYPE_TIMER = 5;
   EASYIP_TYPE_STRING = 11;
-
   CHANNEL_DEFAULT_TIMEOUT = 2000;
-  
   WINSOCK_VERSION = $0202;
-  LANG_ID = $400;
+//  LANG_ID = $400;
+  LANG_ID = $0409;
 
 resourcestring
   DEBUG_MESSAGE_DESTROY = '%s is destroyed';
