@@ -20,7 +20,7 @@ var
   buffer: string;
   logger: ILogger;
 begin
-  SetConsoleTitle('EasyIp Server');
+  SetConsoleTitle('Ip Server');
   {$IFDEF DEBUG}
   logger := TConsoleLogger.Create();
   {$ELSE}

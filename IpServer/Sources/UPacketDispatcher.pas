@@ -92,10 +92,21 @@ end;
 function TEasyIpPacketDispatcher.ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
 var
   packet: EasyIpPacket;
+  mode: PacketModeEnum;
+  dataType: DataTypeEnum;
+  offset: ushort;
+  length: DataLength;
 begin
   //TODO: To implement packet dispatching
   FLogger.Log('Dispatching data request...');
   packet := protocol.Packet;
+  mode := protocol.Mode;
+  dataType := protocol.DataType;
+  offset := protocol.DataOffset;
+  length := protocol.DataLength;
+
+  FLogger.Log('mode: %d  dataType: %d offset: %d length: %d', [Byte(mode), Byte(dataType), offset, length]);
+
   Result := TPacketAdapter.ToByteArray(protocol.Packet);
 end;
 
@@ -194,7 +205,6 @@ begin
   FLogger := logger;
 end;
 
-
 constructor TDaytimePacketDispatcher.Create(logger: ILogger);
 begin
   inherited Create(logger);
@@ -207,8 +217,8 @@ begin
   StartMessage(ClassName);
 
   sDateTime := FLogger.LogPrefix;
-  SetLength(Result, Length(sDateTime));
-  CopyMemory(Result, @sDateTime[1], Length(sDateTime));
+  SetLength(Result, length(sDateTime));
+  CopyMemory(Result, @sDateTime[1], length(sDateTime));
 
   DoneMessage(ClassName);
 end;

@@ -9,9 +9,10 @@ uses
 
 type
   TBaseLogger = class(TInterfacedObject, ILogger)
-    function LogPrefix(): string; 
+    function LogPrefix(): string;
     procedure Log(messageText: string); overload; virtual; abstract;
     procedure Log(messageText: string; formatString: string); overload; virtual; abstract;
+    procedure Log(formatString: string; const args: array of const); overload; virtual; abstract;
   end;
 
   TConsoleLogger = class(TBaseLogger)
@@ -24,6 +25,7 @@ type
     destructor Destroy; override;
     procedure Log(messageText: string); overload; override;
     procedure Log(messageText: string; formatString: string); overload; override;
+    procedure Log(formatString: string; const args: array of const); overload; override;
   end;
 
   TDebugLogger = class(TBaseLogger)
@@ -90,6 +92,11 @@ end;
 procedure TConsoleLogger.Log(messageText, formatString: string);
 begin
   Self.Log(Format(formatString, [messageText]));
+end;
+
+procedure TConsoleLogger.Log(formatString: string; const args: array of const);
+begin
+  Self.Log(Format(formatString, args));
 end;
 
 function TConsoleLogger.StringToOem(const value: string): AnsiString;
