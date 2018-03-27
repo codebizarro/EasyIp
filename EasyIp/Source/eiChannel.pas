@@ -123,6 +123,7 @@ var
   sendBuffer: DynamicByteArray;
   recvBuffer: DynamicByteArray;
   lenFrom: int;
+  varTarget: TSockAddrIn;
 begin
   try
     returnCode := WSAStartup(WINSOCK_VERSION, init);
@@ -137,18 +138,21 @@ begin
       SetLength(recvBuffer, High(short));
       sendBuffer := buffer;
 
-      returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, FTarget, SizeOf(FTarget));
+      CopyMemory(@varTarget, @FTarget, SizeOf(TSockAddrIn));   // TODO: HACK
+
+      returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, varTarget, SizeOf(varTarget));
       if (returnCode = SOCKET_ERROR) then
         raise ESocketException.Create(GetLastErrorString());
 
-      lenFrom := SizeOf(FTarget);
-      returnCode := recvfrom(sock, Pointer(recvBuffer)^, Length(recvBuffer), 0, FTarget, lenFrom);
+      lenFrom := SizeOf(varTarget);
+      returnCode := recvfrom(sock, Pointer(recvBuffer)^, Length(recvBuffer), 0, varTarget, lenFrom);
       if (returnCode = SOCKET_ERROR) then
         raise ESocketException.Create(GetLastErrorString());
 
       SetLength(recvBuffer, returnCode);
 
       closesocket(sock);
+
       Result := recvBuffer;
     except
       on E: ESocketException do

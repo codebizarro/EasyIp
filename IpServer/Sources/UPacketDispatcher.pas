@@ -8,34 +8,58 @@ uses
   eiHelpers,
   eiProtocol,
   eiConstants,
-  UServerTypes;
+  UServerTypes,
+  UDevices;
 
 type
-  TEasyIpPacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
+  TBasePacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
   private
     FLogger: ILogger;
+    procedure DoneMessage(message: string);
+    procedure StartMessage(message: string);
+  public
+    constructor Create(logger: ILogger);
+    function Process(packet: DynamicByteArray): DynamicByteArray; virtual; abstract;
+  end;
+
+  TEasyIpPacketDispatcher = class(TBasePacketDispatcher)
+  private
+    FDevice: IDevice;
     function ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
     function ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
     function ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;
   public
-    constructor Create(logger: ILogger);
-    function Process(packet: DynamicByteArray): DynamicByteArray;
+    constructor Create(logger: ILogger; device: IDevice);
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
   end;
 
-  TEchoPacketDispatcher = class(TInterfacedObject, IPacketDispatcher)
+  TEchoPacketDispatcher = class(TBasePacketDispatcher)
   private
-    FLogger: ILogger;
   public
     constructor Create(logger: ILogger);
-    function Process(packet: DynamicByteArray): DynamicByteArray;
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
+  end;
+
+  TChargenPacketDispatcher = class(TBasePacketDispatcher)
+  private
+  public
+    constructor Create(logger: ILogger);
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
+  end;
+
+  TDaytimePacketDispatcher = class(TBasePacketDispatcher)
+  private
+  public
+    constructor Create(logger: ILogger);
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
   end;
 
 implementation
 
-constructor TEasyIpPacketDispatcher.Create(logger: ILogger);
+constructor TEasyIpPacketDispatcher.Create(logger: ILogger; device: IDevice);
 begin
-  inherited Create();
-  FLogger := logger;
+  inherited Create(logger);
+  FDevice := device;
 end;
 
 function TEasyIpPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
@@ -43,7 +67,7 @@ var
   eInPacket: EasyIpPacket;
   protocol: IEasyIpProtocol;
 begin
-  FLogger.Log('EasyIp packet dispatching ...');
+  StartMessage(ClassName);
 
   //TODO: To implement packet dispatching
   eInPacket := TPacketAdapter.ToEasyIpPacket(packet);
@@ -58,7 +82,7 @@ begin
   else if (protocol.Mode = pmBit) then
     Result := ProcessBitPacket(protocol);
 
-  FLogger.Log('EasyIp packet processing is done');
+  DoneMessage(ClassName);
 end;
 
 function TEasyIpPacketDispatcher.ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
@@ -71,11 +95,41 @@ end;
 function TEasyIpPacketDispatcher.ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
 var
   packet: EasyIpPacket;
+  mode: PacketModeEnum;
+  dataType: DataTypeEnum;
+  offset: ushort;
+  length: DataLength;
+  resultData: DynamicWordArray;
+  errorFlag: short;
 begin
-  //TODO: To implement packet dispatching
   FLogger.Log('Dispatching data request...');
   packet := protocol.Packet;
-  Result := TPacketAdapter.ToByteArray(protocol.Packet);
+  mode := protocol.Mode;
+  dataType := protocol.DataType;
+  offset := protocol.DataOffset;
+  length := protocol.DataLength;
+  FLogger.Log('mode: %d  dataType: %d offset: %d length: %d', [Byte(mode), Byte(dataType), offset, length]);
+
+  SetLength(resultData, length);
+  errorFlag := FDevice.RangeCheck(offset, dataType, length);
+  if errorFlag = 0 then
+  begin
+    if mode = pmRead then
+    begin
+      FLogger.Log('Reading data ...');
+      resultData := FDevice.BlockRead(offset, dataType, length);
+      CopyMemory(@packet.Data, resultData, length * SHORT_SIZE);
+    end;
+    if mode = pmWrite then
+    begin
+      FLogger.Log('Writing data request...');
+      CopyMemory(resultData, @packet.Data, length * SHORT_SIZE);
+      FDevice.BlockWrite(offset, resultData, dataType);
+    end;
+  end;
+  packet.Flags := EASYIP_FLAG_RESPONSE;
+  packet.Error := errorFlag;
+  Result := TPacketAdapter.ToByteArray(packet);
 end;
 
 function TEasyIpPacketDispatcher.ProcessInfoPacket(protocol: IEasyIpProtocol): DynamicByteArray;
@@ -109,16 +163,96 @@ end;
 
 constructor TEchoPacketDispatcher.Create(logger: ILogger);
 begin
-  FLogger := logger;
+  inherited Create(logger);
 end;
 
 function TEchoPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
 begin
-  FLogger.Log('Echo packet dispatching ...');
+  StartMessage(ClassName);
 
   Result := packet;
 
-  FLogger.Log('Echo packet processing is done');
+  DoneMessage(ClassName);
+end;
+
+constructor TChargenPacketDispatcher.Create(logger: ILogger);
+begin
+  inherited Create(logger);
+end;
+
+//TODO: need to test
+function TChargenPacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
+const
+  rowlength = 75;
+var
+  s: string;
+  i, row, ln: integer;
+  c: Char;
+begin
+  StartMessage(ClassName);
+  Randomize();
+  SetLength(s, rowlength);
+  i := 1;
+  c := '0';
+  s := '';
+  ln := Random(512);
+  row := 0;
+  while i <= ln do
+  begin
+    if c > #95 then
+    begin
+      c := '0';
+    end;
+    if i mod (rowlength + 1) = 0 then
+    begin
+      s := s + #13;
+      c := chr(ord('0') + row mod (95 - ord('0')));
+      inc(row);
+    end
+    else
+    begin
+      s := s + c;
+    end;
+    inc(i);
+    inc(c);
+  end;
+  SetLength(Result, rowlength);
+  CopyMemory(Result, @s[1], rowlength);
+  DoneMessage(ClassName);
+end;
+
+constructor TBasePacketDispatcher.Create(logger: ILogger);
+begin
+  inherited Create();
+  FLogger := logger;
+end;
+
+constructor TDaytimePacketDispatcher.Create(logger: ILogger);
+begin
+  inherited Create(logger);
+end;
+
+function TDaytimePacketDispatcher.Process(packet: DynamicByteArray): DynamicByteArray;
+var
+  sDateTime: string;
+begin
+  StartMessage(ClassName);
+
+  sDateTime := FLogger.LogPrefix;
+  SetLength(Result, length(sDateTime));
+  CopyMemory(Result, @sDateTime[1], length(sDateTime));
+
+  DoneMessage(ClassName);
+end;
+
+procedure TBasePacketDispatcher.DoneMessage(message: string);
+begin
+  FLogger.Log(message + ' is done');
+end;
+
+procedure TBasePacketDispatcher.StartMessage(message: string);
+begin
+  FLogger.Log(message + ' is starting ...');
 end;
 
 end.

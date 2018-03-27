@@ -8,7 +8,14 @@ uses
   UServerTypes;
 
 type
-  TConsoleLogger = class(TInterfacedObject, ILogger)
+  TBaseLogger = class(TInterfacedObject, ILogger)
+    function LogPrefix(): string;
+    procedure Log(messageText: string); overload; virtual; abstract;
+    procedure Log(messageText: string; formatString: string); overload; virtual; abstract;
+    procedure Log(formatString: string; const args: array of const); overload; virtual; abstract;
+  end;
+
+  TConsoleLogger = class(TBaseLogger)
   private
     FOemConvert: bool;
     FCritical: TRTLCriticalSection;
@@ -16,37 +23,40 @@ type
   public
     constructor Create(oemConvert: bool = true);
     destructor Destroy; override;
-    procedure Log(messageText: string); overload;
-    procedure Log(messageText: string; formatString: string); overload;
+    procedure Log(messageText: string); overload; override;
+    procedure Log(messageText: string; formatString: string); overload; override;
+    procedure Log(formatString: string; const args: array of const); overload; override;
   end;
 
-  TDebugLogger = class(TInterfacedObject, ILogger)
+  TDebugLogger = class(TBaseLogger)
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Log(messageText: string); overload;
-    procedure Log(messageText: string; formatString: string); overload;
+    procedure Log(messageText: string); overload; override;
+    procedure Log(messageText: string; formatString: string); overload; override;
   end;
 
-  TFileLogger = class(TInterfacedObject, ILogger)
+  TFileLogger = class(TBaseLogger)
   private
     FFileName: string;
   public
     constructor Create(fileName: string);
     destructor Destroy; override;
-    procedure Log(messageText: string); overload; virtual; abstract; //TODO: need to implement
-    procedure Log(messageText: string; formatString: string); overload; virtual; abstract; //TODO: need to implement
   end;
 
-  TStubLogger = class(TInterfacedObject, ILogger)
+  TStubLogger = class(TBaseLogger)
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Log(messageText: string); overload;
-    procedure Log(messageText: string; formatString: string); overload;
+    procedure Log(messageText: string); overload; override;
+    procedure Log(messageText: string; formatString: string); overload; override;
   end;
 
 implementation
+
+const
+  DATETIME_FORMAT = 'yyyy-mm-dd hh:nn:ss.zzz';
+  LOG_MESSAGE = '%s %s';
 
 constructor TConsoleLogger.Create(oemConvert: bool = true);
 begin
@@ -57,6 +67,7 @@ end;
 
 destructor TConsoleLogger.Destroy;
 begin
+  Log('Console log destroyed');
   DeleteCriticalSection(FCritical);
   inherited;
 end;
@@ -65,9 +76,6 @@ procedure TConsoleLogger.Log(messageText: string);
 var
   sDateTime: string;
   sOut: string;
-const
-  LOG_MESSAGE = '%s %s';
-  DATETIME_FORMAT = 'yyyy-mm-dd hh:nn:ss.zzz';
 begin
   sDateTime := FormatDateTime(DATETIME_FORMAT, Now);
   sOut := Format(LOG_MESSAGE, [sDateTime, messageText]);
@@ -84,6 +92,11 @@ end;
 procedure TConsoleLogger.Log(messageText, formatString: string);
 begin
   Self.Log(Format(formatString, [messageText]));
+end;
+
+procedure TConsoleLogger.Log(formatString: string; const args: array of const);
+begin
+  Self.Log(Format(formatString, args));
 end;
 
 function TConsoleLogger.StringToOem(const value: string): AnsiString;
@@ -142,6 +155,11 @@ end;
 procedure TStubLogger.Log(messageText, formatString: string);
 begin
   Exit;
+end;
+
+function TBaseLogger.LogPrefix: string;
+begin
+  Result := FormatDateTime(DATETIME_FORMAT, Now);
 end;
 
 end.

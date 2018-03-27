@@ -20,7 +20,7 @@ var
   buffer: string;
   logger: ILogger;
 begin
-  SetConsoleTitle('EasyIp Server');
+  SetConsoleTitle('Ip Server');
   {$IFDEF DEBUG}
   logger := TConsoleLogger.Create();
   {$ELSE}
@@ -28,13 +28,14 @@ begin
   {$ENDIF}
   Writeln('Type q and press Enter for exit');
   server := TServer.Create(logger);
-  server.Run();
+  server.Start();
   repeat
     ReadLn(buffer);
     if buffer = 'q' then
       Break;
   until false;
   server := nil;
+  logger := nil;
 //  Sleep(10000);
 end;
 
