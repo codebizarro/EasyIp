@@ -62,7 +62,7 @@ begin
     dtTimer:
       CopyMemory(resultArray, @FTimers[offset], copyLength);
   end;
-  FLogger.Log('Read device value: %d', [FFlags[offset]]);
+//  FLogger.Log('Read device value: %d', [FFlags[offset]]);
   Result := resultArray;
 end;
 
@@ -83,7 +83,7 @@ begin
     dtTimer:
       CopyMemory(@FTimers[offset], value, copyLength);
   end;
-  FLogger.Log('Write device value: %d', [FFlags[offset]]);
+//  FLogger.Log('Write device value: %d', [FFlags[offset]]);
 end;
 
 function TEasyIpDevice.RangeCheck(const offset: short; const dataType: DataTypeEnum; const dataLength: byte): short;

@@ -138,7 +138,6 @@ begin
       SetLength(recvBuffer, High(short));
       sendBuffer := buffer;
 
-      ZeroMemory(@varTarget, SizeOf(TSockAddrIn));             // TODO:  BUG
       CopyMemory(@varTarget, @FTarget, SizeOf(TSockAddrIn));   // TODO: HACK
 
       returnCode := sendto(sock, Pointer(sendBuffer)^, Length(sendBuffer), 0, varTarget, SizeOf(varTarget));
