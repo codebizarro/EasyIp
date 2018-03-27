@@ -16,14 +16,14 @@ uses
   UTestParams in 'Source\UTestParams.pas';
 
 procedure main();
-var
-  testParams: TTestParams;
 begin
   Application.Initialize;
-  testParams := TTestParams.Create(Application);
-  if testParams.ShowModal = mrOK then
+  with TTestParams.Create(Application) do
   begin
-    TEST_PLC_HOST := testParams.SelectedAddress;
+    if ShowModal = mrOK then
+    begin
+      TEST_PLC_HOST := SelectedAddress;
+    end;
   end;
   GUITestRunner.RunRegisteredTests;
 end;

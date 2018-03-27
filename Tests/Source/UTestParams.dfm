@@ -12,9 +12,11 @@ object TestParams: TTestParams
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnKeyUp = FormKeyUp
   PixelsPerInch = 96
   TextHeight = 13
   object ipList: TListBox
@@ -42,5 +44,6 @@ object TestParams: TTestParams
     Height = 25
     Caption = 'Cancel'
     TabOrder = 2
+    OnClick = btCancelClick
   end
 end
