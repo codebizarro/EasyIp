@@ -18,7 +18,7 @@ type
   TUdpResponseThread = class(TBaseSocketThread)
   private
     FClientAddr: TSockAddrIn;
-    FPacketDispatcher: IPacketDispatcher;
+    FPacketDispatcher: IHandler;
     FBuffer: DynamicByteArray;
   public
     constructor Create(logger: ILogger; const request: RequestStruct);
@@ -42,7 +42,7 @@ begin
     bufferLength := Length(request.Buffer);
     SetLength(FBuffer, bufferLength);
     CopyMemory(FBuffer, request.Buffer, bufferLength);
-    FPacketDispatcher := request.Dispather;
+    FPacketDispatcher := request.Handler;
 
     ZeroMemory(@FWsaData, SizeOf(TWsaData));
     code := WSAStartup(WINSOCK_VERSION, FWsaData);

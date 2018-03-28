@@ -23,7 +23,7 @@ type
     procedure Stop;
   end;
 
-  IPacketDispatcher = interface
+  IHandler = interface
     ['{E711FE7F-781D-457E-9529-C211B2BF2537}']
     function Process(packet: DynamicByteArray): DynamicByteArray;
   end;
@@ -38,7 +38,7 @@ type
   RequestStruct = record
     Target: TSockAddrIn;
     Buffer: DynamicByteArray;
-    Dispather: IPacketDispatcher;
+    Handler: IHandler;
   end;
 
   TRequestEvent = procedure(Sender: TObject; request: RequestStruct) of object;

@@ -65,7 +65,7 @@ end;
 procedure TServer.OnChargenRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnChargenRequest occured');
-  request.Dispather := TChargenPacketDispatcher.Create(FLogger);
+  request.Handler := TChargenHandler.Create(FLogger);
   with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
@@ -73,7 +73,7 @@ end;
 procedure TServer.OnEasyIpRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnEasyIpRequest occured');
-  request.Dispather := TEasyIpPacketDispatcher.Create(FLogger, FEasyIpDevice);
+  request.Handler := TEasyIpHandler.Create(FLogger, FEasyIpDevice);
   with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
@@ -81,7 +81,7 @@ end;
 procedure TServer.OnEchoRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnEchoRequest occured');
-  request.Dispather := TEchoPacketDispatcher.Create(FLogger);
+  request.Handler := TEchoHandler.Create(FLogger);
   with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
@@ -89,7 +89,7 @@ end;
 procedure TServer.OnDaytimeRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnDaytimeRequest occured');
-  request.Dispather := TDaytimePacketDispatcher.Create(FLogger);
+  request.Handler := TDaytimeHandler.Create(FLogger);
   with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
