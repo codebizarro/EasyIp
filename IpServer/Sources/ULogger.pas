@@ -78,9 +78,6 @@ var
   sOut: string;
   color: byte;
   hConsole: THandle;
-  attr: Cardinal;
-  coordinates: _COORD;
-  screenBufferInfo: TConsoleScreenBufferInfo;
 const
   hlNotice = 240;
   hlWarning = 14;
@@ -104,10 +101,9 @@ begin
   try
     EnterCriticalSection(FCritical);
     hConsole := GetStdHandle(STD_OUTPUT_HANDLE);
-    GetConsoleScreenBufferInfo(hConsole, screenBufferInfo);
-    coordinates := screenBufferInfo.dwCursorPosition;
+    SetConsoleTextAttribute(hConsole, color);
     Writeln(sOut);
-    FillConsoleOutputAttribute(hConsole, color, Length(sOut), coordinates, attr);
+    SetConsoleTextAttribute(hConsole, hlInfo);
   finally
     LeaveCriticalSection(FCritical);
   end;

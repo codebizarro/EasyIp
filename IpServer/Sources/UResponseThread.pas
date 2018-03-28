@@ -53,7 +53,7 @@ begin
     if FSocket = INVALID_SOCKET then
       raise ESocketException.Create(GetLastErrorString());
 
-    FLogger.Log('Response thread created');
+    FLogger.Log('Response thread created', elNotice);
   except
     on Ex: Exception do
       FLogger.Log(Ex.Message, elError);
