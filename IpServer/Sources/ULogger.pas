@@ -78,11 +78,14 @@ var
   sOut: string;
   color: byte;
   hConsole: THandle;
+  bufferInfo: TConsoleScreenBufferInfo;
+  newAttributes: short;
+  oldAttributes: short;
 const
-  hlNotice = 240;
-  hlWarning = 14;
-  hlError = 12;
-  hlInfo = 15;
+  hlNotice = BACKGROUND_BLUE or BACKGROUND_GREEN or BACKGROUND_RED;
+  hlWarning = FOREGROUND_RED or FOREGROUND_GREEN or FOREGROUND_INTENSITY;
+  hlError = FOREGROUND_RED or FOREGROUND_INTENSITY;
+  hlInfo = FOREGROUND_BLUE or FOREGROUND_GREEN or FOREGROUND_RED;
 begin
   sDateTime := FormatDateTime(DATETIME_FORMAT, Now);
   sOut := Format(LOG_MESSAGE, [sDateTime, messageText]);
@@ -101,9 +104,13 @@ begin
   try
     EnterCriticalSection(FCritical);
     hConsole := GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, color);
+    GetConsoleScreenBufferInfo(hConsole, bufferInfo);
+    oldAttributes := bufferInfo.wAttributes;
+    //newAttributes := (color and $0F) or ((oldAttributes shr 4) and $0F) shl 4;
+    newAttributes := color;
+    SetConsoleTextAttribute(hConsole, newAttributes);
     Writeln(sOut);
-    SetConsoleTextAttribute(hConsole, hlInfo);
+    SetConsoleTextAttribute(hConsole, oldAttributes);
   finally
     LeaveCriticalSection(FCritical);
   end;
