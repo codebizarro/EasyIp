@@ -56,7 +56,7 @@ begin
     FLogger.Log('Response thread created');
   except
     on Ex: Exception do
-      FLogger.Log(Ex.Message);
+      FLogger.Log(Ex.Message, elError);
   end;
 end;
 
@@ -82,7 +82,7 @@ begin
     FLogger.Log('To ' + inet_ntoa(FClientAddr.sin_addr));
   except
     on Ex: Exception do
-      FLogger.Log(Ex.Message);
+      FLogger.Log(Ex.Message, elError);
   end;
 end;
 

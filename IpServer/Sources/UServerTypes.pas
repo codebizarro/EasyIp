@@ -7,10 +7,12 @@ uses
   eiTypes;
 
 type
+  TErrorLevel = (elInformation, elNotice, elWarning, elError);
+
   ILogger = interface
     ['{8178CD30-F04B-4B24-948E-734C8832FB94}']
     function LogPrefix(): string;
-    procedure Log(messageText: string); overload;
+    procedure Log(messageText: string; level: TErrorLevel = elInformation); overload;
     procedure Log(messageText: string; formatString: string); overload;
     procedure Log(formatString: string; const args: array of const); overload;
   end;

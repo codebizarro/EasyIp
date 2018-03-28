@@ -53,10 +53,10 @@ begin
     if code < 0 then
       raise ESocketException.Create(GetLastErrorString());
 
-    FLogger.Log('Listen thread created on ' + IntToStr(listenPort) + #9' port');
+    FLogger.Log('Listen thread created on ' + IntToStr(listenPort) + ' port');
   except
     on Ex: Exception do
-      FLogger.Log(Ex.Message);
+      FLogger.Log(Ex.Message, elError);
   end;
 end;
 
@@ -101,7 +101,7 @@ begin
       DoReceiveEvent(FClientAddr, FBuffer);
     except
       on Ex: Exception do
-        FLogger.Log(Ex.Message);
+        FLogger.Log(Ex.Message, elError);
     end;
   end;
 end;

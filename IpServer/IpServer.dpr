@@ -26,7 +26,7 @@ begin
   {$ELSE}
   logger := TStubLogger.Create();
   {$ENDIF}
-  Writeln('Type q and press Enter for exit');
+  logger.Log('Type q and press Enter for exit', elNotice);
   server := TServer.Create(logger);
   server.Start();
   repeat

@@ -10,7 +10,7 @@ uses
 type
   TBaseLogger = class(TInterfacedObject, ILogger)
     function LogPrefix(): string;
-    procedure Log(messageText: string); overload; virtual; abstract;
+    procedure Log(messageText: string; level: TErrorLevel); overload; virtual; abstract;
     procedure Log(messageText: string; formatString: string); overload; virtual; abstract;
     procedure Log(formatString: string; const args: array of const); overload; virtual; abstract;
   end;
@@ -23,7 +23,7 @@ type
   public
     constructor Create(oemConvert: bool = true);
     destructor Destroy; override;
-    procedure Log(messageText: string); overload; override;
+    procedure Log(messageText: string; level: TErrorLevel = elInformation); overload; override;
     procedure Log(messageText: string; formatString: string); overload; override;
     procedure Log(formatString: string; const args: array of const); overload; override;
   end;
@@ -32,7 +32,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Log(messageText: string); overload; override;
+    procedure Log(messageText: string; level: TErrorLevel = elInformation); overload; override;
     procedure Log(messageText: string; formatString: string); overload; override;
   end;
 
@@ -48,7 +48,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Log(messageText: string); overload; override;
+    procedure Log(messageText: string; level: TErrorLevel = elInformation); overload; override;
     procedure Log(messageText: string; formatString: string); overload; override;
   end;
 
@@ -72,18 +72,42 @@ begin
   inherited;
 end;
 
-procedure TConsoleLogger.Log(messageText: string);
+procedure TConsoleLogger.Log(messageText: string; level: TErrorLevel = elInformation);
 var
   sDateTime: string;
   sOut: string;
+  color: byte;
+  hConsole: THandle;
+  attr: Cardinal;
+  coordinates: _COORD;
+  screenBufferInfo: TConsoleScreenBufferInfo;
+const
+  hlNotice = 240;
+  hlWarning = 14;
+  hlError = 12;
+  hlInfo = 15;
 begin
   sDateTime := FormatDateTime(DATETIME_FORMAT, Now);
   sOut := Format(LOG_MESSAGE, [sDateTime, messageText]);
   if FOemConvert then
     sOut := StringToOem(sOut);
+  case level of
+    elInformation:
+      color := hlInfo;
+    elNotice:
+      color := hlNotice;
+    elWarning:
+      color := hlWarning;
+    elError:
+      color := hlError;
+  end;
   try
     EnterCriticalSection(FCritical);
+    hConsole := GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleScreenBufferInfo(hConsole, screenBufferInfo);
+    coordinates := screenBufferInfo.dwCursorPosition;
     Writeln(sOut);
+    FillConsoleOutputAttribute(hConsole, color, Length(sOut), coordinates, attr);
   finally
     LeaveCriticalSection(FCritical);
   end;
@@ -116,7 +140,7 @@ begin
   inherited;
 end;
 
-procedure TDebugLogger.Log(messageText: string);
+procedure TDebugLogger.Log(messageText: string; level: TErrorLevel = elInformation);
 begin
   OutputDebugString(PChar(messageText));
 end;
@@ -147,7 +171,7 @@ begin
   inherited;
 end;
 
-procedure TStubLogger.Log(messageText: string);
+procedure TStubLogger.Log(messageText: string; level: TErrorLevel = elInformation);
 begin
   Exit;
 end;
