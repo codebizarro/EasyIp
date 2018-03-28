@@ -7,7 +7,7 @@ uses
   UServer in 'Sources\UServer.pas',
   UServerTypes in 'Sources\UServerTypes.pas',
   ULogger in 'Sources\ULogger.pas',
-  UPacketDispatcher in 'Sources\UPacketDispatcher.pas',
+  UPacketHandlers in 'Sources\UPacketHandlers.pas',
   UDevices in 'Sources\UDevices.pas',
   UDiscoverResponseThread in 'Sources\UDiscoverResponseThread.pas',
   UBaseThread in 'Sources\UBaseThread.pas',

@@ -13,7 +13,7 @@ uses
   eiConstants,
   UServerTypes,
   ULogger,
-  UPacketDispatcher,
+  UPacketHandlers,
   UBaseThread;
 
 type

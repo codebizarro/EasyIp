@@ -12,7 +12,7 @@ uses
   eiExceptions,
   UServerTypes,
   UBaseThread,
-  UPacketDispatcher;
+  UPacketHandlers;
 
 type
   TUdpResponseThread = class(TBaseSocketThread)
