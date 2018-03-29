@@ -98,10 +98,44 @@ begin
 end;
 
 function TEasyIpHandler.ProcessBitPacket(protocol: IEasyIpProtocol): DynamicByteArray;
+var
+  packet: EasyIpPacket;
+  dataType: DataTypeEnum;
+  offset: ushort;
+  mask: ushort;
+  resultData: DynamicWordArray;
+  bitMode: BitModeEnum;
+  value: short;
+  errorFlag: short;
 begin
   //TODO: To implement packet dispatching
   FLogger.Log('Dispatching bit request...');
-  Result := TPacketAdapter.ToByteArray(protocol.Packet);
+  packet := protocol.Packet;
+  offset := protocol.DataOffset;
+  dataType := protocol.DataType;
+  mask := protocol.Packet.Data[1];
+  bitMode := protocol.BitMode;
+  errorFlag := FDevice.RangeCheck(offset, dataType, 1);
+  if errorFlag = 0 then
+  begin
+    SetLength(resultData, 1);
+    resultData := FDevice.BlockRead(offset, dataType, 1);
+    value := resultData[0];
+    case bitMode of
+      bmOr:
+        value := value or mask;
+      bmAnd:
+        value := value and mask;
+      bmXor:
+        value := value xor mask;
+    end;
+    resultData[0] := value;
+    FDevice.BlockWrite(offset, resultData, dataType);
+    CopyMemory(@packet.Data, resultData, 1 * SHORT_SIZE);
+  end;
+  packet.Flags := EASYIP_FLAG_RESPONSE;
+  packet.Error := errorFlag;
+  Result := TPacketAdapter.ToByteArray(packet);
 end;
 
 function TEasyIpHandler.ProcessDataPacket(protocol: IEasyIpProtocol): DynamicByteArray;
@@ -321,10 +355,10 @@ const
 begin
   StartMessage(ClassName);
 
-  outputLength := Length(RESPONSE);
+  outputLength := length(RESPONSE);
   SetLength(Result, outputLength);
   CopyMemory(Result, @RESPONSE[1], outputLength);
-  
+
   DoneMessage(ClassName);
 end;
 
