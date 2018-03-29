@@ -22,6 +22,7 @@ type
   TServer = class(TInterfacedObject, IServer)
   private
     FChargenListener: TUdpListenThread;
+    FCommandListener: TUdpListenThread;
     FDaytimeListener: TUdpListenThread;
     FEasyIpDevice: IDevice;
     FEasyIpListener: TUdpListenThread;
@@ -31,6 +32,7 @@ type
 //    FDiscoverThread: TDiscoverResponseThread;
     constructor Create; overload;
     procedure OnChargenRequest(Sender: TObject; request: RequestStruct);
+    procedure OnCommandRequest(Sender: TObject; request: RequestStruct);
     procedure OnDaytimeRequest(Sender: TObject; request: RequestStruct);
     procedure OnEasyIpRequest(Sender: TObject; request: RequestStruct);
     procedure OnEchoRequest(Sender: TObject; request: RequestStruct);
@@ -68,6 +70,14 @@ procedure TServer.OnChargenRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnChargenRequest occured');
   request.Handler := TChargenHandler.Create(FLogger);
+  with TUdpResponseThread.Create(FLogger, request) do
+    Resume;
+end;
+
+procedure TServer.OnCommandRequest(Sender: TObject; request: RequestStruct);
+begin
+  FLogger.Log('OnCommandRequest occured');
+  request.Handler := TCommandHandler.Create(FLogger);
   with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
@@ -110,6 +120,7 @@ const
   CHARGEN_PORT = 19;
   DAYTIME_PORT = 13;
   SEARCH_PORT = 990;
+  COMMAND_PORT = 991;
 begin
   FEasyIpListener := TUdpListenThread.Create(FLogger, EASYIP_PORT);
   FEasyIpListener.OnReceive := OnEasyIpRequest;
@@ -121,12 +132,15 @@ begin
   FDaytimeListener.OnReceive := OnDaytimeRequest;
   FSearchListener := TUdpListenThread.Create(FLogger, SEARCH_PORT);
   FSearchListener.OnReceive := OnSearchRequest;
+  FCommandListener := TUdpListenThread.Create(FLogger, COMMAND_PORT);
+  FCommandListener.OnReceive := OnCommandRequest;
 
   FEasyIpListener.Resume();
   FEchoListener.Resume();
   FChargenListener.Resume();
   FDaytimeListener.Resume();
   FSearchListener.Resume();
+  FCommandListener.Resume();
 end;
 
 procedure TServer.Stop;
@@ -136,6 +150,7 @@ begin
   FChargenListener.Cancel;
   FDaytimeListener.Cancel;
   FSearchListener.Cancel;
+  FCommandListener.Cancel;
 //  FDiscoverThread.Cancel;
 end;
 

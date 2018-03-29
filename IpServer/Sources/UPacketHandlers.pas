@@ -34,21 +34,18 @@ type
   end;
 
   TEchoHandler = class(TBaseHandler)
-  private
   public
     constructor Create(logger: ILogger);
     function Process(packet: DynamicByteArray): DynamicByteArray; override;
   end;
 
   TChargenHandler = class(TBaseHandler)
-  private
   public
     constructor Create(logger: ILogger);
     function Process(packet: DynamicByteArray): DynamicByteArray; override;
   end;
 
   TDaytimeHandler = class(TBaseHandler)
-  private
   public
     constructor Create(logger: ILogger);
     function Process(packet: DynamicByteArray): DynamicByteArray; override;
@@ -57,8 +54,14 @@ type
   TSearchHandler = class(TBaseHandler)
   private
     FBuffer: string;
-    FSearchPattern: string;
     FResponsePattern: string;
+    FSearchPattern: string;
+  public
+    constructor Create(logger: ILogger);
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
+  end;
+
+  TCommandHandler = class(TBaseHandler)
   public
     constructor Create(logger: ILogger);
     function Process(packet: DynamicByteArray): DynamicByteArray; override;
@@ -79,7 +82,6 @@ var
 begin
   StartMessage(ClassName);
 
-  //TODO: To implement packet dispatching
   eInPacket := TPacketAdapter.ToEasyIpPacket(packet);
   protocol := TEasyIpProtocol.Create(eInPacket);
 
@@ -237,6 +239,16 @@ begin
   FLogger := logger;
 end;
 
+procedure TBaseHandler.DoneMessage(message: string);
+begin
+  FLogger.Log(message + ' is done');
+end;
+
+procedure TBaseHandler.StartMessage(message: string);
+begin
+  FLogger.Log(message + ' is starting ...');
+end;
+
 constructor TDaytimeHandler.Create(logger: ILogger);
 begin
   inherited Create(logger);
@@ -255,22 +267,11 @@ begin
   DoneMessage(ClassName);
 end;
 
-procedure TBaseHandler.DoneMessage(message: string);
-begin
-  FLogger.Log(message + ' is done');
-end;
-
-procedure TBaseHandler.StartMessage(message: string);
-begin
-  FLogger.Log(message + ' is starting ...');
-end;
-
 constructor TSearchHandler.Create(logger: ILogger);
 begin
   inherited Create(logger);
   FSearchPattern := 'WhereAreYou.01';
-  FResponsePattern := 'WhereAreYou.02003056600127    192.168.001.020 255.255.255.000 Vi '
-  +'                                                             FESTO IPC V2.24                                                 (c)1998-2000 FESTO TCP/IP Driver v1.10                          HC2X        ';
+  FResponsePattern := 'WhereAreYou.02003056600127    192.168.001.020 255.255.255.000 Vi ' + '                                                             FESTO IPC V2.24                                                 (c)1998-2000 FESTO TCP/IP Driver v1.10                          HC2X        ';
 //  FResponsePattern := 'WhereAreYou.02C62AD328CFE5    020.020.020.020 020.020.020.020 TCP/IP App'
 //  +'                                                      '
 //  +'Windows NT'
@@ -298,12 +299,25 @@ begin
   FLogger.Log('packet: %s', [FBuffer]);
   if FBuffer = FSearchPattern then
   begin
-    outputLength := Length(FResponsePattern);
+    outputLength := length(FResponsePattern);
     SetLength(Result, outputLength);
     CopyMemory(Result, @FResponsePattern, outputLength);
     FLogger.Log('result length: %d', [outputLength]);
     FLogger.Log('result: %s', [FResponsePattern]);
   end;
+  DoneMessage(ClassName);
+end;
+
+constructor TCommandHandler.Create(logger: ILogger);
+begin
+  inherited Create(logger);
+end;
+
+function TCommandHandler.Process(packet: DynamicByteArray): DynamicByteArray;
+begin
+  StartMessage(ClassName);
+  SetLength(Result, 1);
+  CopyMemory(Result, PChar(#14), 1);
   DoneMessage(ClassName);
 end;
 
