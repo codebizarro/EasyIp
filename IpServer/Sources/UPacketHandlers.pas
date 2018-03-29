@@ -54,6 +54,16 @@ type
     function Process(packet: DynamicByteArray): DynamicByteArray; override;
   end;
 
+  TSearchHandler = class(TBaseHandler)
+  private
+    FBuffer: string;
+    FSearchPattern: string;
+    FResponsePattern: string;
+  public
+    constructor Create(logger: ILogger);
+    function Process(packet: DynamicByteArray): DynamicByteArray; override;
+  end;
+
 implementation
 
 constructor TEasyIpHandler.Create(logger: ILogger; device: IDevice);
@@ -253,6 +263,48 @@ end;
 procedure TBaseHandler.StartMessage(message: string);
 begin
   FLogger.Log(message + ' is starting ...');
+end;
+
+constructor TSearchHandler.Create(logger: ILogger);
+begin
+  inherited Create(logger);
+  FSearchPattern := 'WhereAreYou.01';
+  FResponsePattern := 'WhereAreYou.02003056600127    192.168.001.020 255.255.255.000 Vi '
+  +'                                                             FESTO IPC V2.24                                                 (c)1998-2000 FESTO TCP/IP Driver v1.10                          HC2X        ';
+//  FResponsePattern := 'WhereAreYou.02C62AD328CFE5    020.020.020.020 020.020.020.020 TCP/IP App'
+//  +'                                                      '
+//  +'Windows NT'
+//  +'                                                                                                                                  ';
+end;
+
+function TSearchHandler.Process(packet: DynamicByteArray): DynamicByteArray;
+var
+ // inputBuffer: string;
+  inputLength: short;
+  outputLength: short;
+//  outputBuffer: DynamicByteArray;
+//  RESPONSE_STRING: string;
+//const
+
+  //RESPONSE_STRING = 'WhereAreYou.02003056600127    010.020.000.004 255.255.255.000 C2                                                              FESTO IPC V2.24                                                 (c)1998-2000 FESTO TCP/IP Driver v1.10                          HC2X        ';
+  //RESPONSE_STRING = 'WhereAreYou.02%s    %s %s %s                                                              FESTO IPC V2.24                                                 (c)1998-2000 FESTO TCP/IP Driver v1.10                          HC2X        ';
+//  RESPONSE_STRING: string = 'WhereAreYou.02003056600127    010.000.020.015 255.000.000.000 Vi'+'                                                              FESTO IPC V2.24                                                 (c)1998-2000 FESTO TCP/IP Driver v1.10                          HC2X        ';
+begin
+  StartMessage(ClassName);
+  inputLength := length(packet);
+  SetLength(FBuffer, inputLength);
+  CopyMemory(@FBuffer[1], packet, inputLength);
+  FLogger.Log('packet length: %d', [inputLength]);
+  FLogger.Log('packet: %s', [FBuffer]);
+  if FBuffer = FSearchPattern then
+  begin
+    outputLength := Length(FResponsePattern);
+    SetLength(Result, outputLength);
+    CopyMemory(Result, @FResponsePattern, outputLength);
+    FLogger.Log('result length: %d', [outputLength]);
+    FLogger.Log('result: %s', [FResponsePattern]);
+  end;
+  DoneMessage(ClassName);
 end;
 
 end.

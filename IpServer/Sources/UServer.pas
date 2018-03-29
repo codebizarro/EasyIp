@@ -21,18 +21,20 @@ uses
 type
   TServer = class(TInterfacedObject, IServer)
   private
-    FLogger: ILogger;
-    FEasyIpListener: TUdpListenThread;
-    FEchoListener: TUdpListenThread;
     FChargenListener: TUdpListenThread;
     FDaytimeListener: TUdpListenThread;
     FEasyIpDevice: IDevice;
+    FEasyIpListener: TUdpListenThread;
+    FEchoListener: TUdpListenThread;
+    FLogger: ILogger;
+    FSearchListener: TUdpListenThread;
 //    FDiscoverThread: TDiscoverResponseThread;
     constructor Create; overload;
-    procedure OnEasyIpRequest(Sender: TObject; request: RequestStruct);
-    procedure OnEchoRequest(Sender: TObject; request: RequestStruct);
     procedure OnChargenRequest(Sender: TObject; request: RequestStruct);
     procedure OnDaytimeRequest(Sender: TObject; request: RequestStruct);
+    procedure OnEasyIpRequest(Sender: TObject; request: RequestStruct);
+    procedure OnEchoRequest(Sender: TObject; request: RequestStruct);
+    procedure OnSearchRequest(Sender: TObject; request: RequestStruct);
   public
     constructor Create(logger: ILogger); overload;
     destructor Destroy; override;
@@ -70,6 +72,14 @@ begin
     Resume;
 end;
 
+procedure TServer.OnDaytimeRequest(Sender: TObject; request: RequestStruct);
+begin
+  FLogger.Log('OnDaytimeRequest occured');
+  request.Handler := TDaytimeHandler.Create(FLogger);
+  with TUdpResponseThread.Create(FLogger, request) do
+    Resume;
+end;
+
 procedure TServer.OnEasyIpRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnEasyIpRequest occured');
@@ -86,10 +96,10 @@ begin
     Resume;
 end;
 
-procedure TServer.OnDaytimeRequest(Sender: TObject; request: RequestStruct);
+procedure TServer.OnSearchRequest(Sender: TObject; request: RequestStruct);
 begin
-  FLogger.Log('OnDaytimeRequest occured');
-  request.Handler := TDaytimeHandler.Create(FLogger);
+  FLogger.Log('OnSearchRequest occured');
+  request.Handler := TSearchHandler.Create(FLogger);
   with TUdpResponseThread.Create(FLogger, request) do
     Resume;
 end;
@@ -99,6 +109,7 @@ const
   ECHO_PORT = 7;
   CHARGEN_PORT = 19;
   DAYTIME_PORT = 13;
+  SEARCH_PORT = 990;
 begin
   FEasyIpListener := TUdpListenThread.Create(FLogger, EASYIP_PORT);
   FEasyIpListener.OnReceive := OnEasyIpRequest;
@@ -108,11 +119,14 @@ begin
   FChargenListener.OnReceive := OnChargenRequest;
   FDaytimeListener := TUdpListenThread.Create(FLogger, DAYTIME_PORT);
   FDaytimeListener.OnReceive := OnDaytimeRequest;
+  FSearchListener := TUdpListenThread.Create(FLogger, SEARCH_PORT);
+  FSearchListener.OnReceive := OnSearchRequest;
 
   FEasyIpListener.Resume();
   FEchoListener.Resume();
   FChargenListener.Resume();
   FDaytimeListener.Resume();
+  FSearchListener.Resume();
 end;
 
 procedure TServer.Stop;
@@ -121,6 +135,7 @@ begin
   FEchoListener.Cancel;
   FChargenListener.Cancel;
   FDaytimeListener.Cancel;
+  FSearchListener.Cancel;
 //  FDiscoverThread.Cancel;
 end;
 
