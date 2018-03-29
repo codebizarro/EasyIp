@@ -82,8 +82,8 @@ var
 begin
   StartMessage(ClassName);
 
-  eInPacket := TPacketAdapter.ToEasyIpPacket(packet);
-  protocol := TEasyIpProtocol.Create(eInPacket);
+  protocol := TEasyIpProtocol.Create(packet);
+  eInPacket := protocol.Packet;
 
   if (protocol.Mode = pmRead) or (protocol.Mode = pmWrite) then
     Result := ProcessDataPacket(protocol)
@@ -314,10 +314,17 @@ begin
 end;
 
 function TCommandHandler.Process(packet: DynamicByteArray): DynamicByteArray;
+var
+  outputLength: short;
+const
+  RESPONSE: string = 'NOT SUPPORTED';
 begin
   StartMessage(ClassName);
-  SetLength(Result, 1);
-  CopyMemory(Result, PChar(#14), 1);
+
+  outputLength := Length(RESPONSE);
+  SetLength(Result, outputLength);
+  CopyMemory(Result, @RESPONSE[1], outputLength);
+  
   DoneMessage(ClassName);
 end;
 
