@@ -29,7 +29,8 @@ uses
   Classes,
   eiTypes,
   eiHelpers,
-  eiConstants;
+  eiConstants,
+  eiExceptions;
 
 type
   TEasyIpProtocol = class(TInterfacedObject, IEasyIpProtocol)
@@ -72,6 +73,8 @@ constructor TEasyIpProtocol.Create(const buffer: DynamicByteArray);
 begin
   inherited Create;
   Debug := Format(DEBUG_MESSAGE_CREATE, ['TEasyIpProtocol']);
+  if Length(buffer) > EASYIP_SIZE then
+    raise ERequestedDataSize.Create('Input buffer greatest than EasyIp packet');
   Create(TPacketAdapter.ToEasyIpPacket(buffer));
 end;
 

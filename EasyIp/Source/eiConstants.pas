@@ -54,6 +54,8 @@ const
   WINSOCK_VERSION = $0202;
 //  LANG_ID = $400;
   LANG_ID = $0409;
+  //
+  EASYIP_SIZE = SizeOf(EasyIpPacket);
 
 resourcestring
   DEBUG_MESSAGE_DESTROY = '%s is destroyed';
