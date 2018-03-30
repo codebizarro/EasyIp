@@ -9,7 +9,8 @@ uses
   eiProtocol,
   eiConstants,
   UServerTypes,
-  UDevices;
+  UDevices,
+  SysUtils;
 
 type
   TBaseHandler = class(TInterfacedObject, IHandler)
@@ -81,10 +82,12 @@ var
   protocol: IEasyIpProtocol;
 begin
   StartMessage(ClassName);
-
   protocol := TEasyIpProtocol.Create(packet);
+  FLogger.Log('mode: %d, offset: %d, data: %d', [int(protocol.BitMode), protocol.DataOffset, protocol.Packet.Data[1]]);
+  FLogger.Log('Flags: ' + IntToStr(protocol.Packet.Flags), elWarning);
+  FLogger.Log('BitMode: ' + IntToStr(Int(protocol.BitMode)), elWarning);
   eInPacket := protocol.Packet;
-
+//  protocol.Packet.da
   if (protocol.Mode = pmRead) or (protocol.Mode = pmWrite) then
     Result := ProcessDataPacket(protocol)
 
@@ -105,7 +108,7 @@ var
   mask: ushort;
   resultData: DynamicWordArray;
   bitMode: BitModeEnum;
-  value: short;
+  value: ushort;
   errorFlag: short;
 begin
   //TODO: To implement packet dispatching
@@ -115,6 +118,7 @@ begin
   dataType := protocol.DataType;
   mask := protocol.Packet.Data[1];
   bitMode := protocol.BitMode;
+  FLogger.Log('mode: %d, offset: %d, mask: %d', [int(bitMode), offset, mask]);
   errorFlag := FDevice.RangeCheck(offset, dataType, 1);
   if errorFlag = 0 then
   begin
@@ -123,11 +127,23 @@ begin
     value := resultData[0];
     case bitMode of
       bmOr:
-        value := value or mask;
+        begin
+          FLogger.Log('bmOr', elWarning);
+          value := value or mask;
+          FLogger.Log(IntToStr(value), elWarning);
+        end;
       bmAnd:
-        value := value and mask;
+        begin
+          FLogger.Log('bmAnd', elWarning);
+          value := value and mask;
+          FLogger.Log(IntToStr(value), elWarning);
+        end;
       bmXor:
-        value := value xor mask;
+        begin
+          FLogger.Log('bmXor', elWarning);
+          value := value xor mask;
+          FLogger.Log(IntToStr(value), elWarning);
+        end;
     end;
     resultData[0] := value;
     FDevice.BlockWrite(offset, resultData, dataType);

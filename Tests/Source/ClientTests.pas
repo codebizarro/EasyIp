@@ -122,18 +122,20 @@ var
   readed: DynamicWordArray;
   i: int;
 const
-  VALUE = $FF00; //1
-  MASKAND = $F000; //2
-  MASKOR = $0F0F; //3
-  MASKXOR = $FF00; //4
+  VALUE = $F00F; //1
+  MASKAND = $F000; //2 $F000
+  MASKOR = $0F0F; //3  $FF0F
+  MASKXOR = $0F00; //4 $F00F
   exAND = $F000;
   exOR = $FF0F;
-  exXOR = $000F;
+  exXOR = $F00F;
 begin
   SetLength(writed, 1);
   for i := 0 to 1 - 1 do
     writed[i] := VALUE;
   FClient.BlockWrite(TEST_OFFSET, writed, dtFlag);
+  readed := FClient.BlockRead(TEST_OFFSET, dtFlag, 1);
+  Check(readed[0] = VALUE);
 
   FClient.BitOperation(TEST_OFFSET, dtFlag, MASKAND, bmAnd);
   readed := FClient.BlockRead(TEST_OFFSET, dtFlag, 1);

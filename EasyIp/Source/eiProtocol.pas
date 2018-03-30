@@ -85,13 +85,13 @@ begin
   FPacket := packet;
   if (FPacket.Flags and EASYIP_FLAG_INFO) = EASYIP_FLAG_INFO then
     FMode := pmInfo
+  else if ((FPacket.Flags and EASYIP_FLAG_BIT_OR) = EASYIP_FLAG_BIT_OR) or
+  ((FPacket.Flags and EASYIP_FLAG_BIT_AND) = EASYIP_FLAG_BIT_AND) then
+    FMode := pmBit
   else if (FPacket.SendDataSize = 0) and (FPacket.RequestDataSize > 0) then
     FMode := pmRead
   else if (FPacket.SendDataSize > 0) and (FPacket.RequestDataSize = 0) then
-    FMode := pmWrite
-  else if ((FPacket.Flags and EASYIP_FLAG_BIT_OR) = EASYIP_FLAG_BIT_OR) or
-  ((FPacket.Flags and EASYIP_FLAG_BIT_AND) = EASYIP_FLAG_BIT_AND) then
-    FMode := pmBit;
+    FMode := pmWrite;
 end;
 
 constructor TEasyIpProtocol.Create(const mode: PacketModeEnum);
@@ -109,6 +109,17 @@ end;
 
 function TEasyIpProtocol.GetBitMode: BitModeEnum;
 begin
+  if ((FPacket.Flags and EASYIP_FLAG_BIT_OR) = EASYIP_FLAG_BIT_OR) and
+  ((FPacket.Flags and EASYIP_FLAG_BIT_AND) = 0) then
+    FBitMode := bmOr
+  else if ((FPacket.Flags and EASYIP_FLAG_BIT_OR) = 0) and
+  ((FPacket.Flags and EASYIP_FLAG_BIT_AND) = EASYIP_FLAG_BIT_AND) then
+    FBitMode := bmAnd
+  else if ((FPacket.Flags and EASYIP_FLAG_BIT_OR) = EASYIP_FLAG_BIT_OR) and
+  ((FPacket.Flags and EASYIP_FLAG_BIT_AND) = EASYIP_FLAG_BIT_AND) then
+    FBitMode := bmXor
+  else
+    FBitMode := bmNormal;
   Result := FBitMode;
 end;
 
@@ -184,7 +195,11 @@ begin
       bmAnd:
         FPacket.Flags := EASYIP_FLAG_BIT_AND;
       bmXor:
-        FPacket.Flags := EASYIP_FLAG_BIT_OR or EASYIP_FLAG_BIT_AND;
+      begin
+        FPacket.Flags := EASYIP_FLAG_BIT_OR;
+        FPacket.Flags := FPacket.Flags or EASYIP_FLAG_BIT_AND;
+      end;
+        
     else
       FPacket.Flags := 0;
     end;
