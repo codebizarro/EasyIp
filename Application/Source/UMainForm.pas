@@ -35,7 +35,9 @@ type
     sheetOnePoint: TTabSheet;
     spinLength: TSpinEdit;
     statusBar: TStatusBar;
+    btnWrite: TButton;
     procedure btnRefreshClick(Sender: TObject);
+    procedure btnWriteClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
@@ -47,6 +49,7 @@ type
     function GetHost: string;
     function GetLength: byte;
     function GetStatus: string;
+    function GetValue: Integer;
     function GetViewMode: ViewModeEnum;
     procedure SetAddress(const value: int);
     procedure SetHost(const value: string);
@@ -62,7 +65,7 @@ type
     property Host: string read GetHost write SetHost;
     property Length: byte read GetLength write SetLength;
     property Status: string read GetStatus write SetStatus;
-    property Value: Integer write SetValue;
+    property Value: Integer read GetValue write SetValue;
     property ViewMode: ViewModeEnum read GetViewMode;
   end;
 
@@ -76,6 +79,11 @@ implementation
 procedure TmainForm.btnRefreshClick(Sender: TObject);
 begin
   FPresenter.Refresh();
+end;
+
+procedure TmainForm.btnWriteClick(Sender: TObject);
+begin
+  FPresenter.WriteSingle();
 end;
 
 procedure TmainForm.ClearStatus;
@@ -125,6 +133,11 @@ end;
 function TmainForm.GetStatus: string;
 begin
   Result := statusBar.SimpleText;
+end;
+
+function TmainForm.GetValue: Integer;
+begin
+  Result := StrToInt(editValue.Text);
 end;
 
 function TmainForm.GetViewMode: ViewModeEnum;

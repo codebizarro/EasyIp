@@ -15,7 +15,6 @@ uses
   UListenThread,
   UResponseThread,
   UPacketHandlers,
-  UDiscoverResponseThread,
   UDevices;
 
 type
@@ -29,7 +28,6 @@ type
     FEchoListener: TUdpListenThread;
     FLogger: ILogger;
     FSearchListener: TUdpListenThread;
-//    FDiscoverThread: TDiscoverResponseThread;
     constructor Create; overload;
     procedure OnChargenRequest(Sender: TObject; request: RequestStruct);
     procedure OnCommandRequest(Sender: TObject; request: RequestStruct);
@@ -151,7 +149,6 @@ begin
   FDaytimeListener.Cancel;
   FSearchListener.Cancel;
   FCommandListener.Cancel;
-//  FDiscoverThread.Cancel;
 end;
 
 end.

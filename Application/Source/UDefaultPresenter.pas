@@ -19,6 +19,7 @@ type
     procedure RefreshBlock;
     procedure RefreshInfo;
     procedure RefreshSingle;
+    procedure WriteSingle;
   public
     constructor Create(view: IView); overload;
     constructor Create(view: IView; plcService: IPlcService); overload;
@@ -120,6 +121,17 @@ begin
     FView.Status := 'Reading single value ...';
     returned := FPlcService.Read(FView.Host, FView.Address, FView.DataType);
     FView.Value := returned;
+  except
+    on Ex: Exception do
+      FView.Status := Ex.Message;
+  end;
+end;
+
+procedure TDefaultPresenter.WriteSingle;
+begin
+  try
+    FView.Status := 'Writing single value ...';
+    FPlcService.Write(FView.Host, FView.Address, FView.DataType, FView.Value);
   except
     on Ex: Exception do
       FView.Status := Ex.Message;

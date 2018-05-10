@@ -32,7 +32,8 @@ uses
   eiChannel,
   Classes,
   SysUtils,
-  Windows;
+  Windows,
+  DsgnIntf;
 
 type
   TEasyIpClient = class(TCustomClient, IEasyIpClient)
@@ -71,6 +72,13 @@ type
     property OnException: TExceptionEvent read FOnException write FOnException;
   end;
 
+  TEasyIpClientEditor = class(TComponentEditor)
+    function GetVerbCount: Integer; override;
+    function GetVerb(Index: Integer): string; override;
+    procedure ExecuteVerb(Index: Integer); override;
+    procedure Edit; override;
+  end;
+
 procedure Register();
 
 implementation
@@ -78,6 +86,7 @@ implementation
 procedure Register();
 begin
   RegisterComponents('AESoft', [TEasyIpClient]);
+  RegisterComponentEditor(TEasyIpClient, TEasyIpClientEditor);
 end;
 
 constructor TEasyIpClient.Create(const _host: string);
@@ -273,6 +282,41 @@ begin
   SetLength(writed, 1);
   writed[0] := value;
   BlockWrite(offset, writed, dataType);
+end;
+
+procedure TEasyIpClientEditor.Edit;
+begin
+  inherited;
+
+end;
+
+procedure TEasyIpClientEditor.ExecuteVerb(Index: Integer);
+begin
+  inherited;
+  case Index of
+    0: ;
+    1: MessageBox(0,
+    'This is a client library for simple access to devices'#13 +
+    'wich support EasyIp protocol by network',
+    'About',
+    MB_OK or MB_ICONINFORMATION);
+  end;
+
+end;
+
+function TEasyIpClientEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0:
+      Result := 'EasyIp Client (© A.Rudenko)';
+    1:
+      Result := '&About this component...';
+  end;
+end;
+
+function TEasyIpClientEditor.GetVerbCount: Integer;
+begin
+  Result := 2;
 end;
 
 end.
