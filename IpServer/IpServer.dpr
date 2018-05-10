@@ -9,7 +9,6 @@ uses
   ULogger in 'Sources\ULogger.pas',
   UPacketHandlers in 'Sources\UPacketHandlers.pas',
   UDevices in 'Sources\UDevices.pas',
-  UDiscoverResponseThread in 'Sources\UDiscoverResponseThread.pas',
   UBaseThread in 'Sources\UBaseThread.pas',
   UListenThread in 'Sources\UListenThread.pas',
   UResponseThread in 'Sources\UResponseThread.pas';
