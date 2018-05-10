@@ -47,7 +47,7 @@ object mainForm: TmainForm
     ActivePage = sheetOnePoint
     TabOrder = 0
     object sheetOnePoint: TTabSheet
-      Caption = 'Read one point'
+      Caption = 'One point'
       object Label4: TLabel
         Left = 10
         Top = 20
@@ -60,9 +60,16 @@ object mainForm: TmainForm
         Top = 40
         Width = 121
         Height = 21
-        Color = clMenu
-        ReadOnly = True
         TabOrder = 0
+      end
+      object btnWrite: TButton
+        Left = 55
+        Top = 73
+        Width = 75
+        Height = 25
+        Caption = 'Write'
+        TabOrder = 1
+        OnClick = btnWriteClick
       end
     end
     object sheetBlockRead: TTabSheet
