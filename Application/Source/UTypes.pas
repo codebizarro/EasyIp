@@ -43,6 +43,7 @@ type
     function Read(host: string; offset: Integer; dataType: DataTypeEnum): Word;
     function ReadBlock(host: string; offset: Integer; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     function ReadInfo(host: string): EasyIpInfoPacket;
+    procedure Write(host: string; offset: Integer; dataType: DataTypeEnum; value: Word);
   end;
 
   ISettings = interface

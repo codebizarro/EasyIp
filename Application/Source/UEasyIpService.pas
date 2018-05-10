@@ -14,6 +14,7 @@ type
     function Read(host: string; offset: Integer; dataType: DataTypeEnum): Word;
     function ReadBlock(host: string; offset: Integer; dataType: DataTypeEnum; length: byte): DynamicWordArray;
     function ReadInfo(host: string): EasyIpInfoPacket;
+    procedure Write(host: string; offset: Integer; dataType: DataTypeEnum; value: Word);
   public
     constructor Create;
   end;
@@ -41,6 +42,12 @@ function TEasyIpPlcService.ReadInfo(host: string): EasyIpInfoPacket;
 begin
   FClient := TEasyIpClient.Create(host);
   Result := FClient.InfoRead();
+end;
+
+procedure TEasyIpPlcService.Write(host: string; offset: Integer; dataType: DataTypeEnum; value: Word);
+begin
+  FClient := TEasyIpClient.Create(host);
+  FClient.WordWrite(offset, value, dataType);
 end;
 
 end.
