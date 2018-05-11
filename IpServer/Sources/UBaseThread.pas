@@ -25,7 +25,6 @@ type
   public
     constructor Create(createSuspended: bool = true);
     destructor Destroy; override;
-    procedure Cancel;
   end;
 
 implementation
@@ -38,25 +37,8 @@ end;
 
 destructor TBaseSocketThread.Destroy;
 begin
-  if not FCancel then
-    Cancel;
-  FLogger.Log('Base thread destroyed.');
-  inherited;
-end;
 
-procedure TBaseSocketThread.Cancel;
-var
-  shutResult: int;
-begin
-  FCancel := true;
-  Terminate;
-  shutResult := shutdown(FSocket, 2);
-  if shutResult = SOCKET_ERROR then
-  begin
-    FLogger.Log(GetLastErrorString(), 'Shutdown failed: %s');
-  end;
-  closesocket(FSocket);
-  WSACleanup();
+  inherited;
 end;
 
 procedure TBaseSocketThread.Execute;

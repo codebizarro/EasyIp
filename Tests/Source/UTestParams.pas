@@ -45,6 +45,7 @@ begin
   ipList.Items.Add('127.0.0.1');
   ipList.Items.Add('10.20.0.104');
   ipList.Items.Add('10.20.5.72');
+  ipList.Items.Add('10.20.6.5');
   ipList.ItemIndex := 0;
 end;
 

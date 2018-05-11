@@ -36,6 +36,7 @@ type
   end;
 
   RequestStruct = record
+    Socket: TSocket;
     Target: TSockAddrIn;
     Buffer: DynamicByteArray;
     Handler: IHandler;
