@@ -23,11 +23,27 @@ type
   public
     constructor Create(logger: ILogger; listenPort: int);
     destructor Destroy; override;
+    procedure Cancel;
     procedure Execute; override;
     property OnReceive: TRequestEvent read FReceiveEvent write FReceiveEvent;
   end;
 
 implementation
+
+procedure TUdpListenThread.Cancel;
+var
+  shutResult: int;
+begin
+  FCancel := true;
+  Terminate;
+  shutResult := shutdown(FSocket, 2);
+  if shutResult = SOCKET_ERROR then
+  begin
+    FLogger.Log(GetLastErrorString(), 'Shutdown failed: %s');
+  end;
+  closesocket(FSocket);
+  WSACleanup();
+end;
 
 constructor TUdpListenThread.Create(logger: ILogger; listenPort: int);
 var
@@ -62,6 +78,9 @@ end;
 
 destructor TUdpListenThread.Destroy;
 begin
+  if not FCancel then
+    Cancel;
+  FLogger.Log('Base thread destroyed.');
   FLogger.Log('Listen thread destroyed');
   inherited;
 end;
@@ -72,6 +91,7 @@ var
 begin
   if Assigned(FReceiveEvent) then
   begin
+    request.Socket := FSocket;
     request.Target := clientAddr;
     request.Buffer := buffer;
     FReceiveEvent(Self, request);
@@ -89,14 +109,14 @@ begin
   begin
     try
       SetLength(FBuffer, High(short));
-      len := SizeOf(FClientAddr);
+      len := SizeOf(TSockAddrIn);
       returnLength := recvfrom(FSocket, Pointer(FBuffer)^, Length(FBuffer), 0, FClientAddr, len);
       if (returnLength = SOCKET_ERROR) then
         raise ESocketException.Create(GetLastErrorString());
 
       SetLength(FBuffer, returnLength);
       FLogger.Log('Inbound data length ' + IntToStr(returnLength));
-      FLogger.Log('From ' + inet_ntoa(FClientAddr.sin_addr));
+      FLogger.Log('From ' + inet_ntoa(FClientAddr.sin_addr) + ' : ' + IntToStr(FClientAddr.sin_port));
 
       DoReceiveEvent(FClientAddr, FBuffer);
     except
