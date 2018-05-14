@@ -1,4 +1,4 @@
-unit UResponseThread;
+unit UResponseUdpThread;
 
 interface
 
@@ -15,7 +15,7 @@ uses
   UPacketHandlers;
 
 type
-  TUdpResponseThread = class(TBaseSocketThread)
+  TResponseUdpThread = class(TBaseSocketThread)
   private
     FClientAddr: TSockAddrIn;
     FHandler: IHandler;
@@ -28,7 +28,7 @@ type
 
 implementation
 
-constructor TUdpResponseThread.Create(logger: ILogger; const request: RequestStruct);
+constructor TResponseUdpThread.Create(logger: ILogger; const request: RequestStruct);
 var
   code: int;
   bufferLength: int;
@@ -60,13 +60,13 @@ begin
   end;
 end;
 
-destructor TUdpResponseThread.Destroy;
+destructor TResponseUdpThread.Destroy;
 begin
   FLogger.Log('Response thread destroyed');
   inherited;
 end;
 
-procedure TUdpResponseThread.Execute;
+procedure TResponseUdpThread.Execute;
 var
   returnLength: int;
   sendBuffer: DynamicByteArray;
