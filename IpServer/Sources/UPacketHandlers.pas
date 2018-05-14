@@ -321,7 +321,7 @@ constructor TSearchHandler.Create(logger: ILogger);
 begin
   inherited Create(logger);
   FSearchPattern := 'WhereAreYou.01';
-  FResponsePattern := 'WhereAreYou.02003056600127    192.168.001.020 255.255.255.000 Vi ' + '                                                             FESTO IPC V2.24                                                 (c)1998-2000 FESTO TCP/IP Driver v1.10                          HC2X        ';
+  FResponsePattern := 'WhereAreYou.02003056600127    192.168.056.002 255.255.255.000 Vi ' + '                                                             FESTO IPC V2.24                                                 (c)1998-2000 FESTO TCP/IP Driver v1.10                          HC2X        ';
 //  FResponsePattern := 'WhereAreYou.02C62AD328CFE5    020.020.020.020 020.020.020.020 TCP/IP App'
 //  +'                                                      '
 //  +'Windows NT'
@@ -366,15 +366,29 @@ end;
 function TCommandHandler.Process(packet: DynamicByteArray): DynamicByteArray;
 var
   outputLength: short;
+  inputLength: short;
+  localBuffer: string;
+  outputBuffer: string;
 const
-  RESPONSE: string = 'NOT SUPPORTED';
+  NOT_SUPPORT: string = 'NOT SUPPORTED';
 begin
   StartMessage(ClassName);
+  inputLength := length(packet);
+  FLogger.Log('packet length: %d', [inputLength]);
+  SetLength(localBuffer, inputLength);
+  CopyMemory(@localBuffer[1], packet, inputLength);
+  if localBuffer = #$14 then
+    outputBuffer := 'FESTO IPC V2.24'
+  else if localBuffer = 'L?' then
+    outputBuffer := 'L2 HC2X,$1B,C4,D:\PROJECT.RUN,40D8:004E'
+  else
+    outputBuffer := NOT_SUPPORT;
 
-  outputLength := length(RESPONSE);
+  outputLength := length(outputBuffer);
   SetLength(Result, outputLength);
-  CopyMemory(Result, @RESPONSE[1], outputLength);
-
+  CopyMemory(Result, @outputBuffer[1], outputLength);
+  FLogger.Log('result length: %d', [outputLength]);
+  FLogger.Log('result: %s', [outputBuffer]);
   DoneMessage(ClassName);
 end;
 

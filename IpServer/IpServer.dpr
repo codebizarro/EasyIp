@@ -11,7 +11,9 @@ uses
   UDevices in 'Sources\UDevices.pas',
   UBaseThread in 'Sources\UBaseThread.pas',
   UListenThread in 'Sources\UListenThread.pas',
-  UResponseThread in 'Sources\UResponseThread.pas';
+  UResponseThread in 'Sources\UResponseThread.pas',
+  UListenTcpThread in 'Sources\UListenTcpThread.pas',
+  UResponseTcpThread in 'Sources\UResponseTcpThread.pas';
 
 procedure Main();
 var

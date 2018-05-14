@@ -1,4 +1,4 @@
-unit UListenThread;
+unit UListenTcpThread;
 
 interface
 
@@ -11,15 +11,14 @@ uses
   eiExceptions,
   eiConstants,
   UServerTypes,
-  UBaseThread,
-  UResponseThread;
+  UBaseThread;
 
 type
-  TUdpListenThread = class(TBaseSocketThread)
+  TListenTcpThread = class(TBaseSocketThread)
   private
     FLocalAddr: TSockAddrIn;
     FReceiveEvent: TRequestEvent;
-    procedure DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
+    procedure DoReceiveEvent(clientAddr: TSockAddrIn; clientSocket: TSocket);
   public
     constructor Create(logger: ILogger; listenPort: int);
     destructor Destroy; override;
@@ -30,7 +29,7 @@ type
 
 implementation
 
-procedure TUdpListenThread.Cancel;
+procedure TListenTcpThread.Cancel;
 var
   shutResult: int;
 begin
@@ -45,7 +44,7 @@ begin
   WSACleanup();
 end;
 
-constructor TUdpListenThread.Create(logger: ILogger; listenPort: int);
+constructor TListenTcpThread.Create(logger: ILogger; listenPort: int);
 var
   code: int;
 begin
@@ -57,7 +56,7 @@ begin
     if code <> 0 then
       raise ESocketException.Create(GetLastErrorString());
 
-    FSocket := Socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    FSocket := Socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     if FSocket = INVALID_SOCKET then
       raise ESocketException.Create(GetLastErrorString());
 
@@ -68,15 +67,18 @@ begin
     code := bind(FSocket, FLocalAddr, SizeOf(FLocalAddr));
     if code < 0 then
       raise ESocketException.Create(GetLastErrorString());
+    code := listen(FSocket, 4);
+    if code = SOCKET_ERROR then
+      raise ESocketException.Create(GetLastErrorString());
 
-    FLogger.Log('Listen thread created on ' + IntToStr(listenPort) + ' UDP port');
+    FLogger.Log('Listen thread created on ' + IntToStr(listenPort) + ' TCP port');
   except
     on Ex: Exception do
       FLogger.Log(Ex.Message, elError);
   end;
 end;
 
-destructor TUdpListenThread.Destroy;
+destructor TListenTcpThread.Destroy;
 begin
   if not FCancel then
     Cancel;
@@ -85,40 +87,37 @@ begin
   inherited;
 end;
 
-procedure TUdpListenThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
+procedure TListenTcpThread.DoReceiveEvent(clientAddr: TSockAddrIn; clientSocket: TSocket);
 var
   request: RequestStruct;
 begin
   if Assigned(FReceiveEvent) then
   begin
-    request.Socket := FSocket;
+    request.Socket := clientSocket;
     request.Target := clientAddr;
-    request.Buffer := buffer;
+    SetLength(request.Buffer, 0);
     FReceiveEvent(Self, request);
   end;
 end;
 
-procedure TUdpListenThread.Execute;
+procedure TListenTcpThread.Execute;
 var
   returnLength: int;
   len: int;
-  FBuffer: DynamicByteArray;
   FClientAddr: TSockAddrIn;
+  clientSocket: TSocket;
 begin
   while not Terminated do
   begin
     try
-      SetLength(FBuffer, High(short));
+      clientSocket := INVALID_SOCKET;
       len := SizeOf(TSockAddrIn);
-      returnLength := recvfrom(FSocket, Pointer(FBuffer)^, Length(FBuffer), 0, FClientAddr, len);
-      if (returnLength = SOCKET_ERROR) then
+      clientSocket := accept(FSocket, @FClientAddr, @len);
+      if clientSocket = INVALID_SOCKET then
         raise ESocketException.Create(GetLastErrorString());
+      FLogger.Log('Request from ' + inet_ntoa(FClientAddr.sin_addr) + ' : ' + IntToStr(FClientAddr.sin_port));
 
-      SetLength(FBuffer, returnLength);
-      FLogger.Log('Inbound data length ' + IntToStr(returnLength));
-      FLogger.Log('From ' + inet_ntoa(FClientAddr.sin_addr) + ' : ' + IntToStr(FClientAddr.sin_port));
-
-      DoReceiveEvent(FClientAddr, FBuffer);
+      DoReceiveEvent(FClientAddr, clientSocket);
     except
       on Ex: Exception do
         FLogger.Log(Ex.Message, elError);
