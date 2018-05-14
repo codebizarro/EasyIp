@@ -24,6 +24,7 @@ type
   private
     FChargenTcpListener: TListenTcpThread;
     FChargenUdpListener: TListenUdpThread;
+    FCommandTcpListener: TListenTcpThread;
     FCommandUdpListener: TListenUdpThread;
     FDaytimeTcpListener: TListenTcpThread;
     FDaytimeUdpListener: TListenUdpThread;
@@ -36,6 +37,7 @@ type
     constructor Create; overload;
     procedure OnChargenTcpRequest(Sender: TObject; request: RequestStruct);
     procedure OnChargenUdpRequest(Sender: TObject; request: RequestStruct);
+    procedure OnCommandTcpRequest(Sender: TObject; request: RequestStruct);
     procedure OnCommandUdpRequest(Sender: TObject; request: RequestStruct);
     procedure OnDaytimeTcpRequest(Sender: TObject; request: RequestStruct);
     procedure OnDaytimeUdpRequest(Sender: TObject; request: RequestStruct);
@@ -85,6 +87,14 @@ begin
   FLogger.Log('OnChargenUdpRequest occured');
   request.Handler := TChargenHandler.Create(FLogger);
   with TResponseUdpThread.Create(FLogger, request) do
+    Resume;
+end;
+
+procedure TServer.OnCommandTcpRequest(Sender: TObject; request: RequestStruct);
+begin
+  FLogger.Log('OnCommandTcpRequest occured');
+  request.Handler := TCommandHandler.Create(FLogger);
+  with TResponseTcpThread.Create(FLogger, request) do
     Resume;
 end;
 
@@ -158,6 +168,9 @@ begin
   FChargenUdpListener := TListenUdpThread.Create(FLogger, CHARGEN_PORT);
   FChargenUdpListener.OnReceive := OnChargenUdpRequest;
   FChargenUdpListener.Resume();
+  FCommandTcpListener := TListenTcpThread.Create(FLogger, COMMAND_PORT);
+  FCommandTcpListener.OnReceive := OnCommandTcpRequest;
+  FCommandTcpListener.Resume();
   FCommandUdpListener := TListenUdpThread.Create(FLogger, COMMAND_PORT);
   FCommandUdpListener.OnReceive := OnCommandUdpRequest;
   FCommandUdpListener.Resume();
@@ -185,6 +198,7 @@ procedure TServer.Stop;
 begin
   FChargenTcpListener.Cancel();
   FChargenUdpListener.Cancel();
+  FCommandTcpListener.Cancel();
   FCommandUdpListener.Cancel();
   FDaytimeTcpListener.Cancel();
   FDaytimeUdpListener.Cancel();
