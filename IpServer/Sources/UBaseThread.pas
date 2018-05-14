@@ -20,6 +20,7 @@ type
     FSocket: TSocket;
     FWsaData: TWSAData;
     FCancel: bool;
+    FStarted: bool;
     function GetLastErrorString: string;
     procedure Execute; override;
   public

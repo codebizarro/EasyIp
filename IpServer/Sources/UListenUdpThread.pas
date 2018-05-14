@@ -67,7 +67,7 @@ begin
     code := bind(FSocket, FLocalAddr, SizeOf(FLocalAddr));
     if code < 0 then
       raise ESocketException.Create(GetLastErrorString());
-
+    FStarted := True;
     FLogger.Log('Listen thread created on ' + IntToStr(listenPort) + ' UDP port');
   except
     on Ex: Exception do
@@ -104,7 +104,7 @@ var
   FBuffer: DynamicByteArray;
   FClientAddr: TSockAddrIn;
 begin
-  while not Terminated do
+  while not Terminated and FStarted do
   begin
     try
       SetLength(FBuffer, High(short));

@@ -70,7 +70,7 @@ begin
     code := listen(FSocket, 4);
     if code = SOCKET_ERROR then
       raise ESocketException.Create(GetLastErrorString());
-
+    FStarted := True;
     FLogger.Log('Listen thread created on ' + IntToStr(listenPort) + ' TCP port');
   except
     on Ex: Exception do
@@ -102,12 +102,11 @@ end;
 
 procedure TListenTcpThread.Execute;
 var
-  returnLength: int;
   len: int;
   FClientAddr: TSockAddrIn;
   clientSocket: TSocket;
 begin
-  while not Terminated do
+  while not Terminated and FStarted do
   begin
     try
       clientSocket := INVALID_SOCKET;
