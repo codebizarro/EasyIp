@@ -1,4 +1,4 @@
-unit UListenThread;
+unit UListenUdpThread;
 
 interface
 
@@ -11,11 +11,10 @@ uses
   eiExceptions,
   eiConstants,
   UServerTypes,
-  UBaseThread,
-  UResponseThread;
+  UBaseThread;
 
 type
-  TUdpListenThread = class(TBaseSocketThread)
+  TListenUdpThread = class(TBaseSocketThread)
   private
     FLocalAddr: TSockAddrIn;
     FReceiveEvent: TRequestEvent;
@@ -30,7 +29,7 @@ type
 
 implementation
 
-procedure TUdpListenThread.Cancel;
+procedure TListenUdpThread.Cancel;
 var
   shutResult: int;
 begin
@@ -45,7 +44,7 @@ begin
   WSACleanup();
 end;
 
-constructor TUdpListenThread.Create(logger: ILogger; listenPort: int);
+constructor TListenUdpThread.Create(logger: ILogger; listenPort: int);
 var
   code: int;
 begin
@@ -76,7 +75,7 @@ begin
   end;
 end;
 
-destructor TUdpListenThread.Destroy;
+destructor TListenUdpThread.Destroy;
 begin
   if not FCancel then
     Cancel;
@@ -85,7 +84,7 @@ begin
   inherited;
 end;
 
-procedure TUdpListenThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
+procedure TListenUdpThread.DoReceiveEvent(clientAddr: TSockAddrIn; buffer: DynamicByteArray);
 var
   request: RequestStruct;
 begin
@@ -98,7 +97,7 @@ begin
   end;
 end;
 
-procedure TUdpListenThread.Execute;
+procedure TListenUdpThread.Execute;
 var
   returnLength: int;
   len: int;

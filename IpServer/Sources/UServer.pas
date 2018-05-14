@@ -12,24 +12,24 @@ uses
   eiConstants,
   UServerTypes,
   ULogger,
-  UListenThread,
+  UListenUdpThread,
+  UResponseUdpThread,
   UListenTcpThread,
   UResponseTcpThread,
-  UResponseThread,
   UPacketHandlers,
   UDevices;
 
 type
   TServer = class(TInterfacedObject, IServer)
   private
-    FChargenListener: TUdpListenThread;
-    FCommandListener: TUdpListenThread;
-    FDaytimeListener: TUdpListenThread;
+    FChargenListener: TListenUdpThread;
+    FCommandListener: TListenUdpThread;
+    FDaytimeListener: TListenUdpThread;
     FEasyIpDevice: IDevice;
-    FEasyIpListener: TUdpListenThread;
-    FEchoListener: TUdpListenThread;
+    FEasyIpListener: TListenUdpThread;
+    FEchoListener: TListenUdpThread;
     FLogger: ILogger;
-    FSearchListener: TUdpListenThread;
+    FSearchListener: TListenUdpThread;
     FEchoTcpListener: TListenTcpThread;
     constructor Create; overload;
     procedure OnChargenRequest(Sender: TObject; request: RequestStruct);
@@ -72,7 +72,7 @@ procedure TServer.OnChargenRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnChargenRequest occured');
   request.Handler := TChargenHandler.Create(FLogger);
-  with TUdpResponseThread.Create(FLogger, request) do
+  with TResponseUdpThread.Create(FLogger, request) do
     Resume;
 end;
 
@@ -80,7 +80,7 @@ procedure TServer.OnCommandRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnCommandRequest occured');
   request.Handler := TCommandHandler.Create(FLogger);
-  with TUdpResponseThread.Create(FLogger, request) do
+  with TResponseUdpThread.Create(FLogger, request) do
     Resume;
 end;
 
@@ -88,7 +88,7 @@ procedure TServer.OnDaytimeRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnDaytimeRequest occured');
   request.Handler := TDaytimeHandler.Create(FLogger);
-  with TUdpResponseThread.Create(FLogger, request) do
+  with TResponseUdpThread.Create(FLogger, request) do
     Resume;
 end;
 
@@ -96,7 +96,7 @@ procedure TServer.OnEasyIpRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnEasyIpRequest occured');
   request.Handler := TEasyIpHandler.Create(FLogger, FEasyIpDevice);
-  with TUdpResponseThread.Create(FLogger, request) do
+  with TResponseUdpThread.Create(FLogger, request) do
     Resume;
 end;
 
@@ -104,7 +104,7 @@ procedure TServer.OnEchoRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnEchoRequest occured');
   request.Handler := TEchoHandler.Create(FLogger);
-  with TUdpResponseThread.Create(FLogger, request) do
+  with TResponseUdpThread.Create(FLogger, request) do
     Resume;
 end;
 
@@ -112,7 +112,7 @@ procedure TServer.OnSearchRequest(Sender: TObject; request: RequestStruct);
 begin
   FLogger.Log('OnSearchRequest occured');
   request.Handler := TSearchHandler.Create(FLogger);
-  with TUdpResponseThread.Create(FLogger, request) do
+  with TResponseUdpThread.Create(FLogger, request) do
     Resume;
 end;
 
@@ -132,17 +132,17 @@ const
   SEARCH_PORT = 990;
   COMMAND_PORT = 991;
 begin
-  FEasyIpListener := TUdpListenThread.Create(FLogger, EASYIP_PORT);
+  FEasyIpListener := TListenUdpThread.Create(FLogger, EASYIP_PORT);
   FEasyIpListener.OnReceive := OnEasyIpRequest;
-  FEchoListener := TUdpListenThread.Create(FLogger, ECHO_PORT);
+  FEchoListener := TListenUdpThread.Create(FLogger, ECHO_PORT);
   FEchoListener.OnReceive := OnEchoRequest;
-  FChargenListener := TUdpListenThread.Create(FLogger, CHARGEN_PORT);
+  FChargenListener := TListenUdpThread.Create(FLogger, CHARGEN_PORT);
   FChargenListener.OnReceive := OnChargenRequest;
-  FDaytimeListener := TUdpListenThread.Create(FLogger, DAYTIME_PORT);
+  FDaytimeListener := TListenUdpThread.Create(FLogger, DAYTIME_PORT);
   FDaytimeListener.OnReceive := OnDaytimeRequest;
-  FSearchListener := TUdpListenThread.Create(FLogger, SEARCH_PORT);
+  FSearchListener := TListenUdpThread.Create(FLogger, SEARCH_PORT);
   FSearchListener.OnReceive := OnSearchRequest;
-  FCommandListener := TUdpListenThread.Create(FLogger, COMMAND_PORT);
+  FCommandListener := TListenUdpThread.Create(FLogger, COMMAND_PORT);
   FCommandListener.OnReceive := OnCommandRequest;
   FEchoTcpListener := TListenTcpThread.Create(FLogger, ECHO_PORT);
   FEchoTcpListener.OnReceive := OnTcpEchoRequest;
