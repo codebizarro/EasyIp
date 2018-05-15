@@ -60,11 +60,37 @@ begin
 end;
 
 constructor TServer.Create(logger: ILogger);
+const
+  ECHO_PORT = 7;
+  CHARGEN_PORT = 19;
+  DAYTIME_PORT = 13;
+  SEARCH_PORT = 990;
+  COMMAND_PORT = 991;
 begin
   inherited Create();
   FLogger := logger;
-  FEasyIpDevice := TEasyIpDevice.Create(logger);
   FLogger.Log('Starting server...', '%s');
+  FEasyIpDevice := TEasyIpDevice.Create(FLogger);
+  FChargenTcpListener := TListenTcpThread.Create(FLogger, CHARGEN_PORT);
+  FChargenTcpListener.OnReceive := OnChargenTcpRequest;
+  FChargenUdpListener := TListenUdpThread.Create(FLogger, CHARGEN_PORT);
+  FChargenUdpListener.OnReceive := OnChargenUdpRequest;
+  FCommandTcpListener := TListenTcpThread.Create(FLogger, COMMAND_PORT);
+  FCommandTcpListener.OnReceive := OnCommandTcpRequest;
+  FCommandUdpListener := TListenUdpThread.Create(FLogger, COMMAND_PORT);
+  FCommandUdpListener.OnReceive := OnCommandUdpRequest;
+  FDaytimeTcpListener := TListenTcpThread.Create(FLogger, DAYTIME_PORT);
+  FDaytimeTcpListener.OnReceive := OnDaytimeTcpRequest;
+  FDaytimeUdpListener := TListenUdpThread.Create(FLogger, DAYTIME_PORT);
+  FDaytimeUdpListener.OnReceive := OnDaytimeUdpRequest;
+  FEasyIpListener := TListenUdpThread.Create(FLogger, EASYIP_PORT);
+  FEasyIpListener.OnReceive := OnEasyIpRequest;
+  FEchoTcpListener := TListenTcpThread.Create(FLogger, ECHO_PORT);
+  FEchoTcpListener.OnReceive := OnEchoTcpRequest;
+  FEchoUdpListener := TListenUdpThread.Create(FLogger, ECHO_PORT);
+  FEchoUdpListener.OnReceive := OnEchoUdpRequest;
+  FSearchListener := TListenUdpThread.Create(FLogger, SEARCH_PORT);
+  FSearchListener.OnReceive := OnSearchRequest;
 end;
 
 destructor TServer.Destroy;
@@ -155,43 +181,18 @@ begin
 end;
 
 procedure TServer.Start;
-const
-  ECHO_PORT = 7;
-  CHARGEN_PORT = 19;
-  DAYTIME_PORT = 13;
-  SEARCH_PORT = 990;
-  COMMAND_PORT = 991;
 begin
-  FChargenTcpListener := TListenTcpThread.Create(FLogger, CHARGEN_PORT);
-  FChargenTcpListener.OnReceive := OnChargenTcpRequest;
   FChargenTcpListener.Resume();
-  FChargenUdpListener := TListenUdpThread.Create(FLogger, CHARGEN_PORT);
-  FChargenUdpListener.OnReceive := OnChargenUdpRequest;
   FChargenUdpListener.Resume();
-  FCommandTcpListener := TListenTcpThread.Create(FLogger, COMMAND_PORT);
-  FCommandTcpListener.OnReceive := OnCommandTcpRequest;
   FCommandTcpListener.Resume();
-  FCommandUdpListener := TListenUdpThread.Create(FLogger, COMMAND_PORT);
-  FCommandUdpListener.OnReceive := OnCommandUdpRequest;
   FCommandUdpListener.Resume();
-  FDaytimeTcpListener := TListenTcpThread.Create(FLogger, DAYTIME_PORT);
-  FDaytimeTcpListener.OnReceive := OnDaytimeTcpRequest;
   FDaytimeTcpListener.Resume();
-  FDaytimeUdpListener := TListenUdpThread.Create(FLogger, DAYTIME_PORT);
-  FDaytimeUdpListener.OnReceive := OnDaytimeUdpRequest;
   FDaytimeUdpListener.Resume();
-  FEasyIpListener := TListenUdpThread.Create(FLogger, EASYIP_PORT);
-  FEasyIpListener.OnReceive := OnEasyIpRequest;
   FEasyIpListener.Resume();
-  FEchoTcpListener := TListenTcpThread.Create(FLogger, ECHO_PORT);
-  FEchoTcpListener.OnReceive := OnEchoTcpRequest;
   FEchoTcpListener.Resume();
-  FEchoUdpListener := TListenUdpThread.Create(FLogger, ECHO_PORT);
-  FEchoUdpListener.OnReceive := OnEchoUdpRequest;
   FEchoUdpListener.Resume();
-  FSearchListener := TListenUdpThread.Create(FLogger, SEARCH_PORT);
-  FSearchListener.OnReceive := OnSearchRequest;
   FSearchListener.Resume();
+  FLogger.Log('Server is started.', '%s');
 end;
 
 procedure TServer.Stop;
